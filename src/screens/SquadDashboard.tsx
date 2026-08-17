@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CONDITIONS } from '../data/manual'
 import { calculateDerivedResources } from '../rules/calculations'
 import type { CampaignSummary, OnlineCharacter, ResourceQuickAction } from '../onlineTypes'
 
@@ -89,6 +90,16 @@ export function SquadDashboard({
                     <div><span>EN</span><strong>{character.sheet.resources.energy}<small>/{derived.maxEnergy}</small></strong><div className="mini-meter mini-meter--cyan"><span style={{ width: `${(character.sheet.resources.energy / derived.maxEnergy) * 100}%` }} /></div></div>
                     <div><span>CP</span><strong>{character.sheet.resources.composure}<small>/{derived.maxComposure}</small></strong><div className="mini-meter mini-meter--violet"><span style={{ width: `${(character.sheet.resources.composure / derived.maxComposure) * 100}%` }} /></div></div>
                     <div><span>STR</span><strong>{character.sheet.resources.stress}<small>/{derived.maxStress}</small></strong><div className="mini-meter mini-meter--amber"><span style={{ width: `${(character.sheet.resources.stress / derived.maxStress) * 100}%` }} /></div></div>
+                  </div>
+
+                  <div className="operator-conditions">
+                    <span>CONDIÇÕES</span>
+                    {character.conditions.length === 0 ? (
+                      <b className="status-safe">NENHUMA</b>
+                    ) : character.conditions.map((active) => {
+                      const definition = CONDITIONS.find((item) => item.id === active.conditionId)
+                      return definition ? <b className="status-danger" key={active.id}>{definition.name}</b> : null
+                    })}
                   </div>
 
                   <div className="master-quick-actions">

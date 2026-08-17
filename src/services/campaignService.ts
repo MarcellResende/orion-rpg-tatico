@@ -1,7 +1,12 @@
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { createEmptyCharacter, hydrateCharacter } from '../character'
 import { requireSupabase } from '../lib/supabase'
-import type { CampaignRole, CampaignSummary, OnlineCharacter } from '../onlineTypes'
+import type {
+  ActiveCondition,
+  CampaignRole,
+  CampaignSummary,
+  OnlineCharacter,
+} from '../onlineTypes'
 import type { Character } from '../types'
 
 interface CampaignJoinRow {
@@ -23,6 +28,14 @@ interface CharacterRow {
   updated_at: string
 }
 
+interface ConditionRow {
+  id: string
+  character_id: string
+  condition_id: string
+  added_by: string
+  created_at: string
+}
+
 const mapCampaign = (row: CampaignJoinRow): CampaignSummary => ({
   id: row.campaigns.id,
   name: row.campaigns.name,
@@ -32,13 +45,46 @@ const mapCampaign = (row: CampaignJoinRow): CampaignSummary => ({
   createdAt: row.campaigns.created_at,
 })
 
-const mapCharacter = (row: CharacterRow): OnlineCharacter => ({
+const mapCondition = (row: ConditionRow): ActiveCondition => ({
+  id: row.id,
+  characterId: row.character_id,
+  conditionId: row.condition_id,
+  addedBy: row.added_by,
+  createdAt: row.created_at,
+})
+
+const mapCharacter = (
+  row: CharacterRow,
+  conditions: ActiveCondition[] = [],
+): OnlineCharacter => ({
   id: row.id,
   campaignId: row.campaign_id,
   ownerId: row.owner_id,
   sheet: hydrateCharacter(row.sheet),
+  conditions,
   updatedAt: row.updated_at,
 })
+
+const listConditionsForCharacters = async (characterIds: string[]) => {
+  const grouped = new Map<string, ActiveCondition[]>()
+  if (characterIds.length === 0) return grouped
+
+  const { data, error } = await requireSupabase()
+    .from('character_conditions')
+    .select('id,character_id,condition_id,added_by,created_at')
+    .in('character_id', characterIds)
+    .order('created_at', { ascending: true })
+
+  if (error) throw error
+  for (const row of (data ?? []) as ConditionRow[]) {
+    const condition = mapCondition(row)
+    grouped.set(condition.characterId, [
+      ...(grouped.get(condition.characterId) ?? []),
+      condition,
+    ])
+  }
+  return grouped
+}
 
 export async function listCampaigns(): Promise<CampaignSummary[]> {
   const client = requireSupabase()
@@ -116,7 +162,10 @@ export async function getCharacter(campaignId: string, ownerId: string) {
     .maybeSingle()
 
   if (error) throw error
-  return data ? mapCharacter(data as CharacterRow) : null
+  if (!data) return null
+  const row = data as CharacterRow
+  const conditions = await listConditionsForCharacters([row.id])
+  return mapCharacter(row, conditions.get(row.id) ?? [])
 }
 
 export async function saveCharacter(
@@ -139,7 +188,9 @@ export async function saveCharacter(
     .single()
 
   if (error) throw error
-  return mapCharacter(data as CharacterRow)
+  const row = data as CharacterRow
+  const conditions = await listConditionsForCharacters([row.id])
+  return mapCharacter(row, conditions.get(row.id) ?? [])
 }
 
 export async function getOrCreateCharacter(campaignId: string, ownerId: string) {
@@ -157,7 +208,37 @@ export async function listSquadCharacters(campaignId: string) {
     .order('updated_at', { ascending: false })
 
   if (error) throw error
-  return ((data ?? []) as CharacterRow[]).map(mapCharacter)
+  const rows = (data ?? []) as CharacterRow[]
+  const conditions = await listConditionsForCharacters(rows.map((row) => row.id))
+  return rows.map((row) => mapCharacter(row, conditions.get(row.id) ?? []))
+}
+
+export async function addCharacterCondition(characterId: string, conditionId: string) {
+  const client = requireSupabase()
+  const { error } = await client
+    .from('character_conditions')
+    .upsert(
+      { character_id: characterId, condition_id: conditionId },
+      { onConflict: 'character_id,condition_id', ignoreDuplicates: true },
+    )
+
+  if (error) throw error
+  const { data, error: readError } = await client
+    .from('character_conditions')
+    .select('id,character_id,condition_id,added_by,created_at')
+    .eq('character_id', characterId)
+    .eq('condition_id', conditionId)
+    .single()
+  if (readError) throw readError
+  return mapCondition(data as ConditionRow)
+}
+
+export async function removeCharacterCondition(conditionRecordId: string) {
+  const { error } = await requireSupabase()
+    .from('character_conditions')
+    .delete()
+    .eq('id', conditionRecordId)
+  if (error) throw error
 }
 
 export function subscribeToSquad(
@@ -167,7 +248,7 @@ export function subscribeToSquad(
 ): RealtimeChannel {
   const client = requireSupabase()
   return client
-    .channel(`campaign:${campaignId}:characters`)
+    .channel(`campaign:${campaignId}:operations`)
     .on(
       'postgres_changes',
       {
@@ -175,6 +256,15 @@ export function subscribeToSquad(
         schema: 'public',
         table: 'characters',
         filter: `campaign_id=eq.${campaignId}`,
+      },
+      onChange,
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'character_conditions',
       },
       onChange,
     )

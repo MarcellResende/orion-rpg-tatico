@@ -7,3 +7,4 @@ dist/
 *.tsbuildinfo
 .vite/
 .pnpm-store/
+tmp/

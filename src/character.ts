@@ -3,16 +3,17 @@ import {
   SKILL_KEYS,
   type Attributes,
   type Character,
+  type FunctionChoices,
   type Identity,
+  type InventoryItem,
   type ResourceState,
   type Skills,
 } from './types'
 import {
   ATTRIBUTE_POINT_LIMIT,
-  BASE_SKILL_POINTS,
-  calculateDerivedResources,
+  applyCharacterLimits,
+  calculateMaxSkillPointsForCharacter,
   clamp,
-  clampResources,
 } from './rules/calculations'
 
 const EMPTY_ATTRIBUTES: Attributes = {
@@ -45,9 +46,10 @@ const EMPTY_IDENTITY: Identity = {
 }
 
 export const createEmptyCharacter = (): Character => ({
-  schemaVersion: 1,
+  schemaVersion: 2,
   level: 1,
   identity: { ...EMPTY_IDENTITY },
+  functionChoices: {},
   attributes: { ...EMPTY_ATTRIBUTES },
   skills: { ...EMPTY_SKILLS },
   resources: {
@@ -56,20 +58,44 @@ export const createEmptyCharacter = (): Character => ({
     composure: 5,
     stress: 0,
   },
+  inventory: [],
   updatedAt: new Date().toISOString(),
 })
 
 const safeObject = (value: unknown): Record<string, unknown> =>
   typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {}
 
-const safeText = (value: unknown) => (typeof value === 'string' ? value.slice(0, 240) : '')
+const safeText = (value: unknown, maximum = 240) =>
+  typeof value === 'string' ? value.slice(0, maximum) : ''
 
 const safeNumber = (value: unknown, fallback = 0) =>
   typeof value === 'number' && Number.isFinite(value) ? value : fallback
 
+const safeDecimal = (value: unknown, minimum: number, maximum: number) => {
+  const number = safeNumber(value, minimum)
+  return Math.min(Math.max(Math.round(number * 100) / 100, minimum), maximum)
+}
+
+const hydrateInventory = (value: unknown): InventoryItem[] => {
+  if (!Array.isArray(value)) return []
+  return value.slice(0, 100).flatMap((raw, index) => {
+    const item = safeObject(raw)
+    const name = safeText(item.name, 100).trim()
+    if (!name) return []
+    return [{
+      id: safeText(item.id, 100) || `legacy-${index}`,
+      name,
+      quantity: clamp(safeNumber(item.quantity, 1), 1, 999),
+      weight: safeDecimal(item.weight, 0, 9999),
+      notes: safeText(item.notes, 300),
+    }]
+  })
+}
+
 export const hydrateCharacter = (value: unknown): Character => {
   const root = safeObject(value)
   const identitySource = safeObject(root.identity)
+  const choicesSource = safeObject(root.functionChoices)
   const attributesSource = safeObject(root.attributes)
   const skillsSource = safeObject(root.skills)
   const resourcesSource = safeObject(root.resources)
@@ -87,18 +113,18 @@ export const hydrateCharacter = (value: unknown): Character => {
     remorse: safeText(identitySource.remorse),
   }
 
+  const functionChoices: FunctionChoices = {}
+  for (const [key, rawChoice] of Object.entries(choicesSource).slice(0, 10)) {
+    if (typeof rawChoice === 'string' && ATTRIBUTE_KEYS.includes(rawChoice as never)) {
+      functionChoices[key] = rawChoice as FunctionChoices[string]
+    }
+  }
+
   let remainingAttributes = ATTRIBUTE_POINT_LIMIT
   const attributes = { ...EMPTY_ATTRIBUTES }
   for (const key of ATTRIBUTE_KEYS) {
     attributes[key] = clamp(safeNumber(attributesSource[key]), 0, remainingAttributes)
     remainingAttributes -= attributes[key]
-  }
-
-  let remainingSkills = BASE_SKILL_POINTS + attributes.intelligence
-  const skills = { ...EMPTY_SKILLS }
-  for (const key of SKILL_KEYS) {
-    skills[key] = clamp(safeNumber(skillsSource[key]), 0, remainingSkills)
-    remainingSkills -= skills[key]
   }
 
   const resources: ResourceState = {
@@ -109,17 +135,22 @@ export const hydrateCharacter = (value: unknown): Character => {
   }
 
   const character: Character = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     level: 1,
     identity,
+    functionChoices,
     attributes,
-    skills,
+    skills: { ...EMPTY_SKILLS },
     resources,
+    inventory: hydrateInventory(root.inventory),
     updatedAt: safeText(root.updatedAt) || new Date().toISOString(),
   }
 
-  return {
-    ...character,
-    resources: clampResources(resources, calculateDerivedResources(character)),
+  let remainingSkills = calculateMaxSkillPointsForCharacter(character)
+  for (const key of SKILL_KEYS) {
+    character.skills[key] = clamp(safeNumber(skillsSource[key]), 0, remainingSkills)
+    remainingSkills -= character.skills[key]
   }
+
+  return applyCharacterLimits(character)
 }

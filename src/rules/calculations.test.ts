@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { createEmptyCharacter } from '../character'
 import {
   calculateAttributePointsSpent,
+  calculateCharacterBonuses,
+  calculateDerivedResources,
+  calculateEffectiveAttributes,
+  calculateEffectiveSkills,
+  calculateInventoryWeight,
   calculateMaxComposure,
   calculateMaxEnergy,
   calculateMaxHp,
@@ -37,6 +42,56 @@ describe('cálculos do manual', () => {
     const character = createEmptyCharacter()
     character.attributes.intelligence = 3
     expect(calculateMaxSkillPoints(character.attributes)).toBe(13)
+  })
+})
+
+describe('bônus automáticos sem consumir pontos', () => {
+  it('aplica os bônus de Médico em atributos, perícia e recursos', () => {
+    const character = createEmptyCharacter()
+    character.identity.functionId = 'medic'
+
+    expect(calculateEffectiveAttributes(character)).toMatchObject({
+      dexterity: 1,
+      intelligence: 1,
+    })
+    expect(calculateEffectiveSkills(character).medicine).toBe(2)
+    expect(calculateAttributePointsSpent(character.attributes)).toBe(0)
+    expect(calculateSkillPointsSpent(character.skills)).toBe(0)
+    expect(calculateDerivedResources(character)).toMatchObject({
+      maxEnergy: 15,
+      maxSkillPoints: 11,
+    })
+  })
+
+  it('aplica as duas escolhas de atributo da Infantaria', () => {
+    const character = createEmptyCharacter()
+    character.identity.functionId = 'infantry'
+    character.functionChoices = {
+      infantry_tactical: 'intelligence',
+      infantry_physical: 'constitution',
+    }
+
+    const bonuses = calculateCharacterBonuses(character)
+    expect(bonuses.attributes.intelligence).toBe(1)
+    expect(bonuses.attributes.constitution).toBe(1)
+    expect(bonuses.skills.combat).toBe(2)
+    expect(calculateAttributePointsSpent(character.attributes)).toBe(0)
+  })
+
+  it('mostra bônus situacional de traço separado dos pontos distribuídos', () => {
+    const character = createEmptyCharacter()
+    character.identity.traitId = 'calculating'
+    expect(calculateEffectiveSkills(character).exploration).toBe(2)
+    expect(calculateSkillPointsSpent(character.skills)).toBe(0)
+  })
+
+  it('soma quantidade e peso unitário do inventário', () => {
+    const character = createEmptyCharacter()
+    character.inventory = [
+      { id: 'a', name: 'Granada', quantity: 2, weight: 0.5, notes: '' },
+      { id: 'b', name: 'Kit', quantity: 1, weight: 3, notes: '' },
+    ]
+    expect(calculateInventoryWeight(character)).toBe(4)
   })
 })
 

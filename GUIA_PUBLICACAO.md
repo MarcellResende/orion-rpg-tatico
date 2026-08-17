@@ -27,11 +27,11 @@ Não coloque no site a senha do banco nem uma chave `service_role`. O sistema ut
 1. No menu esquerdo do Supabase, abra **SQL Editor**.
 2. Clique em **New query**.
 3. Abra o arquivo `supabase/migrations/001_online_campaigns.sql` desta pasta.
-4. Copie todo o conteúdo do arquivo e cole no SQL Editor.
-5. Clique em **Run**.
-6. A mensagem final deve indicar sucesso. Esse comando cria campanhas, participantes, fichas, permissões e tempo real.
+4. Copie todo o conteúdo do arquivo, cole no SQL Editor e clique em **Run**.
+5. Depois faça o mesmo com `supabase/migrations/002_secure_conditions.sql`.
+6. As duas execuções devem indicar sucesso. Elas criam campanhas, participantes, fichas, condições, permissões e tempo real.
 
-Execute esse arquivo apenas uma vez em cada projeto Supabase.
+As migrações podem ser executadas novamente com segurança se houver dúvida, pois foram escritas para atualizar o que já existe.
 
 ## 3. Copiar as duas informações públicas
 
@@ -125,6 +125,8 @@ Isso garante que a confirmação de e-mail leve os jogadores de volta ao seu sit
 4. Preenchem a ficha. O salvamento é automático.
 
 O mestre verá os operadores no painel assim que eles abrirem a campanha. PV, Energia e Estresse podem ser alterados rapidamente no Escudo do Mestre.
+
+O jogador enxerga somente a própria ficha. Ele pode adicionar condições, mas apenas o mestre pode removê-las. O mestre abre qualquer operador pelo Escudo do Mestre para controlar condições e equipamentos.
 
 ## 9. Atualizar o site no futuro
 

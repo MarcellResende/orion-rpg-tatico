@@ -23,6 +23,8 @@ export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number]
 export type SkillKey = (typeof SKILL_KEYS)[number]
 export type ResourceKey = (typeof RESOURCE_KEYS)[number]
 
+export type FunctionChoices = Record<string, AttributeKey | ''>
+
 export interface Identity {
   name: string
   codename: string
@@ -38,13 +40,29 @@ export type Skills = Record<SkillKey, number>
 export type ResourceState = Record<ResourceKey, number>
 
 export interface Character {
-  schemaVersion: 1
+  schemaVersion: 2
   level: 1
   identity: Identity
+  functionChoices: FunctionChoices
   attributes: Attributes
   skills: Skills
   resources: ResourceState
+  inventory: InventoryItem[]
   updatedAt: string
+}
+
+export interface InventoryItem {
+  id: string
+  name: string
+  quantity: number
+  weight: number
+  notes: string
+}
+
+export interface AttributeChoiceDefinition {
+  id: string
+  label: string
+  options: AttributeKey[]
 }
 
 export interface FunctionDefinition {
@@ -52,6 +70,9 @@ export interface FunctionDefinition {
   name: string
   description: string
   bonus: string
+  attributeBonuses?: Partial<Record<AttributeKey, number>>
+  attributeChoices?: AttributeChoiceDefinition[]
+  skillBonuses?: Partial<Record<SkillKey, number>>
   exclusiveAbility: string
   sourcePage: number
 }
@@ -61,8 +82,25 @@ export interface TraitDefinition {
   name: string
   profile: string
   advantage: string
+  skillBonuses?: Partial<Record<SkillKey, number>>
   roleplayTrigger: string
   sourcePage: number
+}
+
+export type ConditionGroup = 'physical' | 'mental' | 'mobility'
+
+export interface ConditionDefinition {
+  id: string
+  name: string
+  group: ConditionGroup
+  cause: string
+  effect: string
+  sourcePage: number
+}
+
+export interface CharacterBonuses {
+  attributes: Attributes
+  skills: Skills
 }
 
 export interface DerivedResources {

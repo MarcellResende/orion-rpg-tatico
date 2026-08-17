@@ -9,12 +9,14 @@ import { CampaignLobby } from './screens/CampaignLobby'
 import { SetupRequired } from './screens/SetupRequired'
 import { SquadDashboard } from './screens/SquadDashboard'
 import {
+  addCharacterCondition,
   createCampaign,
   getOrCreateCharacter,
   joinCampaign,
   listCampaigns,
   listSquadCharacters,
   removeSubscription,
+  removeCharacterCondition,
   saveCharacter,
   subscribeToSquad,
 } from './services/campaignService'
@@ -39,6 +41,7 @@ export function App() {
   const [squad, setSquad] = useState<OnlineCharacter[]>([])
   const [loading, setLoading] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+  const [conditionActionLoading, setConditionActionLoading] = useState(false)
   const [saveState, setSaveState] = useState<SaveState>('saved')
   const [realtimeConnected, setRealtimeConnected] = useState(false)
   const [error, setError] = useState('')
@@ -195,6 +198,46 @@ export function App() {
     }
   }
 
+  const handleAddCondition = async (conditionId: string) => {
+    if (!activeCharacter) return
+    setConditionActionLoading(true)
+    setError('')
+    try {
+      const condition = await addCharacterCondition(activeCharacter.id, conditionId)
+      const merge = (character: OnlineCharacter) => ({
+        ...character,
+        conditions: character.conditions.some((item) => item.id === condition.id)
+          ? character.conditions
+          : [...character.conditions, condition],
+      })
+      setActiveCharacter((current) => current ? merge(current) : current)
+      setSquad((current) => current.map((item) => item.id === activeCharacter.id ? merge(item) : item))
+    } catch (caught) {
+      setError(readableError(caught))
+    } finally {
+      setConditionActionLoading(false)
+    }
+  }
+
+  const handleRemoveCondition = async (conditionRecordId: string) => {
+    if (!activeCharacter || selectedCampaign?.role !== 'master') return
+    setConditionActionLoading(true)
+    setError('')
+    try {
+      await removeCharacterCondition(conditionRecordId)
+      const remove = (character: OnlineCharacter) => ({
+        ...character,
+        conditions: character.conditions.filter((item) => item.id !== conditionRecordId),
+      })
+      setActiveCharacter((current) => current ? remove(current) : current)
+      setSquad((current) => current.map((item) => item.id === activeCharacter.id ? remove(item) : item))
+    } catch (caught) {
+      setError(readableError(caught))
+    } finally {
+      setConditionActionLoading(false)
+    }
+  }
+
   const showCampaigns = () => {
     setView('lobby')
     setSelectedCampaign(null)
@@ -269,7 +312,11 @@ export function App() {
       isOwnCharacter={activeCharacter.ownerId === session.user.id}
       isMaster={selectedCampaign.role === 'master'}
       saveState={saveState}
+      conditions={activeCharacter.conditions}
+      conditionActionLoading={conditionActionLoading}
       onChange={scheduleSave}
+      onAddCondition={(conditionId) => void handleAddCondition(conditionId)}
+      onRemoveCondition={(conditionRecordId) => void handleRemoveCondition(conditionRecordId)}
       onShowCampaigns={showCampaigns}
       onShowSquad={() => setView('squad')}
       onSignOut={() => void signOut()}

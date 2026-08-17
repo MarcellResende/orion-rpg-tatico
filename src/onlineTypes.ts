@@ -16,7 +16,16 @@ export interface OnlineCharacter {
   campaignId: string
   ownerId: string
   sheet: Character
+  conditions: ActiveCondition[]
   updatedAt: string
+}
+
+export interface ActiveCondition {
+  id: string
+  characterId: string
+  conditionId: string
+  addedBy: string
+  createdAt: string
 }
 
 export interface ResourceQuickAction {

@@ -1,6 +1,7 @@
 interface StepperProps {
   label: string
   value: number
+  bonus?: number
   hint?: string
   disableDecrease?: boolean
   disableIncrease?: boolean
@@ -11,6 +12,7 @@ interface StepperProps {
 export function Stepper({
   label,
   value,
+  bonus = 0,
   hint,
   disableDecrease,
   disableIncrease,
@@ -33,8 +35,9 @@ export function Stepper({
         >
           −
         </button>
-        <output className="stepper-value" aria-label={`${label}: ${value}`}>
-          {value}
+        <output className="stepper-value" aria-label={`${label}: ${value + bonus}; ${value} distribuído e ${bonus} de bônus`}>
+          {value + bonus}
+          {bonus > 0 && <small>{value} + {bonus}</small>}
         </output>
         <button
           type="button"
