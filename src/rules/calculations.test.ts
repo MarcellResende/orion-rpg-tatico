@@ -3,21 +3,26 @@ import { createEmptyCharacter } from '../character'
 import { findEquipment } from '../data/equipment'
 import {
   calculateAttributePointsSpent,
+  calculateAttributePointLimit,
   calculateBaseLoadLimit,
   calculateCharacterBonuses,
   calculateDerivedResources,
   calculateEffectiveAttributes,
   calculateEffectiveSkills,
   calculateInventoryWeight,
+  calculateLevelFromXp,
   calculateLoadState,
   calculateMaxComposure,
   calculateMaxEnergy,
   calculateMaxHp,
   calculateMaxSkillPoints,
+  calculateMaxSkillPointsForCharacter,
+  calculateProgressionRewards,
   calculateSkillPointsSpent,
   calculateSubskillPointsAvailable,
   calculateSubskillPointsSpent,
   changeAttribute,
+  changeExperience,
   changeResource,
   changeSkill,
   changeSubskill,
@@ -204,6 +209,61 @@ describe('carga e sobrecarga', () => {
   })
 })
 
+describe('progressão individual do operador', () => {
+  it('calcula os níveis pelos marcos de XP total', () => {
+    expect(calculateLevelFromXp(0)).toBe(1)
+    expect(calculateLevelFromXp(3)).toBe(1)
+    expect(calculateLevelFromXp(4)).toBe(2)
+    expect(calculateLevelFromXp(9)).toBe(3)
+    expect(calculateLevelFromXp(71)).toBe(9)
+    expect(calculateLevelFromXp(72)).toBe(10)
+  })
+
+  it('libera as recompensas cumulativas da tabela', () => {
+    expect(calculateProgressionRewards(9)).toEqual({
+      bonusSkillPoints: 8,
+      bonusAttributePoints: 3,
+      generalAbilitySlots: 4,
+      functionSpecializationUnlocked: true,
+      veteranTrainingUnlocked: true,
+      maximumFunctionAbilityUnlocked: false,
+    })
+  })
+
+  it('aumenta automaticamente os limites de perícia e atributo', () => {
+    const character = createEmptyCharacter()
+    character.progression.xp = 9
+    character.level = calculateLevelFromXp(character.progression.xp)
+    expect(calculateMaxSkillPointsForCharacter(character)).toBe(12)
+    expect(calculateAttributePointLimit(character)).toBe(7)
+  })
+
+  it('registra XP e atualiza o nível do operador', () => {
+    let character = createEmptyCharacter()
+    character = changeExperience(character, 6, 'Missão concluída; objetivo primário')
+    expect(character.progression.xp).toBe(6)
+    expect(character.level).toBe(2)
+    expect(character.progression.awards[0]).toMatchObject({
+      amount: 6,
+      reason: 'Missão concluída; objetivo primário',
+    })
+  })
+
+  it('devolve pontos excedentes se o mestre reduzir o XP e o nível', () => {
+    let character = createEmptyCharacter()
+    character = changeExperience(character, 9, 'Progressão de teste')
+    for (let index = 0; index < 7; index += 1) character = changeAttribute(character, 'strength', 1)
+    for (let index = 0; index < 12; index += 1) character = changeSkill(character, 'technology', 1)
+    expect(calculateAttributePointsSpent(character.attributes)).toBe(7)
+    expect(calculateSkillPointsSpent(character.skills)).toBe(12)
+
+    character = changeExperience(character, -1, 'Correção de XP')
+    expect(character.level).toBe(2)
+    expect(calculateAttributePointsSpent(character.attributes)).toBe(6)
+    expect(calculateSkillPointsSpent(character.skills)).toBe(11)
+  })
+})
+
 describe('limites de criação', () => {
   it('não permite gastar mais de seis pontos de atributo', () => {
     let character = createEmptyCharacter()
@@ -297,4 +357,3 @@ describe('recursos atuais e validação', () => {
     })
   })
 })
-

@@ -7,6 +7,7 @@ import {
   type CustomSpecialization,
   type EquipmentCategory,
   type EquipmentSlot,
+  type ExperienceAward,
   type FunctionChoices,
   type Identity,
   type InventoryItem,
@@ -15,8 +16,9 @@ import {
   type Subskills,
 } from './types'
 import {
-  ATTRIBUTE_POINT_LIMIT,
   applyCharacterLimits,
+  calculateAttributePointLimitForLevel,
+  calculateLevelFromXp,
   calculateMaxSkillPointsForCharacter,
   clamp,
 } from './rules/calculations'
@@ -55,7 +57,7 @@ const EMPTY_IDENTITY: Identity = {
 }
 
 export const createEmptyCharacter = (): Character => ({
-  schemaVersion: 3,
+  schemaVersion: 4,
   level: 1,
   identity: { ...EMPTY_IDENTITY },
   functionChoices: {},
@@ -63,6 +65,14 @@ export const createEmptyCharacter = (): Character => ({
   skills: { ...EMPTY_SKILLS },
   subskills: { ...EMPTY_SUBSKILLS },
   specializations: [],
+  progression: {
+    xp: 0,
+    generalAbilities: [],
+    functionSpecialization: '',
+    veteranTraining: '',
+    maximumFunctionAbility: '',
+    awards: [],
+  },
   resources: {
     hp: 20,
     energy: 10,
@@ -164,6 +174,22 @@ const hydrateSpecializations = (value: unknown): CustomSpecialization[] => {
   })
 }
 
+const hydrateExperienceAwards = (value: unknown): ExperienceAward[] => {
+  if (!Array.isArray(value)) return []
+  return value.slice(0, 50).flatMap((raw, index) => {
+    const award = safeObject(raw)
+    const amount = clamp(safeNumber(award.amount), -99, 99)
+    const reason = safeText(award.reason, 240).trim()
+    if (amount === 0 || !reason) return []
+    return [{
+      id: safeText(award.id, 100) || `legacy-xp-${index}`,
+      amount,
+      reason,
+      createdAt: safeText(award.createdAt, 40) || new Date().toISOString(),
+    }]
+  })
+}
+
 export const hydrateCharacter = (value: unknown): Character => {
   const root = safeObject(value)
   const identitySource = safeObject(root.identity)
@@ -173,6 +199,9 @@ export const hydrateCharacter = (value: unknown): Character => {
   const subskillsSource = safeObject(root.subskills)
   const resourcesSource = safeObject(root.resources)
   const defenseSource = safeObject(root.defenseModifiers)
+  const progressionSource = safeObject(root.progression)
+  const xp = clamp(safeNumber(progressionSource.xp ?? root.xp), 0, 9999)
+  const level = calculateLevelFromXp(xp)
 
   const identity: Identity = {
     name: safeText(identitySource.name),
@@ -194,7 +223,7 @@ export const hydrateCharacter = (value: unknown): Character => {
     }
   }
 
-  let remainingAttributes = ATTRIBUTE_POINT_LIMIT
+  let remainingAttributes = calculateAttributePointLimitForLevel(level)
   const attributes = { ...EMPTY_ATTRIBUTES }
   for (const key of ATTRIBUTE_KEYS) {
     attributes[key] = clamp(safeNumber(attributesSource[key]), 0, remainingAttributes)
@@ -209,14 +238,24 @@ export const hydrateCharacter = (value: unknown): Character => {
   }
 
   const character: Character = {
-    schemaVersion: 3,
-    level: 1,
+    schemaVersion: 4,
+    level,
     identity,
     functionChoices,
     attributes,
     skills: { ...EMPTY_SKILLS },
     subskills: { ...EMPTY_SUBSKILLS },
     specializations: hydrateSpecializations(root.specializations),
+    progression: {
+      xp,
+      generalAbilities: Array.isArray(progressionSource.generalAbilities)
+        ? progressionSource.generalAbilities.slice(0, 4).map((item) => safeText(item, 120))
+        : [],
+      functionSpecialization: safeText(progressionSource.functionSpecialization, 160),
+      veteranTraining: safeText(progressionSource.veteranTraining, 160),
+      maximumFunctionAbility: safeText(progressionSource.maximumFunctionAbility, 160),
+      awards: hydrateExperienceAwards(progressionSource.awards),
+    },
     resources,
     defenseModifiers: {
       other: clamp(safeNumber(defenseSource.other), -20, 20),
@@ -238,4 +277,3 @@ export const hydrateCharacter = (value: unknown): Character => {
 
   return applyCharacterLimits(character)
 }
-

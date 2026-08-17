@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createEmptyCharacter } from './character'
 import { InventoryPanel } from './components/InventoryPanel'
+import { ProgressionPanel } from './components/ProgressionPanel'
 import { ResourceCard } from './components/ResourceCard'
 import { Stepper } from './components/Stepper'
 import { SubskillsPanel } from './components/SubskillsPanel'
@@ -14,13 +15,13 @@ import {
   TRAITS,
 } from './data/manual'
 import {
-  ATTRIBUTE_POINT_LIMIT,
   applyCharacterLimits,
   calculateAttributePointsSpent,
   calculateCharacterBonuses,
   calculateDerivedResources,
   calculateEffectiveAttributes,
   calculateEffectiveSkills,
+  calculateLevelFromXp,
   calculateLoadState,
   calculateSkillPointsSpent,
   changeAttribute,
@@ -71,7 +72,7 @@ const hpTone = (current: number, maximum: number) => {
   return 'green' as const
 }
 
-type SheetTab = 'sheet' | 'operations' | 'notes'
+type SheetTab = 'sheet' | 'operations' | 'progression' | 'notes'
 
 export function CharacterSheet({
   character,
@@ -97,7 +98,7 @@ export function CharacterSheet({
   const loadState = calculateLoadState(character)
   const attributePointsSpent = calculateAttributePointsSpent(character.attributes)
   const skillPointsSpent = calculateSkillPointsSpent(character.skills)
-  const attributePointsRemaining = ATTRIBUTE_POINT_LIMIT - attributePointsSpent
+  const attributePointsRemaining = derived.maxAttributePoints - attributePointsSpent
   const skillPointsRemaining = derived.maxSkillPoints - skillPointsSpent
   const identityErrors = validateIdentity(character)
   const selectedFunction = FUNCTIONS.find((item) => item.id === character.identity.functionId)
@@ -187,7 +188,7 @@ export function CharacterSheet({
           </div>
           <div>
             <span className="eyebrow">NÍVEL</span>
-            <strong>01</strong>
+            <strong>{String(calculateLevelFromXp(character.progression.xp)).padStart(2, '0')}</strong>
           </div>
           <div>
             <span className="eyebrow">FUNÇÃO</span>
@@ -288,6 +289,7 @@ export function CharacterSheet({
         <nav className="sheet-tabs" aria-label="Seções da ficha">
           <button type="button" className={activeTab === 'sheet' ? 'active' : ''} aria-pressed={activeTab === 'sheet'} onClick={() => setActiveTab('sheet')}>Ficha e perícias</button>
           <button type="button" className={activeTab === 'operations' ? 'active' : ''} aria-pressed={activeTab === 'operations'} onClick={() => setActiveTab('operations')}>Condições e inventário</button>
+          <button type="button" className={activeTab === 'progression' ? 'active' : ''} aria-pressed={activeTab === 'progression'} onClick={() => setActiveTab('progression')}>Progressão</button>
           <button type="button" className={activeTab === 'notes' ? 'active' : ''} aria-pressed={activeTab === 'notes'} onClick={() => setActiveTab('notes')}>Anotações</button>
         </nav>
 
@@ -369,10 +371,10 @@ export function CharacterSheet({
                   <h2 id="attributes-heading">Atributos</h2>
                 </div>
                 <span className={`point-counter ${attributePointsRemaining === 0 ? 'point-counter--complete' : ''}`}>
-                  {attributePointsSpent} / {ATTRIBUTE_POINT_LIMIT}
+                  {attributePointsSpent} / {derived.maxAttributePoints}
                 </span>
               </div>
-              <p className="panel-intro">Distribua até seis pontos. O total mostrado já soma o bônus da função, sem consumi-lo.</p>
+              <p className="panel-intro">Distribua até {derived.maxAttributePoints} pontos. O limite aumenta nos níveis 3, 6 e 9; bônus da função não consomem pontos.</p>
               <div className="stepper-list">
                 {ATTRIBUTE_KEYS.map((key) => {
                   return (
@@ -584,11 +586,15 @@ export function CharacterSheet({
           </div>
         </div>
 
+        <div className="sheet-tab-panel" hidden={activeTab !== 'progression'}>
+          <ProgressionPanel character={character} isMaster={isMaster} onChange={onChange} />
+        </div>
+
         <div className="sheet-tab-panel" hidden={activeTab !== 'notes'}>
           <section className="panel notes-panel" aria-labelledby="notes-heading">
             <div className="panel-heading">
               <div>
-                <span className="section-index">08</span>
+                <span className="section-index">09</span>
                 <h2 id="notes-heading">Anotações do operador</h2>
               </div>
               <span className="panel-code">PRIVADO</span>
@@ -618,10 +624,9 @@ export function CharacterSheet({
       </main>
 
       <footer>
-        <span>ORION FIELD SYSTEM // ONLINE BUILD 0.5</span>
+        <span>ORION FIELD SYSTEM // ONLINE BUILD 0.6</span>
         <span>FONTE: MANUAL_RPG_TATICO.PDF</span>
       </footer>
     </div>
   )
 }
-

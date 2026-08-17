@@ -1,5 +1,6 @@
 import { findEquipment } from '../data/equipment'
 import { FUNCTIONS, TRAITS } from '../data/manual'
+import { LEVEL_TABLE } from '../data/progression'
 import { SUBSKILLS } from '../data/subskills'
 import {
   ATTRIBUTE_KEYS,
@@ -12,6 +13,7 @@ import {
   type DerivedResources,
   type IdentityValidation,
   type LoadState,
+  type ProgressionRewards,
   type ResourceKey,
   type ResourceState,
   type SkillKey,
@@ -23,6 +25,29 @@ import {
 export const ATTRIBUTE_POINT_LIMIT = 6
 export const BASE_SKILL_POINTS = 10
 export const BASE_DEFENSE = 10
+
+export const calculateLevelFromXp = (xp: number) => {
+  const safeXp = Math.max(0, Math.floor(Number.isFinite(xp) ? xp : 0))
+  return LEVEL_TABLE.reduce(
+    (level, definition) => safeXp >= definition.totalXp ? definition.level : level,
+    1,
+  )
+}
+
+export const calculateProgressionRewards = (level: number): ProgressionRewards => ({
+  bonusSkillPoints: Math.max(0, Math.min(level, 9) - 1),
+  bonusAttributePoints: Number(level >= 3) + Number(level >= 6) + Number(level >= 9),
+  generalAbilitySlots: Number(level >= 2) + Number(level >= 4) + Number(level >= 7) + Number(level >= 9),
+  functionSpecializationUnlocked: level >= 5,
+  veteranTrainingUnlocked: level >= 8,
+  maximumFunctionAbilityUnlocked: level >= 10,
+})
+
+export const calculateAttributePointLimitForLevel = (level: number) =>
+  ATTRIBUTE_POINT_LIMIT + calculateProgressionRewards(level).bonusAttributePoints
+
+export const calculateAttributePointLimit = (character: Character) =>
+  calculateAttributePointLimitForLevel(calculateLevelFromXp(character.progression.xp))
 
 const emptyAttributes = (): Attributes => ({
   strength: 0,
@@ -238,7 +263,8 @@ export const calculateMaxSkillPoints = (attributes: Attributes) =>
   BASE_SKILL_POINTS + attributes.intelligence
 
 export const calculateMaxSkillPointsForCharacter = (character: Character) =>
-  calculateMaxSkillPoints(calculateEffectiveAttributes(character))
+  calculateMaxSkillPoints(calculateEffectiveAttributes(character)) +
+  calculateProgressionRewards(calculateLevelFromXp(character.progression.xp)).bonusSkillPoints
 
 export const calculateAttributePointsSpent = (attributes: Attributes) =>
   sumValues(ATTRIBUTE_KEYS, attributes)
@@ -275,7 +301,8 @@ export const calculateDerivedResources = (character: Character): DerivedResource
     defenseOther,
     maxComposure: calculateMaxComposure(attributes, skills),
     maxStress: calculateMaxStress(),
-    maxSkillPoints: calculateMaxSkillPoints(attributes),
+    maxSkillPoints: calculateMaxSkillPoints(attributes) + calculateProgressionRewards(calculateLevelFromXp(character.progression.xp)).bonusSkillPoints,
+    maxAttributePoints: calculateAttributePointLimit(character),
   }
 }
 
@@ -297,6 +324,16 @@ const clampAllocatedSkills = (skills: Skills, maximum: number): Skills => {
   const next = emptySkills()
   for (const key of SKILL_KEYS) {
     next[key] = clamp(skills[key], 0, remaining)
+    remaining -= next[key]
+  }
+  return next
+}
+
+const clampAllocatedAttributes = (attributes: Attributes, maximum: number): Attributes => {
+  let remaining = maximum
+  const next = emptyAttributes()
+  for (const key of ATTRIBUTE_KEYS) {
+    next[key] = clamp(attributes[key], 0, remaining)
     remaining -= next[key]
   }
   return next
@@ -326,11 +363,17 @@ const clampSpecializations = (character: Character): Pick<Character, 'subskills'
 }
 
 export const applyCharacterLimits = (character: Character): Character => {
-  const skills = clampAllocatedSkills(
-    character.skills,
-    calculateMaxSkillPointsForCharacter(character),
+  const level = calculateLevelFromXp(character.progression.xp)
+  const attributes = clampAllocatedAttributes(
+    character.attributes,
+    calculateAttributePointLimitForLevel(level),
   )
-  const withSkills = { ...character, skills }
+  const withAttributes = { ...character, level, attributes }
+  const skills = clampAllocatedSkills(
+    withAttributes.skills,
+    calculateMaxSkillPointsForCharacter(withAttributes),
+  )
+  const withSkills = { ...withAttributes, skills }
   const specializationValues = clampSpecializations(withSkills)
   const withSpecializations = { ...withSkills, ...specializationValues }
   return {
@@ -356,7 +399,7 @@ export const changeAttribute = (
   if (step === 0) return character
 
   const current = character.attributes[key]
-  if (step > 0 && calculateAttributePointsSpent(character.attributes) >= ATTRIBUTE_POINT_LIMIT) {
+  if (step > 0 && calculateAttributePointsSpent(character.attributes) >= calculateAttributePointLimit(character)) {
     return character
   }
   if (step < 0 && current === 0) return character
@@ -373,6 +416,34 @@ export const changeAttribute = (
   }
 
   return withClampedResources(candidate)
+}
+
+const makeExperienceAwardId = () =>
+  globalThis.crypto?.randomUUID?.() ?? `xp-${Date.now()}-${Math.random().toString(36).slice(2)}`
+
+export const changeExperience = (
+  character: Character,
+  delta: number,
+  reason = 'Ajuste do mestre',
+): Character => {
+  const amount = Math.trunc(Number.isFinite(delta) ? delta : 0)
+  if (amount === 0) return character
+  const nextXp = clamp(character.progression.xp + amount, 0, 9999)
+  const appliedAmount = nextXp - character.progression.xp
+  if (appliedAmount === 0) return character
+  return applyCharacterLimits({
+    ...character,
+    progression: {
+      ...character.progression,
+      xp: nextXp,
+      awards: [{
+        id: makeExperienceAwardId(),
+        amount: appliedAmount,
+        reason: reason.slice(0, 240),
+        createdAt: new Date().toISOString(),
+      }, ...character.progression.awards].slice(0, 50),
+    },
+  })
 }
 
 export const changeSkill = (
@@ -490,4 +561,3 @@ export const validateIdentity = (character: Character): IdentityValidation => {
   }
   return errors
 }
-

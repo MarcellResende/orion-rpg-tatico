@@ -18,6 +18,8 @@ Aplicação React + TypeScript para fichas sincronizadas do RPG Tático. O mestr
 - subperícias oficiais e especializações livres com orçamento próprio;
 - bônus automáticos de função, traço e equipamento sem consumir pontos distribuídos;
 - aba de anotações do operador;
+- progressão individual por XP, níveis 1 a 10 e recompensas automáticas;
+- encerramento de missão pelo mestre com seleção dos feitos e participantes;
 - salvamento serializado que preserva texto digitado enquanto uma resposta anterior está em trânsito;
 - atualização do painel em tempo real;
 - permissões de banco com Row Level Security: jogador vê somente a própria ficha;
@@ -53,6 +55,12 @@ npm run build
 - Atributos disponíveis: `6`.
 - Carga base: `15 kg + (Força total × 5 kg)`.
 - Carga máxima absoluta: `200% da carga base`.
+
+## Experiência e níveis
+
+O XP é individual. No painel do esquadrão, o mestre marca os feitos da missão e seleciona os operadores participantes; o sistema concede até `6 XP` por missão para cada selecionado. O nível é calculado automaticamente pelos marcos `0, 4, 9, 15, 22, 30, 39, 49, 60 e 72 XP`.
+
+As recompensas de `+1 Perícia` ampliam automaticamente a reserva de pontos. Os níveis 3, 6 e 9 também aumentam a reserva de atributos. Habilidades Gerais, Especialização da Função, Treinamento Veterano e Habilidade Máxima possuem campos próprios na aba **Progressão**.
 
 Os bônus de atributos e perícias principais de função, traço e equipamento são somados automaticamente e exibidos separados dos pontos distribuídos. A sobrecarga aplica automaticamente as penalidades de Furtividade, Tolerância, custo de Energia e deslocamento. A capacidade usa apenas a regra da ficha: `15 kg` iniciais e `+5 kg` por ponto de Força total.
 

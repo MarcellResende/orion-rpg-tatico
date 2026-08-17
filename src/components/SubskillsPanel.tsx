@@ -139,4 +139,3 @@ export function SubskillsPanel({ character, onChange }: SubskillsPanelProps) {
     </section>
   )
 }
-

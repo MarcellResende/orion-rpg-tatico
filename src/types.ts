@@ -93,15 +93,32 @@ export interface CustomSpecialization {
   value: number
 }
 
+export interface ExperienceAward {
+  id: string
+  amount: number
+  reason: string
+  createdAt: string
+}
+
+export interface ProgressionState {
+  xp: number
+  generalAbilities: string[]
+  functionSpecialization: string
+  veteranTraining: string
+  maximumFunctionAbility: string
+  awards: ExperienceAward[]
+}
+
 export interface Character {
-  schemaVersion: 3
-  level: 1
+  schemaVersion: 4
+  level: number
   identity: Identity
   functionChoices: FunctionChoices
   attributes: Attributes
   skills: Skills
   subskills: Subskills
   specializations: CustomSpecialization[]
+  progression: ProgressionState
   resources: ResourceState
   defenseModifiers: DefenseModifiers
   inventory: InventoryItem[]
@@ -231,10 +248,31 @@ export interface DerivedResources {
   maxComposure: number
   maxStress: number
   maxSkillPoints: number
+  maxAttributePoints: number
+}
+
+export interface ProgressionRewards {
+  bonusSkillPoints: number
+  bonusAttributePoints: number
+  generalAbilitySlots: number
+  functionSpecializationUnlocked: boolean
+  veteranTrainingUnlocked: boolean
+  maximumFunctionAbilityUnlocked: boolean
+}
+
+export interface LevelDefinition {
+  level: number
+  totalXp: number
+  reward: string
+}
+
+export interface MissionXpOption {
+  id: string
+  label: string
+  amount: number
 }
 
 export interface IdentityValidation {
   name?: string
   age?: string
 }
-

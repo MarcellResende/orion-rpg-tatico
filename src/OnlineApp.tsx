@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { CharacterSheet, type SaveState } from './App'
+import { MAX_MISSION_XP } from './data/progression'
 import { isSupabaseConfigured, requireSupabase } from './lib/supabase'
 import type { CampaignSummary, OnlineCharacter, ResourceQuickAction } from './onlineTypes'
-import { changeResource } from './rules/calculations'
+import { changeExperience, changeResource } from './rules/calculations'
 import { AuthScreen } from './screens/AuthScreen'
 import { CampaignLobby } from './screens/CampaignLobby'
 import { SetupRequired } from './screens/SetupRequired'
@@ -49,6 +50,7 @@ export function App() {
   const [loading, setLoading] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
   const [conditionActionLoading, setConditionActionLoading] = useState(false)
+  const [xpAwardLoading, setXpAwardLoading] = useState(false)
   const [saveState, setSaveState] = useState<SaveState>('saved')
   const [realtimeConnected, setRealtimeConnected] = useState(false)
   const [error, setError] = useState('')
@@ -229,6 +231,30 @@ export function App() {
     }
   }
 
+  const handleAwardMissionXp = async (characterIds: string[], amount: number, reason: string) => {
+    if (!selectedCampaign || selectedCampaign.role !== 'master') return
+    const safeAmount = Math.max(0, Math.min(MAX_MISSION_XP, Math.trunc(amount)))
+    if (safeAmount === 0) return
+    setXpAwardLoading(true)
+    setError('')
+    try {
+      const targets = squad.filter((character) => characterIds.includes(character.id))
+      const saved = await Promise.all(targets.map((character) => saveCharacter(
+        character.campaignId,
+        character.ownerId,
+        changeExperience(character.sheet, safeAmount, reason),
+      )))
+      const savedById = new Map(saved.map((character) => [character.id, character]))
+      setSquad((current) => current.map((character) => savedById.get(character.id) ?? character))
+    } catch (caught) {
+      setError(readableError(caught))
+      await refreshSquad()
+      throw caught
+    } finally {
+      setXpAwardLoading(false)
+    }
+  }
+
   const handleAddCondition = async (conditionId: string) => {
     if (!activeCharacter) return
     setConditionActionLoading(true)
@@ -326,6 +352,8 @@ export function App() {
         onOpenCharacter={(character) => { setActiveCharacter(character); setView('sheet') }}
         onOpenOwnCharacter={() => void showOwnCharacter()}
         onQuickAction={(action) => void handleQuickAction(action)}
+        xpAwardLoading={xpAwardLoading}
+        onAwardMissionXp={handleAwardMissionXp}
         onShowCampaigns={showCampaigns}
         onSignOut={() => void signOut()}
       />
@@ -354,4 +382,3 @@ export function App() {
     />
   )
 }
-

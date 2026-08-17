@@ -1916,6 +1916,67 @@ footer {
 .magazine-controls .reload-button { margin-left: auto; padding-inline: 0.8rem; }
 .inventory-remove { justify-self: end; }
 
+/* Online build 0.6: progressão individual e encerramento de missão */
+.progression-panel { margin-top: 1rem; }
+.xp-console {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+  padding: 0.9rem;
+  border: 1px solid var(--border);
+  background: rgba(8, 22, 25, 0.78);
+}
+.xp-level { display: grid; place-items: center; align-content: center; border: 1px solid var(--green); }
+.xp-level span { color: var(--green); font-size: 0.65rem; font-weight: 900; letter-spacing: 0.12em; }
+.xp-level strong { color: var(--text); font-size: 2.5rem; line-height: 1; }
+.xp-progress { display: grid; align-content: center; gap: 0.45rem; }
+.xp-progress > div:first-child { display: flex; justify-content: space-between; gap: 0.75rem; color: var(--muted); }
+.xp-progress > div:first-child strong { color: var(--text); }
+.xp-progress small { color: var(--green); }
+.xp-meter { height: 12px; overflow: hidden; border: 1px solid #385157; background: #071114; }
+.xp-meter span { display: block; height: 100%; background: linear-gradient(90deg, var(--green), var(--cyan)); transition: width 180ms ease; }
+.xp-adjust { display: grid; align-content: center; gap: 0.45rem; }
+.xp-adjust button { padding: 0.55rem 0.7rem; white-space: nowrap; }
+.progression-rewards-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; margin-bottom: 1rem; }
+.progression-rewards-summary span { padding: 0.75rem; border: 1px solid var(--border); color: var(--muted); }
+.progression-rewards-summary b { color: var(--cyan); }
+.progression-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+.level-table { display: grid; gap: 0.35rem; }
+.level-row { display: grid; grid-template-columns: 100px 70px minmax(0, 1fr); align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; border: 1px solid var(--border); color: var(--muted); }
+.level-row p { margin: 0; }
+.level-row--unlocked { border-left: 3px solid var(--green); }
+.level-row--unlocked b { color: var(--green); }
+.level-row--current { border-color: var(--cyan); background: rgba(76, 216, 255, 0.06); }
+.xp-history { display: grid; gap: 0.35rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.xp-history > strong { color: var(--green); font-size: 0.68rem; letter-spacing: 0.1em; }
+.xp-history > div { display: grid; grid-template-columns: 65px minmax(0, 1fr) auto; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); color: var(--muted); }
+.xp-history b { color: var(--cyan); }
+
+.mission-xp-panel { margin-bottom: 1.3rem; padding: 1rem; border: 1px solid var(--border); background: rgba(8, 22, 25, 0.78); }
+.mission-xp-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.mission-xp-heading > div { display: flex; align-items: center; gap: 0.75rem; }
+.mission-xp-heading h2 { margin: 0.15rem 0 0; }
+.mission-xp-heading > strong { color: var(--cyan); font-size: 1.25rem; }
+.mission-xp-panel > p { color: var(--muted); }
+.mission-xp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+.mission-xp-options,
+.mission-participants { display: grid; align-content: start; gap: 0.4rem; }
+.mission-participants > strong { color: var(--green); font-size: 0.68rem; letter-spacing: 0.1em; }
+.mission-xp-options label,
+.mission-participants label { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.65rem; padding: 0.65rem; border: 1px solid var(--border); color: var(--text); cursor: pointer; }
+.mission-xp-options input,
+.mission-participants input { width: 18px; height: 18px; accent-color: var(--green); }
+.mission-xp-options b,
+.mission-participants b { color: var(--cyan); font-size: 0.72rem; }
+.mission-xp-actions { display: flex; align-items: center; gap: 1rem; margin-top: 0.85rem; }
+.mission-xp-actions span { color: var(--green); }
+.operator-progression { display: flex; align-items: center; gap: 0.65rem; padding: 0.6rem 0; border-block: 1px solid var(--border); }
+.operator-progression span { color: var(--muted); font-size: 0.65rem; letter-spacing: 0.08em; }
+.operator-progression strong { color: var(--green); }
+.operator-progression b { margin-left: auto; color: var(--cyan); }
+
 .notes-field textarea {
   min-height: 360px;
   resize: vertical;
@@ -1944,5 +2005,12 @@ footer {
   .equipment-toggle { justify-content: flex-end; }
   .defense-shield-row { align-items: flex-start; }
   .defense-breakdown { flex-wrap: wrap; }
+  .xp-console { grid-template-columns: 80px minmax(0, 1fr); }
+  .xp-adjust { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; }
+  .progression-rewards-summary,
+  .progression-fields,
+  .mission-xp-grid { grid-template-columns: 1fr; }
+  .level-row { grid-template-columns: 80px 60px minmax(0, 1fr); gap: 0.45rem; font-size: 0.78rem; }
+  .mission-xp-heading,
+  .mission-xp-actions { align-items: stretch; flex-direction: column; }
 }
-
