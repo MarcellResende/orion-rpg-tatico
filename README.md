@@ -68,6 +68,10 @@ Cada ponto total em Combate gera 2 pontos de subperícia. As demais perícias ge
 
 Uma campanha criada pelo mestre começa sem fichas. A ficha do mestre só é criada quando ele usa **Criar minha ficha**; cada jogador cria apenas a própria ficha ao abrir a campanha pela primeira vez.
 
+## Como a hospedagem funciona
+
+O GitHub guarda o código-fonte. Cada atualização enviada para a branch `main` solicita uma nova publicação automática ao Netlify, que mantém o site acessível mesmo com o computador do mestre desligado. O Supabase é separado da hospedagem: ele guarda contas, campanhas, fichas e alterações em tempo real. Durante o RPG, o mestre cria a campanha, compartilha o código de convite e os jogadores entram pelo mesmo endereço do site.
+
 ## Atualização obrigatória do Supabase
 
 Projetos que já executaram a primeira migração também devem executar:
