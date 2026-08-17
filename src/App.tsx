@@ -103,6 +103,7 @@ export function CharacterSheet({
   const identityErrors = validateIdentity(character)
   const selectedFunction = FUNCTIONS.find((item) => item.id === character.identity.functionId)
   const selectedTrait = TRAITS.find((item) => item.id === character.identity.traitId)
+  const operatorLevel = calculateLevelFromXp(character.progression.xp)
   const stressAtLimit = character.resources.stress >= derived.maxStress
   const availableConditions = CONDITIONS.filter(
     (definition) => !conditions.some((active) => active.conditionId === definition.id),
@@ -186,9 +187,10 @@ export function CharacterSheet({
             <span className="eyebrow">OPERADOR</span>
             <strong>{character.identity.codename || character.identity.name || 'NÃO IDENTIFICADO'}</strong>
           </div>
-          <div>
-            <span className="eyebrow">NÍVEL</span>
-            <strong>{String(calculateLevelFromXp(character.progression.xp)).padStart(2, '0')}</strong>
+          <div className="mission-level-summary">
+            <span className="eyebrow">NÍVEL DO OPERADOR</span>
+            <strong>Nível {operatorLevel}</strong>
+            <small>{character.progression.xp} XP</small>
           </div>
           <div>
             <span className="eyebrow">FUNÇÃO</span>
@@ -289,7 +291,7 @@ export function CharacterSheet({
         <nav className="sheet-tabs" aria-label="Seções da ficha">
           <button type="button" className={activeTab === 'sheet' ? 'active' : ''} aria-pressed={activeTab === 'sheet'} onClick={() => setActiveTab('sheet')}>Ficha e perícias</button>
           <button type="button" className={activeTab === 'operations' ? 'active' : ''} aria-pressed={activeTab === 'operations'} onClick={() => setActiveTab('operations')}>Condições e inventário</button>
-          <button type="button" className={activeTab === 'progression' ? 'active' : ''} aria-pressed={activeTab === 'progression'} onClick={() => setActiveTab('progression')}>Progressão</button>
+          <button type="button" className={activeTab === 'progression' ? 'active' : ''} aria-pressed={activeTab === 'progression'} onClick={() => setActiveTab('progression')}>Progressão · Nível {operatorLevel}</button>
           <button type="button" className={activeTab === 'notes' ? 'active' : ''} aria-pressed={activeTab === 'notes'} onClick={() => setActiveTab('notes')}>Anotações</button>
         </nav>
 

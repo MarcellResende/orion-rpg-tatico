@@ -263,6 +263,18 @@ main {
   white-space: nowrap;
 }
 
+.mission-level-summary strong {
+  color: var(--green);
+  font-size: 0.94rem;
+}
+
+.mission-level-summary small {
+  color: var(--cyan);
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
 .critical-alert {
   display: flex;
   align-items: center;
