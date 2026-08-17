@@ -190,7 +190,7 @@ export const ATTRIBUTE_LABELS = {
 } as const
 
 export const ATTRIBUTE_EFFECTS = {
-  strength: 'A regra de carga aguarda decisão do mestre.',
+  strength: '+5 kg de capacidade de carga por ponto (base de 15 kg).',
   dexterity: '+5 de Energia máxima por ponto.',
   intelligence: '+1 ponto de perícia e Compostura por ponto.',
   constitution: '+10 PV máximos por ponto.',
