@@ -51,10 +51,10 @@ npm run build
 - Estresse máximo: `6`.
 - Pontos de perícia: `10 + Inteligência`.
 - Atributos disponíveis: `6`.
-- Carga base: `15 kg + (Tolerância total × 5 kg) + (Força total × 5 kg)`.
+- Carga base: `15 kg + (Força total × 5 kg)`.
 - Carga máxima absoluta: `200% da carga base`.
 
-Os bônus de atributos e perícias principais de função, traço e equipamento são somados automaticamente e exibidos separados dos pontos distribuídos. A sobrecarga aplica automaticamente as penalidades de Furtividade, Tolerância, custo de Energia e deslocamento previstas no manual. Para conciliar as duas referências do manual, Tolerância define a progressão da tabela e Força acrescenta os `+5 kg` descritos na ficha.
+Os bônus de atributos e perícias principais de função, traço e equipamento são somados automaticamente e exibidos separados dos pontos distribuídos. A sobrecarga aplica automaticamente as penalidades de Furtividade, Tolerância, custo de Energia e deslocamento. A capacidade usa apenas a regra da ficha: `15 kg` iniciais e `+5 kg` por ponto de Força total.
 
 Cada ponto total em Combate gera 2 pontos de subperícia. As demais perícias geram 1 ponto de especialização por ponto total. O total inclui os pontos distribuídos e os bônus gratuitos de função, traço e equipamento; por exemplo, Tecnologia `6 + 2` libera `8` pontos de especialização.
 

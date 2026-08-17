@@ -117,8 +117,7 @@ export const calculateInventoryWeight = (character: Character) =>
 
 export const calculateBaseLoadLimit = (character: Character) => {
   const attributes = calculateEffectiveAttributes(character)
-  const skills = calculateUnencumberedEffectiveSkills(character)
-  return 15 + skills.tolerance * 5 + attributes.strength * 5
+  return 15 + attributes.strength * 5
 }
 
 export const calculateLoadState = (character: Character): LoadState => {

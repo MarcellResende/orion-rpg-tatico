@@ -171,11 +171,11 @@ describe('bônus automáticos sem consumir pontos', () => {
 })
 
 describe('carga e sobrecarga', () => {
-  it('combina Tolerância total e Força total no limite de carga base', () => {
+  it('calcula a carga base apenas com 15 kg e o total de Força', () => {
     const character = createEmptyCharacter()
     character.skills.tolerance = 2
     character.attributes.strength = 1
-    expect(calculateBaseLoadLimit(character)).toBe(30)
+    expect(calculateBaseLoadLimit(character)).toBe(20)
   })
 
   it('classifica a carga de 100% até 200% e aplica as desvantagens do manual', () => {

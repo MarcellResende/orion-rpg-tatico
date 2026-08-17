@@ -187,7 +187,7 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
           {loadState.level === 'normal' && <span>Sem desvantagens</span>}
           {loadState.exceedsMaximum && <strong>Retire equipamentos: não é permitido operar acima de 200%.</strong>}
         </div>
-        <small>Capacidade: 15 kg + 5 kg por Tolerância total + 5 kg por Força total.</small>
+        <small>Capacidade: 15 kg + 5 kg por ponto de Força total.</small>
       </section>
 
       <form className="catalog-form" onSubmit={addCatalogItem}>
