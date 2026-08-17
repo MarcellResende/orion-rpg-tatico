@@ -198,6 +198,29 @@ export interface CharacterBonuses {
   subskills: Subskills
 }
 
+export type EncumbranceLevel =
+  | 'normal'
+  | 'light'
+  | 'moderate'
+  | 'heavy'
+  | 'severe'
+  | 'extreme'
+  | 'overMaximum'
+
+export interface LoadState {
+  weight: number
+  baseLimit: number
+  maximumLimit: number
+  percentage: number
+  level: EncumbranceLevel
+  label: string
+  description: string
+  skillPenalties: Partial<Record<SkillKey, number>>
+  energyCostPenalty: number
+  movementPenalty: number
+  exceedsMaximum: boolean
+}
+
 export interface DerivedResources {
   maxHp: number
   maxEnergy: number

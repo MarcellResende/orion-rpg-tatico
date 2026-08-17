@@ -21,6 +21,7 @@ import {
   calculateDerivedResources,
   calculateEffectiveAttributes,
   calculateEffectiveSkills,
+  calculateLoadState,
   calculateSkillPointsSpent,
   changeAttribute,
   changeDefenseOther,
@@ -93,6 +94,7 @@ export function CharacterSheet({
   const bonuses = calculateCharacterBonuses(character)
   const effectiveAttributes = calculateEffectiveAttributes(character)
   const effectiveSkills = calculateEffectiveSkills(character)
+  const loadState = calculateLoadState(character)
   const attributePointsSpent = calculateAttributePointsSpent(character.attributes)
   const skillPointsSpent = calculateSkillPointsSpent(character.skills)
   const attributePointsRemaining = ATTRIBUTE_POINT_LIMIT - attributePointsSpent
@@ -478,10 +480,12 @@ export function CharacterSheet({
                     key={key}
                     label={SKILL_LABELS[key]}
                     value={character.skills[key]}
-                    bonus={bonuses.skills[key]}
+                    bonus={effectiveSkills[key] - character.skills[key]}
                     hint={
-                      bonuses.skills[key] !== 0
-                        ? 'Total inclui bônus gratuito de função, traço ou equipamento ativo; ele não consome pontos.'
+                      (loadState.skillPenalties[key] ?? 0) !== 0
+                        ? `Total inclui ${loadState.skillPenalties[key]} de ${loadState.label.toLowerCase()}. A desvantagem desaparece ao reduzir a carga.`
+                        : bonuses.skills[key] !== 0
+                          ? 'Total inclui bônus gratuito de função, traço ou equipamento ativo; ele não consome pontos.'
                         : key === 'willpower'
                           ? 'Soma na Compostura máxima.'
                           : undefined
@@ -614,7 +618,7 @@ export function CharacterSheet({
       </main>
 
       <footer>
-        <span>ORION FIELD SYSTEM // ONLINE BUILD 0.4</span>
+        <span>ORION FIELD SYSTEM // ONLINE BUILD 0.5</span>
         <span>FONTE: MANUAL_RPG_TATICO.PDF</span>
       </footer>
     </div>

@@ -12,6 +12,7 @@ Aplicação React + TypeScript para fichas sincronizadas do RPG Tático. O mestr
 - controles rápidos de PV, Energia e Estresse;
 - oito condições oficiais do manual, com remoção exclusiva do mestre;
 - inventário com catálogo completo do manual, quantidade, peso e efeitos automáticos;
+- medidor de carga de 0% a 200%, com limite calculado e penalidades automáticas por sobrecarga;
 - armas com munição no pente, modos de disparo, pentes reserva e recarga;
 - proteções equipáveis que atualizam a Defesa imediatamente;
 - subperícias oficiais e especializações livres com orçamento próprio;
@@ -50,10 +51,12 @@ npm run build
 - Estresse máximo: `6`.
 - Pontos de perícia: `10 + Inteligência`.
 - Atributos disponíveis: `6`.
+- Carga base: `15 kg + (Tolerância total × 5 kg) + (Força total × 5 kg)`.
+- Carga máxima absoluta: `200% da carga base`.
 
-Os bônus de atributos e perícias principais de função e traço são somados automaticamente e exibidos separados dos pontos distribuídos. Bônus situacionais continuam identificados na descrição. A ficha calcula o peso total do inventário, mas o limite de carga permanece sob decisão do mestre porque o manual apresenta versões conflitantes baseadas em Força e Tolerância.
+Os bônus de atributos e perícias principais de função, traço e equipamento são somados automaticamente e exibidos separados dos pontos distribuídos. A sobrecarga aplica automaticamente as penalidades de Furtividade, Tolerância, custo de Energia e deslocamento previstas no manual. Para conciliar as duas referências do manual, Tolerância define a progressão da tabela e Força acrescenta os `+5 kg` descritos na ficha.
 
-Cada ponto distribuído em Combate gera 2 pontos de subperícia. As demais perícias geram 1 ponto de especialização por ponto distribuído. Bônus gratuitos não aumentam esse orçamento e aparecem separados do treino comprado.
+Cada ponto total em Combate gera 2 pontos de subperícia. As demais perícias geram 1 ponto de especialização por ponto total. O total inclui os pontos distribuídos e os bônus gratuitos de função, traço e equipamento; por exemplo, Tecnologia `6 + 2` libera `8` pontos de especialização.
 
 Uma campanha criada pelo mestre começa sem fichas. A ficha do mestre só é criada quando ele usa **Criar minha ficha**; cada jogador cria apenas a própria ficha ao abrir a campanha pela primeira vez.
 

@@ -3,6 +3,7 @@ import { SKILL_LABELS } from '../data/manual'
 import { SUBSKILL_RULES, subskillsFor } from '../data/subskills'
 import {
   calculateCharacterBonuses,
+  calculateUnencumberedEffectiveSkills,
   calculateSubskillPointsAvailable,
   calculateSubskillPointsSpent,
   changeCustomSpecialization,
@@ -23,6 +24,7 @@ export function SubskillsPanel({ character, onChange }: SubskillsPanelProps) {
   const [skillKey, setSkillKey] = useState<SkillKey>('combat')
   const [name, setName] = useState('')
   const bonuses = calculateCharacterBonuses(character).subskills
+  const effectiveSkills = calculateUnencumberedEffectiveSkills(character)
 
   const commit = (next: Character) => onChange({
     ...next,
@@ -53,7 +55,7 @@ export function SubskillsPanel({ character, onChange }: SubskillsPanelProps) {
         <span className="panel-code">TREINO</span>
       </div>
       <p className="panel-intro">
-        Pontos de subperícia vêm apenas dos pontos distribuídos na perícia principal. Bônus de função e equipamento aparecem separados e são gratuitos.
+        A reserva usa o total da perícia principal: pontos distribuídos + bônus gratuitos de função, traço e equipamento. Em Combate, cada ponto total gera 2 pontos de subperícia.
       </p>
 
       <div className="subskill-groups">
@@ -62,12 +64,19 @@ export function SubskillsPanel({ character, onChange }: SubskillsPanelProps) {
           const custom = character.specializations.filter((item) => item.skillKey === currentSkill)
           const available = calculateSubskillPointsAvailable(character, currentSkill)
           const spent = calculateSubskillPointsSpent(character, currentSkill)
+          const base = character.skills[currentSkill]
+          const freeBonus = effectiveSkills[currentSkill] - base
           return (
-            <details className="subskill-group" key={currentSkill} open={currentSkill === 'combat'}>
-              <summary>
-                <span><strong>{SKILL_LABELS[currentSkill]}</strong><small>{SUBSKILL_RULES[currentSkill]}</small></span>
+            <section className="subskill-group" key={currentSkill}>
+              <div className="subskill-group__header">
+                <span>
+                  <strong>{SKILL_LABELS[currentSkill]}</strong>
+                  <small>
+                    Total {effectiveSkills[currentSkill]} = {base} distribuído{freeBonus !== 0 ? ` ${freeBonus > 0 ? '+' : '−'} ${Math.abs(freeBonus)} gratuito` : ''}. {SUBSKILL_RULES[currentSkill]}
+                  </small>
+                </span>
                 <b>{spent} / {available}</b>
-              </summary>
+              </div>
               <div className="subskill-group__content">
                 {definitions.length === 0 && custom.length === 0 && (
                   <div className="empty-inline">Adicione abaixo uma especialização própria para esta perícia.</div>
@@ -109,7 +118,7 @@ export function SubskillsPanel({ character, onChange }: SubskillsPanelProps) {
                   </div>
                 ))}
               </div>
-            </details>
+            </section>
           )
         })}
       </div>

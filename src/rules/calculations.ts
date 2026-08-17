@@ -11,6 +11,7 @@ import {
   type CharacterBonuses,
   type DerivedResources,
   type IdentityValidation,
+  type LoadState,
   type ResourceKey,
   type ResourceState,
   type SkillKey,
@@ -101,10 +102,102 @@ export const calculateEffectiveAttributes = (character: Character): Attributes =
   ) as unknown as Attributes
 }
 
-export const calculateEffectiveSkills = (character: Character): Skills => {
+export const calculateUnencumberedEffectiveSkills = (character: Character): Skills => {
   const bonuses = calculateCharacterBonuses(character).skills
   return Object.fromEntries(
     SKILL_KEYS.map((key) => [key, Math.max(0, character.skills[key] + bonuses[key])]),
+  ) as unknown as Skills
+}
+
+export const calculateInventoryWeight = (character: Character) =>
+  Math.round(character.inventory.reduce(
+    (total, item) => total + item.weight * item.quantity,
+    0,
+  ) * 100) / 100
+
+export const calculateBaseLoadLimit = (character: Character) => {
+  const attributes = calculateEffectiveAttributes(character)
+  const skills = calculateUnencumberedEffectiveSkills(character)
+  return 15 + skills.tolerance * 5 + attributes.strength * 5
+}
+
+export const calculateLoadState = (character: Character): LoadState => {
+  const weight = calculateInventoryWeight(character)
+  const baseLimit = calculateBaseLoadLimit(character)
+  const maximumLimit = baseLimit * 2
+  const percentage = baseLimit > 0 ? Math.round((weight / baseLimit) * 1000) / 10 : 0
+
+  const common = { weight, baseLimit, maximumLimit, percentage }
+  if (percentage <= 100) return {
+    ...common,
+    level: 'normal',
+    label: 'Carga operacional',
+    description: 'Dentro do limite base. Nenhuma penalidade de carga.',
+    skillPenalties: {},
+    energyCostPenalty: 0,
+    movementPenalty: 0,
+    exceedsMaximum: false,
+  }
+  if (percentage <= 110) return {
+    ...common,
+    level: 'light',
+    label: 'Sobrecarga leve',
+    description: 'A mochila cheia gera volume e ruído ao se mover.',
+    skillPenalties: { stealth: -2 },
+    energyCostPenalty: 0,
+    movementPenalty: 0,
+    exceedsMaximum: false,
+  }
+  if (percentage <= 125) return {
+    ...common,
+    level: 'moderate',
+    label: 'Sobrecarga moderada',
+    description: 'O peso força os ombros, a lombar e a resistência do operador.',
+    skillPenalties: { stealth: -4, tolerance: -2 },
+    energyCostPenalty: 0,
+    movementPenalty: 0,
+    exceedsMaximum: false,
+  }
+  if (percentage <= 150) return {
+    ...common,
+    level: 'heavy',
+    label: 'Sobrecarga pesada',
+    description: 'A carga causa cansaço rápido durante passos e manobras táticas.',
+    skillPenalties: { stealth: -4, tolerance: -4 },
+    energyCostPenalty: 1,
+    movementPenalty: 0,
+    exceedsMaximum: false,
+  }
+  if (percentage <= 175) return {
+    ...common,
+    level: 'severe',
+    label: 'Sobrecarga severa',
+    description: 'O ritmo de marcha cai drasticamente sob o peso carregado.',
+    skillPenalties: { stealth: -4, tolerance: -4 },
+    energyCostPenalty: 1,
+    movementPenalty: -3,
+    exceedsMaximum: false,
+  }
+
+  return {
+    ...common,
+    level: percentage <= 200 ? 'extreme' : 'overMaximum',
+    label: percentage <= 200 ? 'Sobrecarga extrema' : 'Carga máxima excedida',
+    description: percentage <= 200
+      ? 'O operador está entre 175% e 200% da capacidade base: seu limite físico absoluto.'
+      : 'O inventário passou de 200% da capacidade. Retire itens antes da operação.',
+    skillPenalties: { stealth: -4, tolerance: -4 },
+    energyCostPenalty: 2,
+    movementPenalty: -3,
+    exceedsMaximum: percentage > 200,
+  }
+}
+
+export const calculateEffectiveSkills = (character: Character): Skills => {
+  const skills = calculateUnencumberedEffectiveSkills(character)
+  const penalties = calculateLoadState(character).skillPenalties
+  return Object.fromEntries(
+    SKILL_KEYS.map((key) => [key, Math.max(0, skills[key] + (penalties[key] ?? 0))]),
   ) as unknown as Skills
 }
 
@@ -157,7 +250,7 @@ export const calculateSkillPointsSpent = (skills: Skills) =>
 const specializationRatio = (skillKey: SkillKey) => skillKey === 'combat' ? 2 : 1
 
 export const calculateSubskillPointsAvailable = (character: Character, skillKey: SkillKey) =>
-  character.skills[skillKey] * specializationRatio(skillKey)
+  calculateUnencumberedEffectiveSkills(character)[skillKey] * specializationRatio(skillKey)
 
 export const calculateSubskillPointsSpent = (character: Character, skillKey: SkillKey) => {
   const defined = SUBSKILLS
@@ -186,12 +279,6 @@ export const calculateDerivedResources = (character: Character): DerivedResource
     maxSkillPoints: calculateMaxSkillPoints(attributes),
   }
 }
-
-export const calculateInventoryWeight = (character: Character) =>
-  Math.round(character.inventory.reduce(
-    (total, item) => total + item.weight * item.quantity,
-    0,
-  ) * 100) / 100
 
 export const clamp = (value: number, minimum: number, maximum: number) =>
   Math.min(Math.max(Math.round(Number.isFinite(value) ? value : minimum), minimum), maximum)
@@ -305,17 +392,15 @@ export const changeSkill = (
     return character
   }
   if (step < 0 && current === 0) return character
-  if (
-    step < 0 &&
-    calculateSubskillPointsSpent(character, key) > (current - 1) * specializationRatio(key)
-  ) {
+  const candidate = {
+    ...character,
+    skills: { ...character.skills, [key]: current + step },
+  }
+  if (step < 0 && calculateSubskillPointsSpent(character, key) > calculateSubskillPointsAvailable(candidate, key)) {
     return character
   }
 
-  return withClampedResources({
-    ...character,
-    skills: { ...character.skills, [key]: current + step },
-  })
+  return withClampedResources(candidate)
 }
 
 export const changeSubskill = (

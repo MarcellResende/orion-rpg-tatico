@@ -3,11 +3,13 @@ import { createEmptyCharacter } from '../character'
 import { findEquipment } from '../data/equipment'
 import {
   calculateAttributePointsSpent,
+  calculateBaseLoadLimit,
   calculateCharacterBonuses,
   calculateDerivedResources,
   calculateEffectiveAttributes,
   calculateEffectiveSkills,
   calculateInventoryWeight,
+  calculateLoadState,
   calculateMaxComposure,
   calculateMaxEnergy,
   calculateMaxHp,
@@ -147,6 +149,58 @@ describe('bônus automáticos sem consumir pontos', () => {
     character.identity.functionId = 'artillery'
     expect(calculateCharacterBonuses(character).subskills.artilleryWeapons).toBe(3)
     expect(calculateSubskillPointsSpent(character, 'combat')).toBe(0)
+  })
+
+  it('usa o total da perícia, incluindo bônus gratuito, na reserva de subperícias', () => {
+    const character = createEmptyCharacter()
+    character.skills.technology = 6
+    character.inventory = [catalogInventoryItem('invasion-tools')]
+
+    expect(calculateEffectiveSkills(character).technology).toBe(8)
+    expect(calculateSubskillPointsAvailable(character, 'technology')).toBe(8)
+  })
+
+  it('aplica também o bônus gratuito no total dobrado das subperícias de Combate', () => {
+    const character = createEmptyCharacter()
+    character.skills.combat = 1
+    character.identity.functionId = 'infantry'
+
+    expect(calculateEffectiveSkills(character).combat).toBe(3)
+    expect(calculateSubskillPointsAvailable(character, 'combat')).toBe(6)
+  })
+})
+
+describe('carga e sobrecarga', () => {
+  it('combina Tolerância total e Força total no limite de carga base', () => {
+    const character = createEmptyCharacter()
+    character.skills.tolerance = 2
+    character.attributes.strength = 1
+    expect(calculateBaseLoadLimit(character)).toBe(30)
+  })
+
+  it('classifica a carga de 100% até 200% e aplica as desvantagens do manual', () => {
+    const character = createEmptyCharacter()
+    character.skills.stealth = 6
+    character.inventory = [
+      { id: 'load', catalogItemId: '', name: 'Carga', quantity: 1, weight: 18, notes: '', category: 'custom', effect: '', active: true },
+    ]
+
+    const load = calculateLoadState(character)
+    expect(load.percentage).toBe(120)
+    expect(load.level).toBe('moderate')
+    expect(load.skillPenalties).toEqual({ stealth: -4, tolerance: -2 })
+    expect(calculateEffectiveSkills(character).stealth).toBe(2)
+  })
+
+  it('marca 200% como sobrecarga extrema e mais de 200% como inválido', () => {
+    const character = createEmptyCharacter()
+    character.inventory = [
+      { id: 'load', catalogItemId: '', name: 'Carga', quantity: 1, weight: 30, notes: '', category: 'custom', effect: '', active: true },
+    ]
+    expect(calculateLoadState(character)).toMatchObject({ level: 'extreme', percentage: 200, exceedsMaximum: false })
+
+    character.inventory[0].weight = 31
+    expect(calculateLoadState(character)).toMatchObject({ level: 'overMaximum', exceedsMaximum: true })
   })
 })
 
