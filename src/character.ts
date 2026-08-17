@@ -1,13 +1,18 @@
 import {
   ATTRIBUTE_KEYS,
   SKILL_KEYS,
+  SUBSKILL_KEYS,
   type Attributes,
   type Character,
+  type CustomSpecialization,
+  type EquipmentCategory,
+  type EquipmentSlot,
   type FunctionChoices,
   type Identity,
   type InventoryItem,
   type ResourceState,
   type Skills,
+  type Subskills,
 } from './types'
 import {
   ATTRIBUTE_POINT_LIMIT,
@@ -35,6 +40,10 @@ const EMPTY_SKILLS: Skills = {
   willpower: 0,
 }
 
+const EMPTY_SUBSKILLS: Subskills = Object.fromEntries(
+  SUBSKILL_KEYS.map((key) => [key, 0]),
+) as Subskills
+
 const EMPTY_IDENTITY: Identity = {
   name: '',
   codename: '',
@@ -46,19 +55,23 @@ const EMPTY_IDENTITY: Identity = {
 }
 
 export const createEmptyCharacter = (): Character => ({
-  schemaVersion: 2,
+  schemaVersion: 3,
   level: 1,
   identity: { ...EMPTY_IDENTITY },
   functionChoices: {},
   attributes: { ...EMPTY_ATTRIBUTES },
   skills: { ...EMPTY_SKILLS },
+  subskills: { ...EMPTY_SUBSKILLS },
+  specializations: [],
   resources: {
     hp: 20,
     energy: 10,
     composure: 5,
     stress: 0,
   },
+  defenseModifiers: { other: 0 },
   inventory: [],
+  notes: '',
   updatedAt: new Date().toISOString(),
 })
 
@@ -76,18 +89,77 @@ const safeDecimal = (value: unknown, minimum: number, maximum: number) => {
   return Math.min(Math.max(Math.round(number * 100) / 100, minimum), maximum)
 }
 
+const EQUIPMENT_CATEGORIES: EquipmentCategory[] = [
+  'primaryWeapon',
+  'secondaryWeapon',
+  'recon',
+  'electronic',
+  'explosive',
+  'medical',
+  'ammunition',
+  'protection',
+  'survival',
+  'custom',
+]
+
+const EQUIPMENT_SLOTS: EquipmentSlot[] = ['primary', 'secondary', 'armor', 'shield']
+
 const hydrateInventory = (value: unknown): InventoryItem[] => {
   if (!Array.isArray(value)) return []
   return value.slice(0, 100).flatMap((raw, index) => {
     const item = safeObject(raw)
     const name = safeText(item.name, 100).trim()
     if (!name) return []
+    const category = typeof item.category === 'string' && EQUIPMENT_CATEGORIES.includes(item.category as EquipmentCategory)
+      ? item.category as EquipmentCategory
+      : 'custom'
+    const slot = typeof item.slot === 'string' && EQUIPMENT_SLOTS.includes(item.slot as EquipmentSlot)
+      ? item.slot as EquipmentSlot
+      : undefined
+    const weaponSource = safeObject(item.weapon)
+    const magazineCapacity = clamp(safeNumber(weaponSource.magazineCapacity), 0, 999)
+    const allowedShots = Array.isArray(weaponSource.allowedShots)
+      ? [...new Set(weaponSource.allowedShots.map((shot) => clamp(safeNumber(shot), 1, 10)))].sort((a, b) => a - b)
+      : []
     return [{
       id: safeText(item.id, 100) || `legacy-${index}`,
+      catalogItemId: safeText(item.catalogItemId, 100),
       name,
       quantity: clamp(safeNumber(item.quantity, 1), 1, 999),
       weight: safeDecimal(item.weight, 0, 9999),
       notes: safeText(item.notes, 300),
+      category,
+      effect: safeText(item.effect, 1000),
+      active: typeof item.active === 'boolean' ? item.active : true,
+      slot,
+      selectedSkillBonus:
+        typeof item.selectedSkillBonus === 'string' && SKILL_KEYS.includes(item.selectedSkillBonus as never)
+          ? item.selectedSkillBonus as InventoryItem['selectedSkillBonus']
+          : undefined,
+      weapon: magazineCapacity > 0
+        ? {
+            magazineCapacity,
+            ammo: clamp(safeNumber(weaponSource.ammo, magazineCapacity), 0, magazineCapacity),
+            spareMagazines: clamp(safeNumber(weaponSource.spareMagazines), 0, 99),
+            allowedShots: allowedShots.length > 0 ? allowedShots : [1],
+          }
+        : undefined,
+    }]
+  })
+}
+
+const hydrateSpecializations = (value: unknown): CustomSpecialization[] => {
+  if (!Array.isArray(value)) return []
+  return value.slice(0, 50).flatMap((raw, index) => {
+    const specialization = safeObject(raw)
+    const name = safeText(specialization.name, 80).trim()
+    const skillKey = specialization.skillKey
+    if (!name || typeof skillKey !== 'string' || !SKILL_KEYS.includes(skillKey as never)) return []
+    return [{
+      id: safeText(specialization.id, 100) || `specialization-${index}`,
+      skillKey: skillKey as CustomSpecialization['skillKey'],
+      name,
+      value: clamp(safeNumber(specialization.value), 0, 99),
     }]
   })
 }
@@ -98,7 +170,9 @@ export const hydrateCharacter = (value: unknown): Character => {
   const choicesSource = safeObject(root.functionChoices)
   const attributesSource = safeObject(root.attributes)
   const skillsSource = safeObject(root.skills)
+  const subskillsSource = safeObject(root.subskills)
   const resourcesSource = safeObject(root.resources)
+  const defenseSource = safeObject(root.defenseModifiers)
 
   const identity: Identity = {
     name: safeText(identitySource.name),
@@ -135,14 +209,20 @@ export const hydrateCharacter = (value: unknown): Character => {
   }
 
   const character: Character = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     level: 1,
     identity,
     functionChoices,
     attributes,
     skills: { ...EMPTY_SKILLS },
+    subskills: { ...EMPTY_SUBSKILLS },
+    specializations: hydrateSpecializations(root.specializations),
     resources,
+    defenseModifiers: {
+      other: clamp(safeNumber(defenseSource.other), -20, 20),
+    },
     inventory: hydrateInventory(root.inventory),
+    notes: safeText(root.notes, 20000),
     updatedAt: safeText(root.updatedAt) || new Date().toISOString(),
   }
 
@@ -152,5 +232,10 @@ export const hydrateCharacter = (value: unknown): Character => {
     remainingSkills -= character.skills[key]
   }
 
+  for (const key of SUBSKILL_KEYS) {
+    character.subskills[key] = clamp(safeNumber(subskillsSource[key]), 0, 99)
+  }
+
   return applyCharacterLimits(character)
 }
+

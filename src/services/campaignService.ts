@@ -45,6 +45,15 @@ const mapCampaign = (row: CampaignJoinRow): CampaignSummary => ({
   createdAt: row.campaigns.created_at,
 })
 
+export const deduplicateCampaigns = (campaigns: CampaignSummary[]) => {
+  const unique = new Map<string, CampaignSummary>()
+  for (const campaign of campaigns) {
+    const existing = unique.get(campaign.id)
+    if (!existing || campaign.role === 'master') unique.set(campaign.id, campaign)
+  }
+  return [...unique.values()]
+}
+
 const mapCondition = (row: ConditionRow): ActiveCondition => ({
   id: row.id,
   characterId: row.character_id,
@@ -88,13 +97,18 @@ const listConditionsForCharacters = async (characterIds: string[]) => {
 
 export async function listCampaigns(): Promise<CampaignSummary[]> {
   const client = requireSupabase()
+  const { data: authData, error: authError } = await client.auth.getSession()
+  if (authError) throw authError
+  const userId = authData.session?.user.id
+  if (!userId) return []
   const { data, error } = await client
     .from('campaign_members')
     .select('role, campaigns!campaign_members_campaign_id_fkey(id,name,description,invite_code,created_at)')
+    .eq('user_id', userId)
     .order('joined_at', { ascending: false })
 
   if (error) throw error
-  return ((data ?? []) as unknown as CampaignJoinRow[]).map(mapCampaign)
+  return deduplicateCampaigns(((data ?? []) as unknown as CampaignJoinRow[]).map(mapCampaign))
 }
 
 export async function createCampaign(name: string, description: string) {
@@ -274,3 +288,4 @@ export function subscribeToSquad(
 export async function removeSubscription(channel: RealtimeChannel) {
   await requireSupabase().removeChannel(channel)
 }
+

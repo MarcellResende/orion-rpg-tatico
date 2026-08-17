@@ -40,6 +40,7 @@ export function SquadDashboard({
   onSignOut,
 }: SquadDashboardProps) {
   const [copied, setCopied] = useState(false)
+  const masterHasCharacter = characters.some((character) => character.ownerId === currentUserId)
 
   const copyInvite = async () => {
     await navigator.clipboard.writeText(campaign.inviteCode)
@@ -53,7 +54,7 @@ export function SquadDashboard({
         <div className="brand-lockup"><span className="brand-mark" aria-hidden="true">O</span><div><span className="eyebrow">ORION // ESCUDO DO MESTRE</span><h1>{campaign.name}</h1></div></div>
         <div className="topbar-actions">
           <span className={`save-state ${realtimeConnected ? 'save-state--saved' : 'save-state--saving'}`}><span aria-hidden="true" />{realtimeConnected ? 'Tempo real ativo' : 'Conectando'}</span>
-          <button type="button" className="secondary-button" onClick={onOpenOwnCharacter}>Minha ficha</button>
+          <button type="button" className="secondary-button" onClick={onOpenOwnCharacter}>{masterHasCharacter ? 'Minha ficha' : 'Criar minha ficha'}</button>
           <button type="button" className="secondary-button" onClick={onShowCampaigns}>Campanhas</button>
           <button type="button" className="text-button" onClick={onSignOut}>Sair</button>
         </div>
@@ -118,3 +119,4 @@ export function SquadDashboard({
     </div>
   )
 }
+

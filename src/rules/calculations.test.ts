@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createEmptyCharacter } from '../character'
+import { findEquipment } from '../data/equipment'
 import {
   calculateAttributePointsSpent,
   calculateCharacterBonuses,
@@ -12,11 +13,32 @@ import {
   calculateMaxHp,
   calculateMaxSkillPoints,
   calculateSkillPointsSpent,
+  calculateSubskillPointsAvailable,
+  calculateSubskillPointsSpent,
   changeAttribute,
   changeResource,
   changeSkill,
+  changeSubskill,
   validateIdentity,
 } from './calculations'
+import type { InventoryItem } from '../types'
+
+const catalogInventoryItem = (catalogItemId: string, active = true): InventoryItem => {
+  const definition = findEquipment(catalogItemId)
+  if (!definition) throw new Error(`Item de teste ausente: ${catalogItemId}`)
+  return {
+    id: `test-${catalogItemId}`,
+    catalogItemId,
+    name: definition.name,
+    quantity: 1,
+    weight: definition.weight,
+    notes: '',
+    category: definition.category,
+    effect: definition.effect,
+    active,
+    slot: definition.slot,
+  }
+}
 
 describe('cálculos do manual', () => {
   it('calcula 40 PV para Constituição 2', () => {
@@ -88,10 +110,43 @@ describe('bônus automáticos sem consumir pontos', () => {
   it('soma quantidade e peso unitário do inventário', () => {
     const character = createEmptyCharacter()
     character.inventory = [
-      { id: 'a', name: 'Granada', quantity: 2, weight: 0.5, notes: '' },
-      { id: 'b', name: 'Kit', quantity: 1, weight: 3, notes: '' },
+      { id: 'a', catalogItemId: '', name: 'Granada', quantity: 2, weight: 0.5, notes: '', category: 'custom', effect: '', active: true },
+      { id: 'b', catalogItemId: '', name: 'Kit', quantity: 1, weight: 3, notes: '', category: 'custom', effect: '', active: true },
     ]
     expect(calculateInventoryWeight(character)).toBe(4)
+  })
+
+  it('aplica bônus gratuito de perícia somente quando o equipamento está em uso', () => {
+    const character = createEmptyCharacter()
+    character.inventory = [catalogInventoryItem('ifak')]
+    expect(calculateEffectiveSkills(character).medicine).toBe(2)
+    expect(calculateSkillPointsSpent(character.skills)).toBe(0)
+
+    character.inventory[0].active = false
+    expect(calculateEffectiveSkills(character).medicine).toBe(0)
+  })
+
+  it('soma a proteção equipada à Defesa sem alterar a base', () => {
+    const character = createEmptyCharacter()
+    character.inventory = [
+      catalogInventoryItem('light-tactical-vest'),
+      catalogInventoryItem('ballistic-shield'),
+    ]
+    expect(calculateDerivedResources(character)).toMatchObject({
+      defenseBase: 10,
+      defenseEquipment: 10,
+      defense: 20,
+    })
+
+    character.inventory[1].active = false
+    expect(calculateDerivedResources(character).defense).toBe(15)
+  })
+
+  it('mantém bônus de Artilharia na subperícia sem gastar pontos', () => {
+    const character = createEmptyCharacter()
+    character.identity.functionId = 'artillery'
+    expect(calculateCharacterBonuses(character).subskills.artilleryWeapons).toBe(3)
+    expect(calculateSubskillPointsSpent(character, 'combat')).toBe(0)
   })
 })
 
@@ -123,6 +178,19 @@ describe('limites de criação', () => {
     const result = changeAttribute(character, 'intelligence', -1)
     expect(result.attributes.intelligence).toBe(1)
   })
+
+  it('gera dois pontos de subperícia por ponto distribuído em Combate', () => {
+    let character = createEmptyCharacter()
+    character = changeSkill(character, 'combat', 1)
+    expect(calculateSubskillPointsAvailable(character, 'combat')).toBe(2)
+
+    character = changeSubskill(character, 'mediumRangeWeapons', 1)
+    character = changeSubskill(character, 'shortRangeWeapons', 1)
+    character = changeSubskill(character, 'melee', 1)
+    expect(calculateSubskillPointsSpent(character, 'combat')).toBe(2)
+    expect(character.subskills.melee).toBe(0)
+    expect(changeSkill(character, 'combat', -1)).toBe(character)
+  })
 })
 
 describe('recursos atuais e validação', () => {
@@ -153,3 +221,4 @@ describe('recursos atuais e validação', () => {
     })
   })
 })
+

@@ -30,7 +30,7 @@ export const FUNCTIONS: FunctionDefinition[] = [
     description: 'Operador de armamentos pesados e fogo de supressão.',
     bonus: '+1 em Destreza e Força; +3 em Combate com Artilharias.',
     attributeBonuses: { dexterity: 1, strength: 1 },
-    skillBonuses: { combat: 3 },
+    subskillBonuses: { artilleryWeapons: 3 },
     exclusiveAbility: 'Supressão Avassaladora',
     sourcePage: 9,
   },
@@ -48,8 +48,9 @@ export const FUNCTIONS: FunctionDefinition[] = [
     id: 'sniper',
     name: 'Franco Atirador',
     description: 'Especialista em precisão, observação e engajamento a longa distância.',
-    bonus: '+1 em Destreza e Inteligência; bônus de perícia descrito no manual requer auditoria.',
+    bonus: '+1 em Destreza e Inteligência; +3 em Armas de Longo Alcance.',
     attributeBonuses: { dexterity: 1, intelligence: 1 },
+    subskillBonuses: { longRangeWeapons: 3 },
     exclusiveAbility: 'Tiro Cirúrgico',
     sourcePage: 9,
   },
@@ -279,3 +280,4 @@ export const CONDITIONS: ConditionDefinition[] = [
     sourcePage: 17,
   },
 ]
+

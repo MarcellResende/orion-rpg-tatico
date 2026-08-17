@@ -37,7 +37,7 @@ export function Stepper({
         </button>
         <output className="stepper-value" aria-label={`${label}: ${value + bonus}; ${value} distribuído e ${bonus} de bônus`}>
           {value + bonus}
-          {bonus > 0 && <small>{value} + {bonus}</small>}
+          {bonus !== 0 && <small>{value} {bonus > 0 ? '+' : '−'} {Math.abs(bonus)}</small>}
         </output>
         <button
           type="button"
@@ -52,3 +52,4 @@ export function Stepper({
     </div>
   )
 }
+

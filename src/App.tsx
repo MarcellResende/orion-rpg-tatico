@@ -1,7 +1,9 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { createEmptyCharacter } from './character'
+import { InventoryPanel } from './components/InventoryPanel'
 import { ResourceCard } from './components/ResourceCard'
 import { Stepper } from './components/Stepper'
+import { SubskillsPanel } from './components/SubskillsPanel'
 import {
   ATTRIBUTE_EFFECTS,
   ATTRIBUTE_LABELS,
@@ -19,9 +21,9 @@ import {
   calculateDerivedResources,
   calculateEffectiveAttributes,
   calculateEffectiveSkills,
-  calculateInventoryWeight,
   calculateSkillPointsSpent,
   changeAttribute,
+  changeDefenseOther,
   changeResource,
   changeSkill,
   setResource,
@@ -34,7 +36,6 @@ import {
   type AttributeKey,
   type Character,
   type Identity,
-  type InventoryItem,
   type ResourceKey,
 } from './types'
 
@@ -69,8 +70,7 @@ const hpTone = (current: number, maximum: number) => {
   return 'green' as const
 }
 
-const makeInventoryId = () =>
-  globalThis.crypto?.randomUUID?.() ?? `item-${Date.now()}-${Math.random().toString(36).slice(2)}`
+type SheetTab = 'sheet' | 'operations' | 'notes'
 
 export function CharacterSheet({
   character,
@@ -88,10 +88,7 @@ export function CharacterSheet({
   onSignOut,
 }: CharacterSheetProps) {
   const [conditionToAdd, setConditionToAdd] = useState('')
-  const [itemName, setItemName] = useState('')
-  const [itemQuantity, setItemQuantity] = useState(1)
-  const [itemWeight, setItemWeight] = useState(0)
-  const [itemNotes, setItemNotes] = useState('')
+  const [activeTab, setActiveTab] = useState<SheetTab>('sheet')
   const derived = calculateDerivedResources(character)
   const bonuses = calculateCharacterBonuses(character)
   const effectiveAttributes = calculateEffectiveAttributes(character)
@@ -104,7 +101,6 @@ export function CharacterSheet({
   const selectedFunction = FUNCTIONS.find((item) => item.id === character.identity.functionId)
   const selectedTrait = TRAITS.find((item) => item.id === character.identity.traitId)
   const stressAtLimit = character.resources.stress >= derived.maxStress
-  const inventoryWeight = calculateInventoryWeight(character)
   const availableConditions = CONDITIONS.filter(
     (definition) => !conditions.some((active) => active.conditionId === definition.id),
   )
@@ -143,31 +139,6 @@ export function CharacterSheet({
     if (!confirmed) return
 
     onChange(createEmptyCharacter())
-  }
-
-  const addInventoryItem = (event: FormEvent) => {
-    event.preventDefault()
-    const name = itemName.trim()
-    if (!name) return
-    const item: InventoryItem = {
-      id: makeInventoryId(),
-      name,
-      quantity: Math.max(1, Math.round(itemQuantity || 1)),
-      weight: Math.max(0, Math.round((itemWeight || 0) * 100) / 100),
-      notes: itemNotes.trim(),
-    }
-    commit((current) => ({ ...current, inventory: [...current.inventory, item] }))
-    setItemName('')
-    setItemQuantity(1)
-    setItemWeight(0)
-    setItemNotes('')
-  }
-
-  const removeInventoryItem = (itemId: string) => {
-    commit((current) => ({
-      ...current,
-      inventory: current.inventory.filter((item) => item.id !== itemId),
-    }))
   }
 
   return (
@@ -266,11 +237,26 @@ export function CharacterSheet({
                 <span className="eyebrow">DEF</span>
                 <h3>Defesa</h3>
               </div>
-              <span className="status-label">BASE</span>
+              <span className="status-label">PROTEGIDO</span>
             </div>
-            <div className="defense-value">{derived.defense}</div>
+            <div className="defense-shield-row">
+              <div className="defense-shield" aria-label={`Defesa total ${derived.defense}`}>{derived.defense}</div>
+              <div className="defense-breakdown">
+                <span><b>{derived.defenseBase}</b><small>Base</small></span>
+                <i>+</i>
+                <span><b>{derived.defenseEquipment}</b><small>Equip.</small></span>
+                <i>+</i>
+                <span><b>{derived.defenseOther}</b><small>Outros</small></span>
+              </div>
+            </div>
             <div className="resource-meter resource-meter--static" aria-hidden="true"><span /></div>
-            <p className="calculation-note">10 base. Cobertura, armadura e postura entrarão em uma fase futura.</p>
+            <div className="defense-other-control">
+              <span>Modificador situacional</span>
+              <button type="button" onClick={() => commit((current) => changeDefenseOther(current, -1))}>−</button>
+              <output>{derived.defenseOther}</output>
+              <button type="button" onClick={() => commit((current) => changeDefenseOther(current, 1))}>+</button>
+            </div>
+            <p className="calculation-note">Proteções são ligadas ou desligadas no Inventário. Apenas uma armadura e um escudo ficam equipados por vez.</p>
           </article>
           <ResourceCard
             label="Compostura"
@@ -297,7 +283,14 @@ export function CharacterSheet({
           />
         </section>
 
-        <div className="content-grid">
+        <nav className="sheet-tabs" aria-label="Seções da ficha">
+          <button type="button" className={activeTab === 'sheet' ? 'active' : ''} aria-pressed={activeTab === 'sheet'} onClick={() => setActiveTab('sheet')}>Ficha e perícias</button>
+          <button type="button" className={activeTab === 'operations' ? 'active' : ''} aria-pressed={activeTab === 'operations'} onClick={() => setActiveTab('operations')}>Condições e inventário</button>
+          <button type="button" className={activeTab === 'notes' ? 'active' : ''} aria-pressed={activeTab === 'notes'} onClick={() => setActiveTab('notes')}>Anotações</button>
+        </nav>
+
+        <div className="sheet-tab-panel" hidden={activeTab !== 'sheet'}>
+          <div className="content-grid">
           <div className="content-column">
             <section className="panel" aria-labelledby="identity-heading">
               <div className="panel-heading">
@@ -477,7 +470,7 @@ export function CharacterSheet({
                 </span>
               </div>
               <p className="panel-intro">
-                {derived.maxSkillPoints} pontos distribuíveis (10 base + Inteligência total). Bônus de função e traço aparecem no total e não gastam pontos.
+                {derived.maxSkillPoints} pontos distribuíveis (10 base + Inteligência total). Bônus de função, traço e equipamento aparecem no total e não gastam pontos.
               </p>
               <div className="stepper-list stepper-list--compact">
                 {SKILL_KEYS.map((key) => (
@@ -487,13 +480,13 @@ export function CharacterSheet({
                     value={character.skills[key]}
                     bonus={bonuses.skills[key]}
                     hint={
-                      bonuses.skills[key] > 0
-                        ? 'Total inclui bônus automático de função ou traço; vantagens de traço são situacionais.'
+                      bonuses.skills[key] !== 0
+                        ? 'Total inclui bônus gratuito de função, traço ou equipamento ativo; ele não consome pontos.'
                         : key === 'willpower'
                           ? 'Soma na Compostura máxima.'
                           : undefined
                     }
-                    disableDecrease={character.skills[key] === 0}
+                    disableDecrease={character.skills[key] === 0 || changeSkill(character, key, -1) === character}
                     disableIncrease={skillPointsRemaining === 0}
                     onDecrease={() => commit((current) => changeSkill(current, key, -1))}
                     onIncrease={() => commit((current) => changeSkill(current, key, 1))}
@@ -502,13 +495,17 @@ export function CharacterSheet({
               </div>
             </section>
           </div>
+          </div>
+
+          <SubskillsPanel character={character} onChange={onChange} />
         </div>
 
-        <div className="operations-grid">
+        <div className="sheet-tab-panel" hidden={activeTab !== 'operations'}>
+          <div className="operations-grid">
           <section className="panel operations-panel" aria-labelledby="conditions-heading">
             <div className="panel-heading">
               <div>
-                <span className="section-index">05</span>
+                <span className="section-index">06</span>
                 <h2 id="conditions-heading">Condições</h2>
               </div>
               <span className="point-counter">{conditions.length} ATIVA{conditions.length === 1 ? '' : 'S'}</span>
@@ -579,83 +576,31 @@ export function CharacterSheet({
             </div>
           </section>
 
-          <section className="panel operations-panel" aria-labelledby="inventory-heading">
+            <InventoryPanel character={character} onChange={onChange} />
+          </div>
+        </div>
+
+        <div className="sheet-tab-panel" hidden={activeTab !== 'notes'}>
+          <section className="panel notes-panel" aria-labelledby="notes-heading">
             <div className="panel-heading">
               <div>
-                <span className="section-index">06</span>
-                <h2 id="inventory-heading">Inventário</h2>
+                <span className="section-index">08</span>
+                <h2 id="notes-heading">Anotações do operador</h2>
               </div>
-              <span className="point-counter">{inventoryWeight.toLocaleString('pt-BR')} KG</span>
+              <span className="panel-code">PRIVADO</span>
             </div>
-            <p className="panel-intro">
-              O peso total é calculado automaticamente. O limite de carga continua sob decisão do mestre por conflito no manual.
-            </p>
-
-            {character.inventory.length === 0 ? (
-              <div className="empty-inline">Nenhum equipamento adicionado.</div>
-            ) : (
-              <div className="inventory-list">
-                {character.inventory.map((item) => (
-                  <article className="inventory-item" key={item.id}>
-                    <div>
-                      <strong>{item.name}</strong>
-                      <span>{item.quantity} × {item.weight.toLocaleString('pt-BR')} kg</span>
-                      {item.notes && <p>{item.notes}</p>}
-                    </div>
-                    <div>
-                      <b>{(item.quantity * item.weight).toLocaleString('pt-BR')} kg</b>
-                      <button type="button" className="danger-text-button" onClick={() => removeInventoryItem(item.id)}>
-                        Remover
-                      </button>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-
-            <form className="inventory-form" onSubmit={addInventoryItem}>
-              <label className="field inventory-name">
-                <span>Equipamento</span>
-                <input
-                  value={itemName}
-                  maxLength={100}
-                  required
-                  placeholder="Ex.: Kit Médico de Trauma"
-                  onChange={(event) => setItemName(event.currentTarget.value)}
-                />
-              </label>
-              <label className="field">
-                <span>Quantidade</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={999}
-                  value={itemQuantity}
-                  onChange={(event) => setItemQuantity(event.currentTarget.valueAsNumber)}
-                />
-              </label>
-              <label className="field">
-                <span>Peso unitário (kg)</span>
-                <input
-                  type="number"
-                  min={0}
-                  max={9999}
-                  step="0.01"
-                  value={itemWeight}
-                  onChange={(event) => setItemWeight(event.currentTarget.valueAsNumber)}
-                />
-              </label>
-              <label className="field inventory-notes">
-                <span>Observação</span>
-                <input
-                  value={itemNotes}
-                  maxLength={300}
-                  placeholder="Usos, munição ou efeito"
-                  onChange={(event) => setItemNotes(event.currentTarget.value)}
-                />
-              </label>
-              <button type="submit" className="primary-button">Adicionar equipamento</button>
-            </form>
+            <p className="panel-intro">Use este espaço para pistas, contatos, objetivos e lembretes. O jogador e o mestre podem consultar estas anotações na ficha.</p>
+            <label className="field notes-field">
+              <span>Registro de campo</span>
+              <textarea
+                rows={18}
+                maxLength={20000}
+                value={character.notes}
+                placeholder="Escreva livremente. O salvamento aguarda você parar de digitar e não substituirá texto novo por respostas antigas."
+                onChange={(event) => commit((current) => ({ ...current, notes: event.currentTarget.value }))}
+              />
+              <small>{character.notes.length.toLocaleString('pt-BR')} / 20.000 caracteres</small>
+            </label>
           </section>
         </div>
 
@@ -669,9 +614,10 @@ export function CharacterSheet({
       </main>
 
       <footer>
-        <span>ORION FIELD SYSTEM // ONLINE BUILD 0.3</span>
+        <span>ORION FIELD SYSTEM // ONLINE BUILD 0.4</span>
         <span>FONTE: MANUAL_RPG_TATICO.PDF</span>
       </footer>
     </div>
   )
 }
+

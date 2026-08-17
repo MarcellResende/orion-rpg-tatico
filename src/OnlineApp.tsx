@@ -24,6 +24,13 @@ import type { Character } from './types'
 
 type AppView = 'lobby' | 'sheet' | 'squad'
 
+interface PendingCharacterSave {
+  campaignId: string
+  ownerId: string
+  character: Character
+  revision: number
+}
+
 const readableError = (caught: unknown) => {
   const message = caught instanceof Error ? caught.message : 'Ocorreu um erro inesperado.'
   if (message.toLowerCase().includes('campaign_not_found')) return 'Código de campanha não encontrado.'
@@ -46,6 +53,9 @@ export function App() {
   const [realtimeConnected, setRealtimeConnected] = useState(false)
   const [error, setError] = useState('')
   const saveTimer = useRef<number | null>(null)
+  const saveRevision = useRef(0)
+  const pendingSave = useRef<PendingCharacterSave | null>(null)
+  const saveInFlight = useRef(false)
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -120,17 +130,38 @@ export function App() {
     if (saveTimer.current !== null) window.clearTimeout(saveTimer.current)
   }, [])
 
+  const flushPendingSave = async () => {
+    if (saveInFlight.current) return
+    const pending = pendingSave.current
+    if (!pending) return
+    pendingSave.current = null
+    saveInFlight.current = true
+    try {
+      await saveCharacter(pending.campaignId, pending.ownerId, pending.character)
+      if (saveRevision.current === pending.revision && pendingSave.current === null) {
+        setSaveState('saved')
+      }
+    } catch (caught) {
+      setSaveState('error')
+      setError(readableError(caught))
+    } finally {
+      saveInFlight.current = false
+      if (pendingSave.current && saveTimer.current === null) void flushPendingSave()
+    }
+  }
+
   const openCampaign = async (campaign: CampaignSummary) => {
     if (!session) return
     setLoading(true)
     setError('')
     try {
-      const ownCharacter = await getOrCreateCharacter(campaign.id, session.user.id)
       setSelectedCampaign(campaign)
-      setActiveCharacter(ownCharacter)
       if (campaign.role === 'master') {
+        setActiveCharacter(null)
         setView('squad')
       } else {
+        const ownCharacter = await getOrCreateCharacter(campaign.id, session.user.id)
+        setActiveCharacter(ownCharacter)
         setView('sheet')
       }
     } catch (caught) {
@@ -170,21 +201,21 @@ export function App() {
 
   const scheduleSave = (nextCharacter: Character) => {
     if (!selectedCampaign || !activeCharacter) return
-    const campaignId = selectedCampaign.id
-    const ownerId = activeCharacter.ownerId
-    setActiveCharacter({ ...activeCharacter, sheet: nextCharacter })
+    const revision = saveRevision.current + 1
+    saveRevision.current = revision
+    pendingSave.current = {
+      campaignId: selectedCampaign.id,
+      ownerId: activeCharacter.ownerId,
+      character: nextCharacter,
+      revision,
+    }
+    setActiveCharacter((current) => current ? { ...current, sheet: nextCharacter } : current)
     setSaveState('saving')
     if (saveTimer.current !== null) window.clearTimeout(saveTimer.current)
-    saveTimer.current = window.setTimeout(async () => {
-      try {
-        const saved = await saveCharacter(campaignId, ownerId, nextCharacter)
-        setActiveCharacter(saved)
-        setSaveState('saved')
-      } catch (caught) {
-        setSaveState('error')
-        setError(readableError(caught))
-      }
-    }, 500)
+    saveTimer.current = window.setTimeout(() => {
+      saveTimer.current = null
+      void flushPendingSave()
+    }, 900)
   }
 
   const handleQuickAction = async ({ character, resource, delta }: ResourceQuickAction) => {
@@ -323,3 +354,4 @@ export function App() {
     />
   )
 }
+
