@@ -395,8 +395,9 @@ export const changeSkill = (
     ...character,
     skills: { ...character.skills, [key]: current + step },
   }
-  if (step < 0 && calculateSubskillPointsSpent(character, key) > calculateSubskillPointsAvailable(candidate, key)) {
-    return character
+  if (step < 0) {
+    const specializationValues = clampSpecializations(candidate)
+    return withClampedResources({ ...candidate, ...specializationValues })
   }
 
   return withClampedResources(candidate)

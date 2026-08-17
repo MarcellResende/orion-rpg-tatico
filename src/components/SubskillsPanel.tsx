@@ -55,7 +55,7 @@ export function SubskillsPanel({ character, onChange }: SubskillsPanelProps) {
         <span className="panel-code">TREINO</span>
       </div>
       <p className="panel-intro">
-        A reserva usa o total da perícia principal: pontos distribuídos + bônus gratuitos de função, traço e equipamento. Em Combate, cada ponto total gera 2 pontos de subperícia.
+        A reserva usa o total da perícia principal: pontos distribuídos + bônus gratuitos de função, traço e equipamento. Em Combate, cada ponto total gera 2 pontos de subperícia. Ao reduzir a perícia principal, pontos excedentes das especializações são devolvidos automaticamente.
       </p>
 
       <div className="subskill-groups">

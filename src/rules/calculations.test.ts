@@ -243,7 +243,29 @@ describe('limites de criação', () => {
     character = changeSubskill(character, 'melee', 1)
     expect(calculateSubskillPointsSpent(character, 'combat')).toBe(2)
     expect(character.subskills.melee).toBe(0)
-    expect(changeSkill(character, 'combat', -1)).toBe(character)
+
+    character = changeSkill(character, 'combat', -1)
+    expect(character.skills.combat).toBe(0)
+    expect(calculateSubskillPointsSpent(character, 'combat')).toBe(0)
+  })
+
+  it('permite adicionar e retirar um ponto de perícia principal', () => {
+    let character = createEmptyCharacter()
+    character = changeSkill(character, 'technology', 1)
+    expect(character.skills.technology).toBe(1)
+
+    character = changeSkill(character, 'technology', -1)
+    expect(character.skills.technology).toBe(0)
+  })
+
+  it('permite retirar o ponto de uma subperícia depois de adicioná-lo', () => {
+    let character = createEmptyCharacter()
+    character = changeSkill(character, 'technology', 1)
+    character = changeSubskill(character, 'mechanics', 1)
+    expect(character.subskills.mechanics).toBe(1)
+
+    character = changeSubskill(character, 'mechanics', -1)
+    expect(character.subskills.mechanics).toBe(0)
   })
 })
 
