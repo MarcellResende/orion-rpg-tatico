@@ -275,7 +275,10 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
                     <span>Bônus gratuito de +{skillChoice.amount}</span>
                     <select
                       value={item.selectedSkillBonus ?? skillChoice.options[0]}
-                      onChange={(event) => updateItem(item.id, (current) => ({ ...current, selectedSkillBonus: event.currentTarget.value as SkillKey }))}
+                      onChange={(event) => {
+                        const selectedSkillBonus = event.currentTarget.value as SkillKey
+                        updateItem(item.id, (current) => ({ ...current, selectedSkillBonus }))
+                      }}
                     >
                       {skillChoice.options.map((key) => <option key={key} value={key}>{SKILL_LABELS[key]}</option>)}
                     </select>
@@ -315,4 +318,3 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
     </section>
   )
 }
-

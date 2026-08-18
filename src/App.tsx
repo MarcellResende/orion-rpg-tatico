@@ -609,7 +609,10 @@ export function CharacterSheet({
                 maxLength={20000}
                 value={character.notes}
                 placeholder="Escreva livremente. O salvamento aguarda você parar de digitar e não substituirá texto novo por respostas antigas."
-                onChange={(event) => commit((current) => ({ ...current, notes: event.currentTarget.value }))}
+                onChange={(event) => {
+                  const notes = event.currentTarget.value
+                  commit((current) => ({ ...current, notes }))
+                }}
               />
               <small>{character.notes.length.toLocaleString('pt-BR')} / 20.000 caracteres</small>
             </label>
