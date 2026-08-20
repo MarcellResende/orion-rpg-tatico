@@ -1,4 +1,5 @@
 import { findEquipment } from '../data/equipment'
+import { findGeneralAbility } from '../data/abilities'
 import { FUNCTIONS, TRAITS } from '../data/manual'
 import { LEVEL_TABLE } from '../data/progression'
 import { SUBSKILLS } from '../data/subskills'
@@ -42,6 +43,15 @@ export const calculateProgressionRewards = (level: number): ProgressionRewards =
   veteranTrainingUnlocked: level >= 8,
   maximumFunctionAbilityUnlocked: level >= 10,
 })
+
+export const calculateActiveGeneralAbilities = (character: Character) => {
+  const slots = calculateProgressionRewards(calculateLevelFromXp(character.progression.xp)).generalAbilitySlots
+  const selectedIds = [...new Set(character.progression.generalAbilities.slice(0, slots).filter(Boolean))]
+  return selectedIds.flatMap((abilityId) => {
+    const ability = findGeneralAbility(abilityId)
+    return ability ? [ability] : []
+  })
+}
 
 export const calculateAttributePointLimitForLevel = (level: number) =>
   ATTRIBUTE_POINT_LIMIT + calculateProgressionRewards(level).bonusAttributePoints
@@ -97,6 +107,15 @@ export const calculateCharacterBonuses = (character: Character): CharacterBonuse
     subskills[key] += selectedFunction?.subskillBonuses?.[key] ?? 0
   }
 
+  for (const ability of calculateActiveGeneralAbilities(character)) {
+    for (const key of SKILL_KEYS) {
+      skills[key] += ability.skillBonuses?.[key] ?? 0
+    }
+    for (const key of SUBSKILL_KEYS) {
+      subskills[key] += ability.subskillBonuses?.[key] ?? 0
+    }
+  }
+
   for (const inventoryItem of character.inventory) {
     if (!inventoryItem.active) continue
     const definition = findEquipment(inventoryItem.catalogItemId)
@@ -142,7 +161,9 @@ export const calculateInventoryWeight = (character: Character) =>
 
 export const calculateBaseLoadLimit = (character: Character) => {
   const attributes = calculateEffectiveAttributes(character)
-  return 15 + attributes.strength * 5
+  const abilityBonus = calculateActiveGeneralAbilities(character)
+    .reduce((total, ability) => total + (ability.loadLimitBonus ?? 0), 0)
+  return 15 + attributes.strength * 5 + abilityBonus
 }
 
 export const calculateLoadState = (character: Character): LoadState => {
@@ -219,9 +240,19 @@ export const calculateLoadState = (character: Character): LoadState => {
 
 export const calculateEffectiveSkills = (character: Character): Skills => {
   const skills = calculateUnencumberedEffectiveSkills(character)
-  const penalties = calculateLoadState(character).skillPenalties
+  const loadPenalties = calculateLoadState(character).skillPenalties
+  const stressPenalty = character.resources.stress >= 5
+    ? -2
+    : character.resources.stress >= 3
+      ? -1
+      : 0
   return Object.fromEntries(
-    SKILL_KEYS.map((key) => [key, Math.max(0, skills[key] + (penalties[key] ?? 0))]),
+    SKILL_KEYS.map((key) => [key, Math.max(
+      0,
+      skills[key] +
+      (loadPenalties[key] ?? 0) +
+      (key === 'communication' || key === 'exploration' ? stressPenalty : 0),
+    )]),
   ) as unknown as Skills
 }
 
@@ -292,8 +323,14 @@ export const calculateDerivedResources = (character: Character): DerivedResource
   const skills = calculateEffectiveSkills(character)
   const defenseEquipment = calculateEquipmentDefense(character)
   const defenseOther = character.defenseModifiers.other
+  const abilityMaxHpBonus = calculateActiveGeneralAbilities(character)
+    .reduce((total, ability) => total + (ability.maxHpBonus ?? 0), 0)
+  const level = calculateLevelFromXp(character.progression.xp)
+  const runnerIgnoresLoadMovement = calculateActiveGeneralAbilities(character)
+    .some((ability) => ability.id === 'tactical-runner')
+  const loadMovementPenalty = calculateLoadState(character).movementPenalty
   return {
-    maxHp: calculateMaxHp(attributes),
+    maxHp: calculateMaxHp(attributes) + abilityMaxHpBonus,
     maxEnergy: calculateMaxEnergy(attributes),
     defense: BASE_DEFENSE + defenseEquipment + defenseOther,
     defenseBase: BASE_DEFENSE,
@@ -301,8 +338,11 @@ export const calculateDerivedResources = (character: Character): DerivedResource
     defenseOther,
     maxComposure: calculateMaxComposure(attributes, skills),
     maxStress: calculateMaxStress(),
-    maxSkillPoints: calculateMaxSkillPoints(attributes) + calculateProgressionRewards(calculateLevelFromXp(character.progression.xp)).bonusSkillPoints,
+    maxSkillPoints: calculateMaxSkillPoints(attributes) + calculateProgressionRewards(level).bonusSkillPoints,
     maxAttributePoints: calculateAttributePointLimit(character),
+    socialDefense: 10 + skills.willpower,
+    bonusCap: 10 + level,
+    movement: Math.max(0, 9 + (runnerIgnoresLoadMovement ? 0 : loadMovementPenalty)),
   }
 }
 

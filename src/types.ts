@@ -73,6 +73,7 @@ export type EquipmentCategory =
   | 'ammunition'
   | 'protection'
   | 'survival'
+  | 'weaponModification'
   | 'custom'
 
 export interface WeaponState {
@@ -110,7 +111,7 @@ export interface ProgressionState {
 }
 
 export interface Character {
-  schemaVersion: 4
+  schemaVersion: 5
   level: number
   identity: Identity
   functionChoices: FunctionChoices
@@ -185,7 +186,21 @@ export interface FunctionDefinition {
   skillBonuses?: Partial<Record<SkillKey, number>>
   subskillBonuses?: Partial<Record<SubskillKey, number>>
   exclusiveAbility: string
+  exclusiveAbilityEffect: string
   sourcePage: number
+}
+
+export interface AbilityDefinition {
+  id: string
+  name: string
+  effect: string
+  sourcePage: number
+  skillBonuses?: Partial<Record<SkillKey, number>>
+  subskillBonuses?: Partial<Record<SubskillKey, number>>
+  maxHpBonus?: number
+  loadLimitBonus?: number
+  automaticSummary?: string
+  situational?: boolean
 }
 
 export interface TraitDefinition {
@@ -249,6 +264,9 @@ export interface DerivedResources {
   maxStress: number
   maxSkillPoints: number
   maxAttributePoints: number
+  socialDefense: number
+  bonusCap: number
+  movement: number
 }
 
 export interface ProgressionRewards {

@@ -4,7 +4,7 @@ import {
   calculateProgressionRewards,
   changeExperience,
 } from '../rules/calculations'
-import type { Character, ProgressionState } from '../types'
+import type { Character } from '../types'
 
 interface ProgressionPanelProps {
   character: Character
@@ -25,22 +25,6 @@ export function ProgressionPanel({ character, isMaster, onChange }: ProgressionP
     ...next,
     updatedAt: new Date().toISOString(),
   })
-
-  const updateProgression = <Key extends keyof ProgressionState>(key: Key, value: ProgressionState[Key]) => {
-    commit({
-      ...character,
-      progression: { ...character.progression, [key]: value },
-    })
-  }
-
-  const updateGeneralAbility = (index: number, value: string) => {
-    const abilities = Array.from(
-      { length: rewards.generalAbilitySlots },
-      (_, abilityIndex) => character.progression.generalAbilities[abilityIndex] ?? '',
-    )
-    abilities[index] = value
-    updateProgression('generalAbilities', abilities)
-  }
 
   return (
     <section className="panel progression-panel" aria-labelledby="progression-heading">
@@ -68,32 +52,13 @@ export function ProgressionPanel({ character, isMaster, onChange }: ProgressionP
       </div>
 
       <p className="panel-intro">
-        O mestre concede XP no painel do esquadrão ao encerrar a missão. Pontos extras de perícia e atributo são liberados automaticamente ao subir de nível.
+        O mestre concede XP no painel do esquadrão ao encerrar a missão. Pontos extras de perícia e atributo são liberados automaticamente; escolhas de habilidades ficam na aba “Habilidades”.
       </p>
 
       <div className="progression-rewards-summary">
         <span><b>+{rewards.bonusSkillPoints}</b> pontos de Perícia por nível</span>
         <span><b>+{rewards.bonusAttributePoints}</b> pontos de Atributo por nível</span>
         <span><b>{rewards.generalAbilitySlots}</b> Habilidades Gerais</span>
-      </div>
-
-      <div className="progression-fields">
-        {rewards.generalAbilitySlots > 0 ? Array.from({ length: rewards.generalAbilitySlots }, (_, index) => (
-          <label className="field" key={index}>
-            <span>Habilidade Geral {index + 1}</span>
-            <input maxLength={120} value={character.progression.generalAbilities[index] ?? ''} onChange={(event) => updateGeneralAbility(index, event.currentTarget.value)} placeholder="Registre a habilidade escolhida" />
-          </label>
-        )) : <div className="empty-inline">A primeira Habilidade Geral é liberada no nível 2.</div>}
-
-        {rewards.functionSpecializationUnlocked && (
-          <label className="field"><span>Especialização da Função</span><input maxLength={160} value={character.progression.functionSpecialization} onChange={(event) => updateProgression('functionSpecialization', event.currentTarget.value)} placeholder="Descreva a especialização do nível 5" /></label>
-        )}
-        {rewards.veteranTrainingUnlocked && (
-          <label className="field"><span>Treinamento Veterano</span><input maxLength={160} value={character.progression.veteranTraining} onChange={(event) => updateProgression('veteranTraining', event.currentTarget.value)} placeholder="Descreva o treinamento do nível 8" /></label>
-        )}
-        {rewards.maximumFunctionAbilityUnlocked && (
-          <label className="field"><span>Habilidade Máxima da Função</span><input maxLength={160} value={character.progression.maximumFunctionAbility} onChange={(event) => updateProgression('maximumFunctionAbility', event.currentTarget.value)} placeholder="Descreva a habilidade máxima do nível 10" /></label>
-        )}
       </div>
 
       <div className="level-table" role="table" aria-label="Tabela de níveis do operador">

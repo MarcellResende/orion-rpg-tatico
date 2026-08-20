@@ -1,6 +1,29 @@
 import type { Character, ResourceKey } from './types'
 
 export type CampaignRole = 'master' | 'player'
+export type AlertLevel = 'green' | 'yellow' | 'red'
+
+export interface CampaignProgressionState {
+  operationalPrestige: number
+  headquartersPoints: number
+  squadDoctrines: string[]
+  eliteDoctrine: string
+  headquartersProjects: string[]
+  missionSupports: string[]
+  heat: number
+  alert: AlertLevel
+}
+
+export const EMPTY_CAMPAIGN_PROGRESSION: CampaignProgressionState = {
+  operationalPrestige: 0,
+  headquartersPoints: 0,
+  squadDoctrines: [],
+  eliteDoctrine: '',
+  headquartersProjects: [],
+  missionSupports: [],
+  heat: 0,
+  alert: 'green',
+}
 
 export interface CampaignSummary {
   id: string
@@ -9,6 +32,7 @@ export interface CampaignSummary {
   inviteCode: string
   role: CampaignRole
   createdAt: string
+  progression: CampaignProgressionState
 }
 
 export interface OnlineCharacter {

@@ -3,10 +3,12 @@ import { createEmptyCharacter, hydrateCharacter } from '../character'
 import { requireSupabase } from '../lib/supabase'
 import type {
   ActiveCondition,
+  CampaignProgressionState,
   CampaignRole,
   CampaignSummary,
   OnlineCharacter,
 } from '../onlineTypes'
+import { EMPTY_CAMPAIGN_PROGRESSION } from '../onlineTypes'
 import type { Character } from '../types'
 
 interface CampaignJoinRow {
@@ -17,6 +19,7 @@ interface CampaignJoinRow {
     description: string | null
     invite_code: string
     created_at: string
+    progression_state?: unknown
   }
 }
 
@@ -36,6 +39,26 @@ interface ConditionRow {
   created_at: string
 }
 
+const hydrateCampaignProgression = (value: unknown): CampaignProgressionState => {
+  const source = typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
+  const strings = (candidate: unknown, maximum: number) => Array.isArray(candidate)
+    ? candidate.filter((item): item is string => typeof item === 'string').slice(0, maximum)
+    : []
+  const number = (candidate: unknown, minimum: number, maximum: number) =>
+    Math.min(maximum, Math.max(minimum, typeof candidate === 'number' && Number.isFinite(candidate) ? Math.round(candidate) : minimum))
+  const alert = source.alert === 'yellow' || source.alert === 'red' ? source.alert : 'green'
+  return {
+    operationalPrestige: number(source.operationalPrestige, 0, 999),
+    headquartersPoints: number(source.headquartersPoints, 0, 9999),
+    squadDoctrines: strings(source.squadDoctrines, 3),
+    eliteDoctrine: typeof source.eliteDoctrine === 'string' ? source.eliteDoctrine.slice(0, 80) : '',
+    headquartersProjects: strings(source.headquartersProjects, 6),
+    missionSupports: strings(source.missionSupports, 20),
+    heat: number(source.heat, 0, 5),
+    alert,
+  }
+}
+
 const mapCampaign = (row: CampaignJoinRow): CampaignSummary => ({
   id: row.campaigns.id,
   name: row.campaigns.name,
@@ -43,6 +66,7 @@ const mapCampaign = (row: CampaignJoinRow): CampaignSummary => ({
   inviteCode: row.campaigns.invite_code,
   role: row.role,
   createdAt: row.campaigns.created_at,
+  progression: hydrateCampaignProgression(row.campaigns.progression_state),
 })
 
 export const deduplicateCampaigns = (campaigns: CampaignSummary[]) => {
@@ -101,12 +125,21 @@ export async function listCampaigns(): Promise<CampaignSummary[]> {
   if (authError) throw authError
   const userId = authData.session?.user.id
   if (!userId) return []
-  const { data, error } = await client
+  let { data, error } = await client
     .from('campaign_members')
-    .select('role, campaigns!campaign_members_campaign_id_fkey(id,name,description,invite_code,created_at)')
+    .select('role, campaigns!campaign_members_campaign_id_fkey(id,name,description,invite_code,created_at,progression_state)')
     .eq('user_id', userId)
     .order('joined_at', { ascending: false })
 
+  if (error && (error.code === '42703' || error.code === 'PGRST200')) {
+    const fallback = await client
+      .from('campaign_members')
+      .select('role, campaigns!campaign_members_campaign_id_fkey(id,name,description,invite_code,created_at)')
+      .eq('user_id', userId)
+      .order('joined_at', { ascending: false })
+    data = fallback.data as typeof data
+    error = fallback.error
+  }
   if (error) throw error
   return deduplicateCampaigns(((data ?? []) as unknown as CampaignJoinRow[]).map(mapCampaign))
 }
@@ -136,6 +169,7 @@ export async function createCampaign(name: string, description: string) {
     inviteCode: row.invite_code,
     createdAt: row.created_at,
     role: row.role,
+    progression: { ...EMPTY_CAMPAIGN_PROGRESSION },
   } satisfies CampaignSummary
 }
 
@@ -163,7 +197,22 @@ export async function joinCampaign(inviteCode: string) {
     inviteCode: row.invite_code,
     createdAt: row.created_at,
     role: row.role,
+    progression: { ...EMPTY_CAMPAIGN_PROGRESSION },
   } satisfies CampaignSummary
+}
+
+export async function updateCampaignProgression(
+  campaignId: string,
+  progression: CampaignProgressionState,
+) {
+  const { data, error } = await requireSupabase()
+    .from('campaigns')
+    .update({ progression_state: progression })
+    .eq('id', campaignId)
+    .select('id')
+    .single()
+  if (error) throw error
+  return data
 }
 
 export async function getCharacter(campaignId: string, ownerId: string) {
@@ -288,4 +337,3 @@ export function subscribeToSquad(
 export async function removeSubscription(channel: RealtimeChannel) {
   await requireSupabase().removeChannel(channel)
 }
-

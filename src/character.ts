@@ -22,6 +22,7 @@ import {
   calculateMaxSkillPointsForCharacter,
   clamp,
 } from './rules/calculations'
+import { findGeneralAbility, findGeneralAbilityByName } from './data/abilities'
 
 const EMPTY_ATTRIBUTES: Attributes = {
   strength: 0,
@@ -57,7 +58,7 @@ const EMPTY_IDENTITY: Identity = {
 }
 
 export const createEmptyCharacter = (): Character => ({
-  schemaVersion: 4,
+  schemaVersion: 5,
   level: 1,
   identity: { ...EMPTY_IDENTITY },
   functionChoices: {},
@@ -109,6 +110,7 @@ const EQUIPMENT_CATEGORIES: EquipmentCategory[] = [
   'ammunition',
   'protection',
   'survival',
+  'weaponModification',
   'custom',
 ]
 
@@ -237,8 +239,15 @@ export const hydrateCharacter = (value: unknown): Character => {
     stress: safeNumber(resourcesSource.stress, 0),
   }
 
+  const generalAbilities = Array.isArray(progressionSource.generalAbilities)
+    ? progressionSource.generalAbilities.slice(0, 4).map((item) => {
+        const stored = safeText(item, 120)
+        return findGeneralAbility(stored)?.id ?? findGeneralAbilityByName(stored)?.id ?? stored
+      })
+    : []
+
   const character: Character = {
-    schemaVersion: 4,
+    schemaVersion: 5,
     level,
     identity,
     functionChoices,
@@ -248,9 +257,7 @@ export const hydrateCharacter = (value: unknown): Character => {
     specializations: hydrateSpecializations(root.specializations),
     progression: {
       xp,
-      generalAbilities: Array.isArray(progressionSource.generalAbilities)
-        ? progressionSource.generalAbilities.slice(0, 4).map((item) => safeText(item, 120))
-        : [],
+      generalAbilities,
       functionSpecialization: safeText(progressionSource.functionSpecialization, 160),
       veteranTraining: safeText(progressionSource.veteranTraining, 160),
       maximumFunctionAbility: safeText(progressionSource.maximumFunctionAbility, 160),

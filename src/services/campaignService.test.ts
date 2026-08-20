@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CampaignSummary } from '../onlineTypes'
+import { EMPTY_CAMPAIGN_PROGRESSION } from '../onlineTypes'
 import { deduplicateCampaigns } from './campaignService'
 
 const campaign = (role: CampaignSummary['role']): CampaignSummary => ({
@@ -9,6 +10,7 @@ const campaign = (role: CampaignSummary['role']): CampaignSummary => ({
   inviteCode: '0268390D',
   role,
   createdAt: '2026-08-17T00:00:00.000Z',
+  progression: { ...EMPTY_CAMPAIGN_PROGRESSION },
 })
 
 describe('lista de campanhas', () => {
@@ -22,4 +24,3 @@ describe('lista de campanhas', () => {
     expect(result[0].role).toBe('master')
   })
 })
-

@@ -3,7 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { CharacterSheet, type SaveState } from './App'
 import { MAX_MISSION_XP } from './data/progression'
 import { isSupabaseConfigured, requireSupabase } from './lib/supabase'
-import type { CampaignSummary, OnlineCharacter, ResourceQuickAction } from './onlineTypes'
+import type { CampaignProgressionState, CampaignSummary, OnlineCharacter, ResourceQuickAction } from './onlineTypes'
 import { changeExperience, changeResource } from './rules/calculations'
 import { AuthScreen } from './screens/AuthScreen'
 import { CampaignLobby } from './screens/CampaignLobby'
@@ -20,6 +20,7 @@ import {
   removeCharacterCondition,
   saveCharacter,
   subscribeToSquad,
+  updateCampaignProgression,
 } from './services/campaignService'
 import type { Character } from './types'
 
@@ -255,6 +256,22 @@ export function App() {
     }
   }
 
+  const handleCampaignProgressionChange = async (progression: CampaignProgressionState) => {
+    if (!selectedCampaign || selectedCampaign.role !== 'master') return
+    const previous = selectedCampaign.progression
+    const campaignId = selectedCampaign.id
+    setSelectedCampaign((current) => current ? { ...current, progression } : current)
+    setCampaigns((current) => current.map((campaign) => campaign.id === campaignId ? { ...campaign, progression } : campaign))
+    try {
+      await updateCampaignProgression(campaignId, progression)
+    } catch (caught) {
+      setSelectedCampaign((current) => current ? { ...current, progression: previous } : current)
+      setCampaigns((current) => current.map((campaign) => campaign.id === campaignId ? { ...campaign, progression: previous } : campaign))
+      setError(readableError(caught))
+      throw caught
+    }
+  }
+
   const handleAddCondition = async (conditionId: string) => {
     if (!activeCharacter) return
     setConditionActionLoading(true)
@@ -354,6 +371,7 @@ export function App() {
         onQuickAction={(action) => void handleQuickAction(action)}
         xpAwardLoading={xpAwardLoading}
         onAwardMissionXp={handleAwardMissionXp}
+        onCampaignProgressionChange={handleCampaignProgressionChange}
         onShowCampaigns={showCampaigns}
         onSignOut={() => void signOut()}
       />

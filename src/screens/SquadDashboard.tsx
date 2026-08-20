@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import { CampaignProgressionPanel } from '../components/CampaignProgressionPanel'
 import { CONDITIONS } from '../data/manual'
 import { MAX_MISSION_XP, MISSION_XP_OPTIONS } from '../data/progression'
 import { calculateDerivedResources, calculateLevelFromXp } from '../rules/calculations'
-import type { CampaignSummary, OnlineCharacter, ResourceQuickAction } from '../onlineTypes'
+import type { CampaignProgressionState, CampaignSummary, OnlineCharacter, ResourceQuickAction } from '../onlineTypes'
 
 interface SquadDashboardProps {
   campaign: CampaignSummary
@@ -15,6 +16,7 @@ interface SquadDashboardProps {
   onQuickAction: (action: ResourceQuickAction) => void
   xpAwardLoading: boolean
   onAwardMissionXp: (characterIds: string[], amount: number, reason: string) => Promise<void>
+  onCampaignProgressionChange: (progression: CampaignProgressionState) => Promise<void>
   onShowCampaigns: () => void
   onSignOut: () => void
 }
@@ -41,6 +43,7 @@ export function SquadDashboard({
   onQuickAction,
   xpAwardLoading,
   onAwardMissionXp,
+  onCampaignProgressionChange,
   onShowCampaigns,
   onSignOut,
 }: SquadDashboardProps) {
@@ -104,6 +107,8 @@ export function SquadDashboard({
         </section>
 
         <div className="squad-heading"><div><span className="section-index">01</span><div><span className="eyebrow">SITUAÇÃO DA EQUIPE</span><h2>Ficha de Esquadrão</h2></div></div><p>Use os controles rápidos durante a sessão ou abra a ficha completa de qualquer operador.</p></div>
+
+        <CampaignProgressionPanel progression={campaign.progression} onChange={onCampaignProgressionChange} />
 
         {characters.length > 0 && (
           <section className="mission-xp-panel" aria-labelledby="mission-xp-heading">

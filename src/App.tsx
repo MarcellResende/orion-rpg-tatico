@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { createEmptyCharacter } from './character'
+import { AbilitiesPanel } from './components/AbilitiesPanel'
 import { InventoryPanel } from './components/InventoryPanel'
+import { ManualReferencePanel } from './components/ManualReferencePanel'
 import { ProgressionPanel } from './components/ProgressionPanel'
 import { ResourceCard } from './components/ResourceCard'
 import { Stepper } from './components/Stepper'
@@ -16,6 +18,7 @@ import {
 } from './data/manual'
 import {
   applyCharacterLimits,
+  calculateActiveGeneralAbilities,
   calculateAttributePointsSpent,
   calculateCharacterBonuses,
   calculateDerivedResources,
@@ -72,7 +75,7 @@ const hpTone = (current: number, maximum: number) => {
   return 'green' as const
 }
 
-type SheetTab = 'sheet' | 'operations' | 'progression' | 'notes'
+type SheetTab = 'sheet' | 'operations' | 'abilities' | 'progression' | 'reference' | 'notes'
 
 export function CharacterSheet({
   character,
@@ -105,6 +108,8 @@ export function CharacterSheet({
   const selectedTrait = TRAITS.find((item) => item.id === character.identity.traitId)
   const operatorLevel = calculateLevelFromXp(character.progression.xp)
   const stressAtLimit = character.resources.stress >= derived.maxStress
+  const stressSkillPenalty = character.resources.stress >= 5 ? -2 : character.resources.stress >= 3 ? -1 : 0
+  const abilityHpBonus = derived.maxHp - (20 + effectiveAttributes.constitution * 10)
   const availableConditions = CONDITIONS.filter(
     (definition) => !conditions.some((active) => active.conditionId === definition.id),
   )
@@ -202,12 +207,18 @@ export function CharacterSheet({
           </div>
         </section>
 
+        <section className="operator-rule-strip" aria-label="Regras derivadas do operador">
+          <span><b>+{derived.bonusCap}</b><small>Teto de Bônus</small></span>
+          <span><b>{derived.movement} m</b><small>Deslocamento</small></span>
+          <span><b>{derived.socialDefense}</b><small>Defesa Social</small></span>
+        </section>
+
         {stressAtLimit && (
           <div className="critical-alert" role="alert">
             <span className="critical-alert__icon" aria-hidden="true">!</span>
             <div>
-              <strong>ESTRESSE NO LIMITE — VISÃO DE TÚNEL / PÂNICO TÁTICO</strong>
-              <p>Verifique imunidades e efeitos aplicáveis antes de resolver a condição.</p>
+              <strong>ESTRESSE NO LIMITE — VISÃO DE TÚNEL</strong>
+              <p>Novo Estresse exige Vontade DT 15; em falha, aplique Colapso Tático. A DT aumenta em +2 por novo Colapso na mesma cena, até 20.</p>
             </div>
           </div>
         )}
@@ -219,7 +230,7 @@ export function CharacterSheet({
             code="PV"
             current={character.resources.hp}
             maximum={derived.maxHp}
-            explanation={`20 base + ${effectiveAttributes.constitution} Constituição total × 10`}
+            explanation={`20 base + ${effectiveAttributes.constitution} Constituição total × 10${abilityHpBonus > 0 ? ` + ${abilityHpBonus} de Habilidades` : ''}`}
             status={hpStatus(character.resources.hp, derived.maxHp)}
             tone={hpTone(character.resources.hp, derived.maxHp)}
             onDelta={(delta) => commit((current) => changeResource(current, 'hp', delta))}
@@ -279,7 +290,7 @@ export function CharacterSheet({
             code="STR"
             current={character.resources.stress}
             maximum={derived.maxStress}
-            explanation="Limite padrão do manual: 6."
+            explanation={character.resources.stress >= 5 ? 'Limite 6. Penalidade atual: -2 Comunicação e Exploração.' : character.resources.stress >= 3 ? 'Pressionado: -1 Comunicação e Exploração.' : '0–2: controlado, sem penalidade.'}
             status={stressAtLimit ? 'PÂNICO' : 'MONITORADO'}
             tone={stressAtLimit ? 'red' : 'amber'}
             steps={[-1, 1]}
@@ -291,7 +302,9 @@ export function CharacterSheet({
         <nav className="sheet-tabs" aria-label="Seções da ficha">
           <button type="button" className={activeTab === 'sheet' ? 'active' : ''} aria-pressed={activeTab === 'sheet'} onClick={() => setActiveTab('sheet')}>Ficha e perícias</button>
           <button type="button" className={activeTab === 'operations' ? 'active' : ''} aria-pressed={activeTab === 'operations'} onClick={() => setActiveTab('operations')}>Condições e inventário</button>
+          <button type="button" className={activeTab === 'abilities' ? 'active' : ''} aria-pressed={activeTab === 'abilities'} onClick={() => setActiveTab('abilities')}>Habilidades · {calculateActiveGeneralAbilities(character).length}</button>
           <button type="button" className={activeTab === 'progression' ? 'active' : ''} aria-pressed={activeTab === 'progression'} onClick={() => setActiveTab('progression')}>Progressão · Nível {operatorLevel}</button>
+          <button type="button" className={activeTab === 'reference' ? 'active' : ''} aria-pressed={activeTab === 'reference'} onClick={() => setActiveTab('reference')}>Manual v1.1</button>
           <button type="button" className={activeTab === 'notes' ? 'active' : ''} aria-pressed={activeTab === 'notes'} onClick={() => setActiveTab('notes')}>Anotações</button>
         </nav>
 
@@ -426,6 +439,7 @@ export function CharacterSheet({
                     <strong>{selectedFunction.exclusiveAbility}</strong>
                     <p>{selectedFunction.description}</p>
                     <p><b>Bônus descrito:</b> {selectedFunction.bonus}</p>
+                    <p><b>Habilidade exclusiva:</b> {selectedFunction.exclusiveAbilityEffect}</p>
                     <small>Bônus de atributos e perícias principais aplicado automaticamente.</small>
                   </div>
                 )}
@@ -488,8 +502,10 @@ export function CharacterSheet({
                     hint={
                       (loadState.skillPenalties[key] ?? 0) !== 0
                         ? `Total inclui ${loadState.skillPenalties[key]} de ${loadState.label.toLowerCase()}. A desvantagem desaparece ao reduzir a carga.`
+                        : stressSkillPenalty !== 0 && (key === 'communication' || key === 'exploration')
+                          ? `Total inclui ${stressSkillPenalty} pelo estágio atual de Estresse.`
                         : bonuses.skills[key] !== 0
-                          ? 'Total inclui bônus gratuito de função, traço ou equipamento ativo; ele não consome pontos.'
+                          ? 'Total inclui bônus gratuito de função, traço, habilidade ou equipamento ativo; ele não consome pontos.'
                         : key === 'willpower'
                           ? 'Soma na Compostura máxima.'
                           : undefined
@@ -592,6 +608,14 @@ export function CharacterSheet({
           <ProgressionPanel character={character} isMaster={isMaster} onChange={onChange} />
         </div>
 
+        <div className="sheet-tab-panel" hidden={activeTab !== 'abilities'}>
+          <AbilitiesPanel character={character} onChange={onChange} />
+        </div>
+
+        <div className="sheet-tab-panel" hidden={activeTab !== 'reference'}>
+          <ManualReferencePanel />
+        </div>
+
         <div className="sheet-tab-panel" hidden={activeTab !== 'notes'}>
           <section className="panel notes-panel" aria-labelledby="notes-heading">
             <div className="panel-heading">
@@ -629,8 +653,8 @@ export function CharacterSheet({
       </main>
 
       <footer>
-        <span>ORION FIELD SYSTEM // ONLINE BUILD 0.6</span>
-        <span>FONTE: MANUAL_RPG_TATICO.PDF</span>
+        <span>ORION FIELD SYSTEM // ONLINE BUILD 1.1</span>
+        <span>FONTE: MANUAL DO OPERADOR V1.1</span>
       </footer>
     </div>
   )

@@ -173,6 +173,57 @@ describe('bônus automáticos sem consumir pontos', () => {
     expect(calculateEffectiveSkills(character).combat).toBe(3)
     expect(calculateSubskillPointsAvailable(character, 'combat')).toBe(6)
   })
+
+  it('aplica bônus de Habilidade Geral sem consumir pontos distribuídos', () => {
+    const character = createEmptyCharacter()
+    character.progression.xp = 4
+    character.progression.generalAbilities = ['clinical-eye']
+
+    expect(calculateEffectiveSkills(character).exploration).toBe(2)
+    expect(calculateSkillPointsSpent(character.skills)).toBe(0)
+  })
+
+  it('aplica Cascagrossa e Mula de Carga nos recursos derivados', () => {
+    const character = createEmptyCharacter()
+    character.progression.xp = 15
+    character.progression.generalAbilities = ['tough', 'pack-mule']
+
+    expect(calculateDerivedResources(character).maxHp).toBe(25)
+    expect(calculateBaseLoadLimit(character)).toBe(20)
+  })
+
+  it('não aplica Habilidade Geral antes de o espaço ser liberado', () => {
+    const character = createEmptyCharacter()
+    character.progression.generalAbilities = ['tough']
+    expect(calculateDerivedResources(character).maxHp).toBe(20)
+  })
+
+  it('aplica bônus de habilidade diretamente na Subperícia sem gastar a reserva', () => {
+    const character = createEmptyCharacter()
+    character.progression.xp = 4
+    character.progression.generalAbilities = ['cold-interrogator']
+    expect(calculateCharacterBonuses(character).subskills.intimidation).toBe(3)
+    expect(calculateSubskillPointsSpent(character, 'communication')).toBe(0)
+  })
+})
+
+describe('regras fundamentais v1.1', () => {
+  it('calcula Teto de Bônus como 10 + Nível', () => {
+    const character = createEmptyCharacter()
+    character.progression.xp = 9
+    expect(calculateDerivedResources(character).bonusCap).toBe(13)
+  })
+
+  it('aplica as penalidades de Estresse em Comunicação e Exploração', () => {
+    const character = createEmptyCharacter()
+    character.skills.communication = 3
+    character.skills.exploration = 3
+    character.resources.stress = 3
+    expect(calculateEffectiveSkills(character)).toMatchObject({ communication: 2, exploration: 2 })
+
+    character.resources.stress = 5
+    expect(calculateEffectiveSkills(character)).toMatchObject({ communication: 1, exploration: 1 })
+  })
 })
 
 describe('carga e sobrecarga', () => {
