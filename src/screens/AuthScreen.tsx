@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { requireSupabase } from '../lib/supabase'
 
-type AuthMode = 'login' | 'register'
+type AuthMode = 'login' | 'register' | 'forgot'
 
 const friendlyAuthError = (message: string) => {
   const normalized = message.toLowerCase()
@@ -32,7 +32,7 @@ export function AuthScreen() {
       if (mode === 'login') {
         const { error: authError } = await client.auth.signInWithPassword({ email, password })
         if (authError) throw authError
-      } else {
+      } else if (mode === 'register') {
         const { data, error: authError } = await client.auth.signUp({
           email,
           password,
@@ -42,6 +42,10 @@ export function AuthScreen() {
         if (!data.session) {
           setMessage('Conta criada. Abra o e-mail de confirmação enviado pelo Supabase e depois volte para entrar.')
         }
+      } else {
+        const { error: authError } = await client.auth.resetPasswordForEmail(email)
+        if (authError) throw authError
+        setMessage('Se existir uma conta com este e-mail, enviaremos um link para criar uma nova senha.')
       }
     } catch (caught) {
       setError(friendlyAuthError(caught instanceof Error ? caught.message : 'Não foi possível entrar.'))
@@ -74,14 +78,18 @@ export function AuthScreen() {
           <span className="brand-mark" aria-hidden="true">O</span>
           <div>
             <span className="eyebrow">ORION // ACESSO SEGURO</span>
-            <h2>{mode === 'login' ? 'Entrar na operação' : 'Criar credencial'}</h2>
+            <h2>{mode === 'login' ? 'Entrar na operação' : mode === 'register' ? 'Criar credencial' : 'Recuperar acesso'}</h2>
           </div>
         </div>
 
-        <div className="auth-tabs" role="tablist" aria-label="Tipo de acesso">
-          <button type="button" role="tab" aria-selected={mode === 'login'} onClick={() => switchMode('login')}>Entrar</button>
-          <button type="button" role="tab" aria-selected={mode === 'register'} onClick={() => switchMode('register')}>Criar conta</button>
-        </div>
+        {mode === 'forgot' ? (
+          <p className="password-recovery-lead">Informe o e-mail da conta. Você receberá um link seguro para escolher uma nova senha.</p>
+        ) : (
+          <div className="auth-tabs" role="tablist" aria-label="Tipo de acesso">
+            <button type="button" role="tab" aria-selected={mode === 'login'} onClick={() => switchMode('login')}>Entrar</button>
+            <button type="button" role="tab" aria-selected={mode === 'register'} onClick={() => switchMode('register')}>Criar conta</button>
+          </div>
+        )}
 
         <form className="gateway-form" onSubmit={submit}>
           {mode === 'register' && (
@@ -94,17 +102,31 @@ export function AuthScreen() {
             <span>E-mail</span>
             <input type="email" value={email} onChange={(event) => setEmail(event.currentTarget.value)} required autoComplete="email" placeholder="voce@email.com" />
           </label>
-          <label>
-            <span>Senha</span>
-            <input type="password" minLength={6} value={password} onChange={(event) => setPassword(event.currentTarget.value)} required autoComplete={mode === 'login' ? 'current-password' : 'new-password'} placeholder="Mínimo de 6 caracteres" />
-          </label>
+          {mode !== 'forgot' && (
+            <label>
+              <span>Senha</span>
+              <input type="password" minLength={6} value={password} onChange={(event) => setPassword(event.currentTarget.value)} required autoComplete={mode === 'login' ? 'current-password' : 'new-password'} placeholder="Mínimo de 6 caracteres" />
+            </label>
+          )}
+
+          {mode === 'login' && (
+            <button type="button" className="forgot-password-button" onClick={() => switchMode('forgot')}>
+              Esqueci minha senha
+            </button>
+          )}
 
           {error && <div className="form-message form-message--error" role="alert">{error}</div>}
           {message && <div className="form-message form-message--success" role="status">{message}</div>}
 
           <button type="submit" className="primary-button" disabled={loading}>
-            {loading ? 'Aguarde...' : mode === 'login' ? 'Entrar' : 'Criar conta'}
+            {loading ? 'Aguarde...' : mode === 'login' ? 'Entrar' : mode === 'register' ? 'Criar conta' : 'Enviar link de recuperação'}
           </button>
+
+          {mode === 'forgot' && (
+            <button type="button" className="forgot-password-button forgot-password-button--back" onClick={() => switchMode('login')}>
+              Voltar para entrar
+            </button>
+          )}
         </form>
         <p className="privacy-note">Cada usuário acessa somente as campanhas das quais participa.</p>
       </div>

@@ -7,6 +7,7 @@ import type { CampaignProgressionState, CampaignSummary, OnlineCharacter, Resour
 import { changeExperience, changeResource } from './rules/calculations'
 import { AuthScreen } from './screens/AuthScreen'
 import { CampaignLobby } from './screens/CampaignLobby'
+import { ResetPasswordScreen } from './screens/ResetPasswordScreen'
 import { SetupRequired } from './screens/SetupRequired'
 import { SquadDashboard } from './screens/SquadDashboard'
 import {
@@ -44,6 +45,7 @@ const readableError = (caught: unknown) => {
 export function App() {
   const [session, setSession] = useState<Session | null>(null)
   const [authReady, setAuthReady] = useState(false)
+  const [passwordRecovery, setPasswordRecovery] = useState(false)
   const [view, setView] = useState<AppView>('lobby')
   const [campaigns, setCampaigns] = useState<CampaignSummary[]>([])
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignSummary | null>(null)
@@ -72,7 +74,9 @@ export function App() {
       setSession(data.session)
       setAuthReady(true)
     })
-    const { data: listener } = client.auth.onAuthStateChange((_event, nextSession) => {
+    const { data: listener } = client.auth.onAuthStateChange((event, nextSession) => {
+      if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true)
+      if (event === 'SIGNED_OUT') setPasswordRecovery(false)
       setSession(nextSession)
       setAuthReady(true)
       if (!nextSession) {
@@ -357,11 +361,17 @@ export function App() {
     await requireSupabase().auth.signOut()
   }
 
+  const finishPasswordRecovery = async () => {
+    await requireSupabase().auth.signOut({ scope: 'local' })
+    setPasswordRecovery(false)
+  }
+
   if (!authReady) {
     return <div className="fullscreen-loading"><span />Inicializando central de operações...</div>
   }
   if (!isSupabaseConfigured) return <SetupRequired />
   if (!session) return <AuthScreen />
+  if (passwordRecovery) return <ResetPasswordScreen onComplete={finishPasswordRecovery} />
 
   if (view === 'lobby' || !selectedCampaign) {
     return (

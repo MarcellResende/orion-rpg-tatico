@@ -1249,6 +1249,13 @@ footer {
   color: var(--green);
 }
 
+.password-recovery-lead {
+  margin: 28px 0 22px;
+  color: var(--muted-strong);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
 .gateway-form {
   display: grid;
   gap: 16px;
@@ -1309,6 +1316,27 @@ footer {
   border-color: var(--cyan);
   background: var(--cyan);
 }
+
+.forgot-password-button {
+  justify-self: end;
+  margin-top: -7px;
+  padding: 2px 0;
+  border: 0;
+  color: var(--cyan);
+  background: transparent;
+  font-size: 0.76rem;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.forgot-password-button:hover { color: var(--green); }
+.forgot-password-button--back { justify-self: center; margin-top: 0; }
+
+.password-reset-panel { width: min(100%, 520px); }
+.password-reset-form { margin-top: 28px; }
+.password-reset-form .password-recovery-lead { margin: 0 0 6px; }
+.password-reset-success { display: grid; gap: 20px; margin-top: 28px; }
 
 .form-message {
   padding: 11px 13px;
