@@ -12,6 +12,7 @@ import { SquadDashboard } from './screens/SquadDashboard'
 import {
   addCharacterCondition,
   createCampaign,
+  duplicateCampaign,
   getOrCreateCharacter,
   joinCampaign,
   listCampaigns,
@@ -202,6 +203,26 @@ export function App() {
     }
   }
 
+  const handleDuplicateCampaign = async (
+    sourceCampaign: CampaignSummary,
+    name: string,
+    description: string,
+  ) => {
+    if (sourceCampaign.role !== 'master') return
+    setActionLoading(true)
+    setError('')
+    try {
+      const campaign = await duplicateCampaign(sourceCampaign.id, name, description)
+      await refreshCampaigns()
+      await openCampaign(campaign)
+    } catch (caught) {
+      setError(readableError(caught))
+      throw caught
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
   const scheduleSave = (nextCharacter: Character) => {
     if (!selectedCampaign || !activeCharacter) return
     const revision = saveRevision.current + 1
@@ -351,6 +372,7 @@ export function App() {
         actionLoading={actionLoading}
         error={error}
         onCreate={handleCreateCampaign}
+        onDuplicate={handleDuplicateCampaign}
         onJoin={handleJoinCampaign}
         onOpen={openCampaign}
         onSignOut={() => void signOut()}

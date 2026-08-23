@@ -8,6 +8,7 @@ interface CampaignLobbyProps {
   actionLoading: boolean
   error: string
   onCreate: (name: string, description: string) => Promise<void>
+  onDuplicate: (campaign: CampaignSummary, name: string, description: string) => Promise<void>
   onJoin: (code: string) => Promise<void>
   onOpen: (campaign: CampaignSummary) => void
   onSignOut: () => void
@@ -20,6 +21,7 @@ export function CampaignLobby({
   actionLoading,
   error,
   onCreate,
+  onDuplicate,
   onJoin,
   onOpen,
   onSignOut,
@@ -27,6 +29,9 @@ export function CampaignLobby({
   const [campaignName, setCampaignName] = useState('')
   const [description, setDescription] = useState('')
   const [inviteCode, setInviteCode] = useState('')
+  const [duplicateSource, setDuplicateSource] = useState<CampaignSummary | null>(null)
+  const [duplicateName, setDuplicateName] = useState('')
+  const [duplicateDescription, setDuplicateDescription] = useState('')
 
   const submitCreate = async (event: FormEvent) => {
     event.preventDefault()
@@ -39,6 +44,29 @@ export function CampaignLobby({
     event.preventDefault()
     await onJoin(inviteCode)
     setInviteCode('')
+  }
+
+  const startDuplicate = (campaign: CampaignSummary) => {
+    setDuplicateSource(campaign)
+    setDuplicateName(`${campaign.name} — cópia`)
+    setDuplicateDescription(campaign.description)
+  }
+
+  const cancelDuplicate = () => {
+    setDuplicateSource(null)
+    setDuplicateName('')
+    setDuplicateDescription('')
+  }
+
+  const submitDuplicate = async (event: FormEvent) => {
+    event.preventDefault()
+    if (!duplicateSource) return
+    try {
+      await onDuplicate(duplicateSource, duplicateName, duplicateDescription)
+      cancelDuplicate()
+    } catch {
+      // A mensagem detalhada já é exibida pelo aplicativo; mantém o formulário aberto.
+    }
   }
 
   return (
@@ -74,7 +102,26 @@ export function CampaignLobby({
                     <div className="campaign-card__meta"><span>{campaign.role === 'master' ? 'MESTRE' : 'JOGADOR'}</span><code>{campaign.inviteCode}</code></div>
                     <h3>{campaign.name}</h3>
                     <p>{campaign.description || 'Operação sem descrição.'}</p>
-                    <button type="button" className="primary-button" onClick={() => onOpen(campaign)}>Abrir campanha</button>
+                    <div className="campaign-card__actions">
+                      <button type="button" className="primary-button" onClick={() => onOpen(campaign)}>Abrir campanha</button>
+                      {campaign.role === 'master' && (
+                        <button type="button" className="secondary-button" onClick={() => startDuplicate(campaign)}>Duplicar campanha</button>
+                      )}
+                    </div>
+                    {duplicateSource?.id === campaign.id && (
+                      <form className="gateway-form campaign-duplicate-form" onSubmit={submitDuplicate}>
+                        <div className="campaign-duplicate-heading">
+                          <strong>Criar cópia completa</strong>
+                          <span>Participantes, fichas, condições e progresso serão preservados.</span>
+                        </div>
+                        <label><span>Novo nome</span><input value={duplicateName} onChange={(event) => setDuplicateName(event.currentTarget.value)} required maxLength={80} autoFocus /></label>
+                        <label><span>Descrição</span><textarea value={duplicateDescription} onChange={(event) => setDuplicateDescription(event.currentTarget.value)} rows={3} maxLength={400} /></label>
+                        <div className="campaign-duplicate-actions">
+                          <button type="button" className="text-button" onClick={cancelDuplicate} disabled={actionLoading}>Cancelar</button>
+                          <button type="submit" className="primary-button" disabled={actionLoading}>{actionLoading ? 'Copiando...' : 'Criar cópia'}</button>
+                        </div>
+                      </form>
+                    )}
                   </article>
                 ))}
               </div>

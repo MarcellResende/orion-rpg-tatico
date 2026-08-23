@@ -173,6 +173,41 @@ export async function createCampaign(name: string, description: string) {
   } satisfies CampaignSummary
 }
 
+export async function duplicateCampaign(
+  sourceCampaignId: string,
+  name: string,
+  description: string,
+) {
+  const client = requireSupabase()
+  const { data, error } = await client.rpc('duplicate_campaign', {
+    source_campaign_id: sourceCampaignId,
+    new_campaign_name: name.trim(),
+    new_campaign_description: description.trim(),
+  })
+  if (error) throw error
+
+  const row = (data as Array<{
+    id: string
+    name: string
+    description: string | null
+    invite_code: string
+    created_at: string
+    role: CampaignRole
+    progression_state: unknown
+  }> | null)?.[0]
+  if (!row) throw new Error('A campanha não pôde ser duplicada.')
+
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description ?? '',
+    inviteCode: row.invite_code,
+    createdAt: row.created_at,
+    role: row.role,
+    progression: hydrateCampaignProgression(row.progression_state),
+  } satisfies CampaignSummary
+}
+
 export async function joinCampaign(inviteCode: string) {
   const client = requireSupabase()
   const { data, error } = await client.rpc('join_campaign', {

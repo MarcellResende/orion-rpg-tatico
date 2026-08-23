@@ -1487,6 +1487,22 @@ footer {
 .campaign-card__meta code { color: var(--muted); }
 .campaign-card h3 { margin: 22px 0 8px; font-size: 1.12rem; }
 .campaign-card p { flex: 1; margin: 0 0 18px; color: var(--muted); font-size: 0.78rem; line-height: 1.55; }
+.campaign-card__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.campaign-card__actions > button:only-child { grid-column: 1 / -1; }
+.campaign-duplicate-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.campaign-duplicate-heading { display: grid; gap: 4px; }
+.campaign-duplicate-heading strong { color: var(--green); font-size: 0.84rem; }
+.campaign-duplicate-heading span { color: var(--muted); font-size: 0.7rem; line-height: 1.45; }
+.campaign-duplicate-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+.campaign-duplicate-actions .primary-button { min-width: 130px; }
 .invite-input { text-transform: uppercase; font-family: "Cascadia Code", Consolas, monospace; letter-spacing: 0.18em; font-weight: 800; }
 
 .empty-state,
@@ -2054,6 +2070,10 @@ footer {
   .level-row { grid-template-columns: 80px 60px minmax(0, 1fr); gap: 0.45rem; font-size: 0.78rem; }
   .mission-xp-heading,
   .mission-xp-actions { align-items: stretch; flex-direction: column; }
+  .campaign-card__actions { grid-template-columns: 1fr; }
+  .campaign-card__actions > button:only-child { grid-column: 1; }
+  .campaign-duplicate-actions { align-items: stretch; flex-direction: column-reverse; }
+  .campaign-duplicate-actions button { width: 100%; }
 }
 
 /* Manual v1.1: habilidades do operador */
