@@ -213,6 +213,17 @@ export function CharacterSheet({
           <span><b>{derived.socialDefense}</b><small>Defesa Social</small></span>
         </section>
 
+        <nav className="sheet-tabs" aria-label="Seções da ficha">
+          <button type="button" className={activeTab === 'sheet' ? 'active' : ''} aria-pressed={activeTab === 'sheet'} onClick={() => setActiveTab('sheet')}>Ficha e perícias</button>
+          <button type="button" className={activeTab === 'operations' ? 'active' : ''} aria-pressed={activeTab === 'operations'} onClick={() => setActiveTab('operations')}>Condições e inventário</button>
+          <button type="button" className={activeTab === 'abilities' ? 'active' : ''} aria-pressed={activeTab === 'abilities'} onClick={() => setActiveTab('abilities')}>Habilidades · {calculateActiveGeneralAbilities(character).length}</button>
+          <button type="button" className={activeTab === 'progression' ? 'active' : ''} aria-pressed={activeTab === 'progression'} onClick={() => setActiveTab('progression')}>Progressão · Nível {operatorLevel}</button>
+          <button type="button" className={activeTab === 'reference' ? 'active' : ''} aria-pressed={activeTab === 'reference'} onClick={() => setActiveTab('reference')}>Manual v1.1</button>
+          <button type="button" className={activeTab === 'notes' ? 'active' : ''} aria-pressed={activeTab === 'notes'} onClick={() => setActiveTab('notes')}>Anotações</button>
+        </nav>
+
+        <div className="sheet-tab-panel" hidden={activeTab !== 'sheet'}>
+
         {stressAtLimit && (
           <div className="critical-alert" role="alert">
             <span className="critical-alert__icon" aria-hidden="true">!</span>
@@ -299,16 +310,6 @@ export function CharacterSheet({
           />
         </section>
 
-        <nav className="sheet-tabs" aria-label="Seções da ficha">
-          <button type="button" className={activeTab === 'sheet' ? 'active' : ''} aria-pressed={activeTab === 'sheet'} onClick={() => setActiveTab('sheet')}>Ficha e perícias</button>
-          <button type="button" className={activeTab === 'operations' ? 'active' : ''} aria-pressed={activeTab === 'operations'} onClick={() => setActiveTab('operations')}>Condições e inventário</button>
-          <button type="button" className={activeTab === 'abilities' ? 'active' : ''} aria-pressed={activeTab === 'abilities'} onClick={() => setActiveTab('abilities')}>Habilidades · {calculateActiveGeneralAbilities(character).length}</button>
-          <button type="button" className={activeTab === 'progression' ? 'active' : ''} aria-pressed={activeTab === 'progression'} onClick={() => setActiveTab('progression')}>Progressão · Nível {operatorLevel}</button>
-          <button type="button" className={activeTab === 'reference' ? 'active' : ''} aria-pressed={activeTab === 'reference'} onClick={() => setActiveTab('reference')}>Manual v1.1</button>
-          <button type="button" className={activeTab === 'notes' ? 'active' : ''} aria-pressed={activeTab === 'notes'} onClick={() => setActiveTab('notes')}>Anotações</button>
-        </nav>
-
-        <div className="sheet-tab-panel" hidden={activeTab !== 'sheet'}>
           <div className="content-grid">
           <div className="content-column">
             <section className="panel" aria-labelledby="identity-heading">
@@ -653,7 +654,7 @@ export function CharacterSheet({
       </main>
 
       <footer>
-        <span>ORION FIELD SYSTEM // ONLINE BUILD 1.1</span>
+        <span>ORION FIELD SYSTEM // ONLINE BUILD 1.2</span>
         <span>FONTE: MANUAL DO OPERADOR V1.1</span>
       </footer>
     </div>

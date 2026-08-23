@@ -1676,13 +1676,19 @@ footer {
 
 /* Online build 0.4: navegação, treino e arsenal operacional */
 .sheet-tabs {
+  position: sticky;
+  z-index: 15;
+  top: 82px;
   display: flex;
   gap: 0.55rem;
   margin: 1.2rem 0;
   padding: 0.45rem;
   overflow-x: auto;
   border: 1px solid var(--border);
-  background: rgba(5, 15, 18, 0.78);
+  background: rgba(5, 15, 18, 0.96);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+  scrollbar-width: thin;
+  scrollbar-color: var(--green) var(--background);
 }
 
 .sheet-tabs button {
@@ -1705,6 +1711,10 @@ footer {
 
 .sheet-tab-panel[hidden] { display: none; }
 .sheet-tab-panel .operations-grid { grid-template-columns: 1fr; }
+
+@media (max-width: 860px) {
+  .sheet-tabs { top: 0; }
+}
 
 .subskills-panel,
 .notes-panel { margin-top: 1rem; }
@@ -2048,8 +2058,13 @@ footer {
 }
 
 @media (max-width: 760px) {
-  .sheet-tabs { display: grid; grid-template-columns: 1fr; overflow: visible; }
-  .sheet-tabs button { width: 100%; min-width: 0; }
+  .sheet-tabs {
+    top: 0;
+    margin-inline: calc(clamp(18px, 3vw, 42px) * -1);
+    padding-inline: clamp(18px, 3vw, 42px);
+    border-inline: 0;
+  }
+  .sheet-tabs button { min-width: max-content; }
   .subskill-groups { grid-template-columns: 1fr; }
   .specialization-form,
   .catalog-form { grid-template-columns: 1fr; }
