@@ -1,6 +1,7 @@
+import { characterSkillKeys, characterSubskillsFor } from '../data/characterOptions'
 import { useState, type FormEvent } from 'react'
 import { SKILL_LABELS } from '../data/manual'
-import { SUBSKILL_RULES, subskillsFor } from '../data/subskills'
+import { SUBSKILL_RULES } from '../data/subskills'
 import {
   calculateCharacterBonuses,
   calculateUnencumberedEffectiveSkills,
@@ -9,7 +10,7 @@ import {
   changeCustomSpecialization,
   changeSubskill,
 } from '../rules/calculations'
-import { SKILL_KEYS, type Character, type SkillKey } from '../types'
+import { type Character, type SkillKey } from '../types'
 import { Stepper } from './Stepper'
 
 interface SubskillsPanelProps {
@@ -59,8 +60,8 @@ export function SubskillsPanel({ character, onChange }: SubskillsPanelProps) {
       </p>
 
       <div className="subskill-groups">
-        {SKILL_KEYS.map((currentSkill) => {
-          const definitions = subskillsFor(currentSkill)
+        {characterSkillKeys(character).map((currentSkill) => {
+          const definitions = characterSubskillsFor(character, currentSkill)
           const custom = character.specializations.filter((item) => item.skillKey === currentSkill)
           const available = calculateSubskillPointsAvailable(character, currentSkill)
           const spent = calculateSubskillPointsSpent(character, currentSkill)
@@ -127,7 +128,7 @@ export function SubskillsPanel({ character, onChange }: SubskillsPanelProps) {
         <label className="field">
           <span>Perícia principal</span>
           <select value={skillKey} onChange={(event) => setSkillKey(event.currentTarget.value as SkillKey)}>
-            {SKILL_KEYS.map((key) => <option key={key} value={key}>{SKILL_LABELS[key]}</option>)}
+            {characterSkillKeys(character).map((key) => <option key={key} value={key}>{SKILL_LABELS[key]}</option>)}
           </select>
         </label>
         <label className="field specialization-name">

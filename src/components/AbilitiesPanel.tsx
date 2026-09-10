@@ -1,6 +1,8 @@
-import { GENERAL_ABILITIES, findGeneralAbility } from '../data/abilities'
-import { FUNCTIONS, SKILL_LABELS } from '../data/manual'
 import { SUBSKILLS } from '../data/subskills'
+import { characterAbilities, findCharacterAbility, schoolSelectionAllowed } from '../data/characterAbilities'
+import { characterFunction, characterSubskills, hasAssassinsCreed } from '../data/characterOptions'
+import { GENERAL_ABILITIES, findGeneralAbility } from '../data/abilities'
+import { SKILL_LABELS } from '../data/manual'
 import {
   calculateActiveGeneralAbilities,
   calculateLevelFromXp,
@@ -32,7 +34,7 @@ const bonusLabels = (abilityId: string) => {
 export function AbilitiesPanel({ character, onChange }: AbilitiesPanelProps) {
   const level = calculateLevelFromXp(character.progression.xp)
   const rewards = calculateProgressionRewards(level)
-  const selectedFunction = FUNCTIONS.find((item) => item.id === character.identity.functionId)
+  const selectedFunction = characterFunction(character)
   const activeAbilities = calculateActiveGeneralAbilities(character)
 
   const commitProgression = <Key extends keyof ProgressionState>(key: Key, value: ProgressionState[Key]) => {
@@ -49,6 +51,7 @@ export function AbilitiesPanel({ character, onChange }: AbilitiesPanelProps) {
       (_, slot) => character.progression.generalAbilities[slot] ?? '',
     )
     selections[index] = abilityId
+    if (!schoolSelectionAllowed(selections, abilityId)) return
     commitProgression('generalAbilities', selections)
   }
 
@@ -59,7 +62,7 @@ export function AbilitiesPanel({ character, onChange }: AbilitiesPanelProps) {
           <span className="section-index">08</span>
           <h2 id="abilities-heading">Habilidades</h2>
         </div>
-        <span className="panel-code">MANUAL 1.1</span>
+        <span className="panel-code">MANUAL + EXPANSÕES</span>
       </div>
 
       <p className="panel-intro">
@@ -91,7 +94,7 @@ export function AbilitiesPanel({ character, onChange }: AbilitiesPanelProps) {
         <div className="ability-slots">
           {Array.from({ length: rewards.generalAbilitySlots }, (_, index) => {
             const selectedId = character.progression.generalAbilities[index] ?? ''
-            const selected = findGeneralAbility(selectedId)
+            const selected = findCharacterAbility(character, selectedId)
             const usedElsewhere = new Set(character.progression.generalAbilities.filter((_, slot) => slot !== index))
             return (
               <article className="ability-slot" key={index}>
@@ -99,8 +102,8 @@ export function AbilitiesPanel({ character, onChange }: AbilitiesPanelProps) {
                   <span>Habilidade Geral {index + 1}</span>
                   <select value={selected ? selectedId : ''} onChange={(event) => updateAbility(index, event.currentTarget.value)}>
                     <option value="">Escolha uma habilidade</option>
-                    {GENERAL_ABILITIES.map((ability) => (
-                      <option key={ability.id} value={ability.id} disabled={usedElsewhere.has(ability.id)}>
+                    {characterAbilities(character).map((ability) => (
+                      <option key={ability.id} value={ability.id} disabled={usedElsewhere.has(ability.id) || !schoolSelectionAllowed([...character.progression.generalAbilities.filter((_, slot) => slot !== index), ability.id], ability.id)}>
                         {ability.name}
                       </option>
                     ))}
@@ -125,7 +128,7 @@ export function AbilitiesPanel({ character, onChange }: AbilitiesPanelProps) {
       )}
 
       <div className="progression-fields ability-milestones">
-        {rewards.functionSpecializationUnlocked && (
+        {rewards.functionSpecializationUnlocked && !hasAssassinsCreed(character) && (
           <label className="field">
             <span>Especialização da Função · Nível 5</span>
             <input
@@ -141,12 +144,12 @@ export function AbilitiesPanel({ character, onChange }: AbilitiesPanelProps) {
             <span>Especialidade Veterana · Nível 8</span>
             <select value={character.progression.veteranTraining} onChange={(event) => commitProgression('veteranTraining', event.currentTarget.value)}>
               <option value="">Escolha a Subperícia da rerrolagem</option>
-              {SUBSKILLS.map((subskill) => <option key={subskill.key} value={subskill.key}>{subskill.name}</option>)}
+              {characterSubskills(character).map((subskill) => <option key={subskill.key} value={subskill.key}>{subskill.name}</option>)}
             </select>
             <small>Uma vez por cena, após falhar nessa Subperícia, rerrole o d20 e aceite o segundo resultado.</small>
           </label>
         )}
-        {rewards.maximumFunctionAbilityUnlocked && (
+        {rewards.maximumFunctionAbilityUnlocked && !hasAssassinsCreed(character) && (
           <label className="field">
             <span>Habilidade Máxima da Função · Nível 10</span>
             <input

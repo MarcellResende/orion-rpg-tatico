@@ -22,6 +22,7 @@ export const SUBSKILLS: SubskillDefinition[] = [
 ]
 
 export const SUBSKILL_RULES: Record<SkillKey, string> = {
+  mobility: 'Perícia direta de Parkour, escaladas, saltos e perseguições.',
   combat: 'Cada ponto distribuído em Combate gera 2 pontos de subperícia.',
   tolerance: 'Cada ponto distribuído em Tolerância gera 1 ponto de subperícia.',
   communication: 'Cada ponto distribuído gera 1 ponto de especialização.',

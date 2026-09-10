@@ -48,16 +48,16 @@ const catalogInventoryItem = (catalogItemId: string, active = true): InventoryIt
 }
 
 describe('cálculos do manual', () => {
-  it('calcula 40 PV para Constituição 2', () => {
+  it('calcula 30 PV para Constituição 2', () => {
     const character = createEmptyCharacter()
     character.attributes.constitution = 2
-    expect(calculateMaxHp(character.attributes)).toBe(40)
+    expect(calculateMaxHp(character.attributes)).toBe(30)
   })
 
-  it('calcula 15 de Energia para Destreza 1', () => {
+  it('calcula 13 de Energia para Destreza 1', () => {
     const character = createEmptyCharacter()
     character.attributes.dexterity = 1
-    expect(calculateMaxEnergy(character.attributes)).toBe(15)
+    expect(calculateMaxEnergy(character.attributes)).toBe(13)
   })
 
   it('calcula Compostura como 5 + Vontade + Inteligência', () => {
@@ -87,7 +87,7 @@ describe('bônus automáticos sem consumir pontos', () => {
     expect(calculateAttributePointsSpent(character.attributes)).toBe(0)
     expect(calculateSkillPointsSpent(character.skills)).toBe(0)
     expect(calculateDerivedResources(character)).toMatchObject({
-      maxEnergy: 15,
+      maxEnergy: 13,
       maxSkillPoints: 11,
     })
   })
@@ -141,12 +141,12 @@ describe('bônus automáticos sem consumir pontos', () => {
     ]
     expect(calculateDerivedResources(character)).toMatchObject({
       defenseBase: 10,
-      defenseEquipment: 10,
-      defense: 20,
+      defenseEquipment: 8,
+      defense: 18,
     })
 
     character.inventory[1].active = false
-    expect(calculateDerivedResources(character).defense).toBe(15)
+    expect(calculateDerivedResources(character).defense).toBe(14)
   })
 
   it('mantém bônus de Artilharia na subperícia sem gastar pontos', () => {
@@ -202,7 +202,7 @@ describe('bônus automáticos sem consumir pontos', () => {
     const character = createEmptyCharacter()
     character.progression.xp = 4
     character.progression.generalAbilities = ['cold-interrogator']
-    expect(calculateCharacterBonuses(character).subskills.intimidation).toBe(3)
+    expect(calculateCharacterBonuses(character).subskills.intimidation).toBe(2)
     expect(calculateSubskillPointsSpent(character, 'communication')).toBe(0)
   })
 })
@@ -303,7 +303,8 @@ describe('progressão individual do operador', () => {
   it('devolve pontos excedentes se o mestre reduzir o XP e o nível', () => {
     let character = createEmptyCharacter()
     character = changeExperience(character, 9, 'Progressão de teste')
-    for (let index = 0; index < 7; index += 1) character = changeAttribute(character, 'strength', 1)
+    for (let index = 0; index < 6; index += 1) character = changeAttribute(character, 'strength', 1)
+    character = changeAttribute(character, 'constitution', 1)
     for (let index = 0; index < 12; index += 1) character = changeSkill(character, 'technology', 1)
     expect(calculateAttributePointsSpent(character.attributes)).toBe(7)
     expect(calculateSkillPointsSpent(character.skills)).toBe(12)
@@ -316,13 +317,29 @@ describe('progressão individual do operador', () => {
 })
 
 describe('limites de criação', () => {
+  it('limita a três na criação e a seis totais com bônus durante a campanha', () => {
+    let character = createEmptyCharacter()
+    for (let i = 0; i < 5; i++) character = changeAttribute(character, 'dexterity', 1)
+    expect(character.attributes.dexterity).toBe(3)
+    character.progression.xp = 22
+    character.identity.functionId = 'medic'
+    for (let i = 0; i < 5; i++) character = changeAttribute(character, 'dexterity', 1)
+    expect(character.attributes.dexterity).toBe(5)
+    expect(calculateEffectiveAttributes(character).dexterity).toBe(6)
+  })
+
+  it('usa o maior bônus de equipamento em vez de somar fontes repetidas', () => {
+    const character = createEmptyCharacter()
+    character.inventory = [catalogInventoryItem('recon-drone'), catalogInventoryItem('fiber-camera'), catalogInventoryItem('nvg')]
+    expect(calculateCharacterBonuses(character).skills.exploration).toBe(2)
+  })
   it('não permite gastar mais de seis pontos de atributo', () => {
     let character = createEmptyCharacter()
     for (let index = 0; index < 7; index += 1) {
-      character = changeAttribute(character, 'constitution', 1)
+      character = changeAttribute(character, index < 3 ? 'constitution' : 'strength', 1)
     }
     expect(calculateAttributePointsSpent(character.attributes)).toBe(6)
-    expect(character.attributes.constitution).toBe(6)
+    expect(character.attributes.constitution).toBe(3)
   })
 
   it('não permite gastar mais pontos de perícia do que o disponível', () => {

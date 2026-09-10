@@ -1,3 +1,5 @@
+import { BrotherhoodPanel } from '../components/BrotherhoodPanel'
+import { hasAssassinsCreed } from '../data/characterOptions'
 import { useEffect, useState } from 'react'
 import { CampaignProgressionPanel } from '../components/CampaignProgressionPanel'
 import { CONDITIONS } from '../data/manual'
@@ -109,6 +111,7 @@ export function SquadDashboard({
         <div className="squad-heading"><div><span className="section-index">01</span><div><span className="eyebrow">SITUAÇÃO DA EQUIPE</span><h2>Ficha de Esquadrão</h2></div></div><p>Use os controles rápidos durante a sessão ou abra a ficha completa de qualquer operador.</p></div>
 
         <CampaignProgressionPanel progression={campaign.progression} onChange={onCampaignProgressionChange} />
+        {characters.some((entry) => hasAssassinsCreed(entry.sheet)) && <BrotherhoodPanel progression={campaign.progression} onChange={onCampaignProgressionChange} />}
 
         {characters.length > 0 && (
           <section className="mission-xp-panel" aria-labelledby="mission-xp-heading">

@@ -1,3 +1,5 @@
+import { hydrateAssassin } from './data/characterOptions'
+import { emptyAssassin } from './data/assassinsCreed'
 import {
   ATTRIBUTE_KEYS,
   SKILL_KEYS,
@@ -19,10 +21,10 @@ import {
   applyCharacterLimits,
   calculateAttributePointLimitForLevel,
   calculateLevelFromXp,
-  calculateMaxSkillPointsForCharacter,
   clamp,
 } from './rules/calculations'
 import { findGeneralAbility, findGeneralAbilityByName } from './data/abilities'
+import { hydrateExpansions } from './data/expansions'
 
 const EMPTY_ATTRIBUTES: Attributes = {
   strength: 0,
@@ -41,6 +43,7 @@ const EMPTY_SKILLS: Skills = {
   medicine: 0,
   technology: 0,
   willpower: 0,
+  mobility: 0,
 }
 
 const EMPTY_SUBSKILLS: Subskills = Object.fromEntries(
@@ -59,6 +62,8 @@ const EMPTY_IDENTITY: Identity = {
 
 export const createEmptyCharacter = (): Character => ({
   schemaVersion: 5,
+  assassin: emptyAssassin(),
+  expansions: { enabledIds: [], attributeValues: {} },
   level: 1,
   identity: { ...EMPTY_IDENTITY },
   functionChoices: {},
@@ -114,7 +119,7 @@ const EQUIPMENT_CATEGORIES: EquipmentCategory[] = [
   'custom',
 ]
 
-const EQUIPMENT_SLOTS: EquipmentSlot[] = ['primary', 'secondary', 'armor', 'shield']
+const EQUIPMENT_SLOTS: EquipmentSlot[] = ['primary', 'secondary', 'armor', 'shield', 'head', 'leftBlade', 'rightBlade']
 
 const hydrateInventory = (value: unknown): InventoryItem[] => {
   if (!Array.isArray(value)) return []
@@ -136,6 +141,7 @@ const hydrateInventory = (value: unknown): InventoryItem[] => {
     return [{
       id: safeText(item.id, 100) || `legacy-${index}`,
       catalogItemId: safeText(item.catalogItemId, 100),
+      expansionId: safeText(item.expansionId, 80) || undefined,
       name,
       quantity: clamp(safeNumber(item.quantity, 1), 1, 999),
       weight: safeDecimal(item.weight, 0, 9999),
@@ -248,6 +254,8 @@ export const hydrateCharacter = (value: unknown): Character => {
 
   const character: Character = {
     schemaVersion: 5,
+    assassin: hydrateAssassin(root.assassin),
+    expansions: hydrateExpansions(root.expansions),
     level,
     identity,
     functionChoices,
@@ -272,10 +280,8 @@ export const hydrateCharacter = (value: unknown): Character => {
     updatedAt: safeText(root.updatedAt) || new Date().toISOString(),
   }
 
-  let remainingSkills = calculateMaxSkillPointsForCharacter(character)
   for (const key of SKILL_KEYS) {
-    character.skills[key] = clamp(safeNumber(skillsSource[key]), 0, remainingSkills)
-    remainingSkills -= character.skills[key]
+    character.skills[key] = clamp(safeNumber(skillsSource[key]), 0, 999)
   }
 
   for (const key of SUBSKILL_KEYS) {

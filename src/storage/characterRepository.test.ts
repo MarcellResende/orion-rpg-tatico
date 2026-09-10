@@ -40,13 +40,13 @@ describe('repositório local da ficha', () => {
     const character = createEmptyCharacter()
     character.identity.name = 'Chloe Vance'
     character.attributes.constitution = 2
-    character.resources.hp = 37
+    character.resources.hp = 27
 
     repository.save(character)
 
     expect(storage.getItem(CHARACTER_STORAGE_KEY)).not.toBeNull()
     expect(repository.load()?.identity.name).toBe('Chloe Vance')
-    expect(repository.load()?.resources.hp).toBe(37)
+    expect(repository.load()?.resources.hp).toBe(27)
   })
 
   it('remove os dados ao criar uma nova ficha', () => {

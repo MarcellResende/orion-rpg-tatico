@@ -1,9 +1,10 @@
+import { hasAssassinsCreed } from '../data/characterOptions'
 import { useMemo, useState, type FormEvent } from 'react'
 import {
   EQUIPMENT_CATALOG,
   EQUIPMENT_CATEGORY_LABELS,
-  findEquipment,
 } from '../data/equipment'
+import { availableEquipment, availableInventory, equipmentExpansionId, EXPANSIONS, findCharacterEquipment } from '../data/expansions'
 import { SKILL_LABELS } from '../data/manual'
 import { calculateInventoryWeight, calculateLoadState, clamp } from '../rules/calculations'
 import type { Character, InventoryItem, SkillKey } from '../types'
@@ -19,6 +20,7 @@ const makeInventoryId = () =>
 export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
   const [catalogItemId, setCatalogItemId] = useState('')
   const [catalogQuantity, setCatalogQuantity] = useState(1)
+  const [catalogWeight, setCatalogWeight] = useState('')
   const [showCustom, setShowCustom] = useState(false)
   const [customName, setCustomName] = useState('')
   const [customQuantity, setCustomQuantity] = useState(1)
@@ -26,19 +28,22 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
   const [customNotes, setCustomNotes] = useState('')
   const inventoryWeight = calculateInventoryWeight(character)
   const loadState = calculateLoadState(character)
-  const selectedCatalogItem = findEquipment(catalogItemId)
-  const catalogProjectedWeight = inventoryWeight + (selectedCatalogItem?.weight ?? 0) * (catalogQuantity || 0)
+  const selectedCatalogItem = findCharacterEquipment(character, catalogItemId)
+  const selectedWeight = selectedCatalogItem?.weightUnspecified ? Number(catalogWeight) : selectedCatalogItem?.weight ?? 0
+  const weightRange = selectedCatalogItem?.weightRange ?? [0, 9999]
+  const missingWeight = Boolean(selectedCatalogItem?.weightUnspecified && (!catalogWeight.trim() || !Number.isFinite(selectedWeight) || selectedWeight < weightRange[0] || selectedWeight > weightRange[1]))
+  const catalogProjectedWeight = inventoryWeight + selectedWeight * (catalogQuantity || 0)
   const customProjectedWeight = inventoryWeight + Math.max(0, customWeight || 0) * (customQuantity || 0)
   const catalogWouldExceed = catalogProjectedWeight > loadState.maximumLimit
   const customWouldExceed = customProjectedWeight > loadState.maximumLimit
 
   const groupedCatalog = useMemo(() => {
     const groups = new Map<string, typeof EQUIPMENT_CATALOG>()
-    for (const definition of EQUIPMENT_CATALOG) {
+    for (const definition of availableEquipment(character).filter((item) => !item.era || !hasAssassinsCreed(character) || item.era === character.assassin.era)) {
       groups.set(definition.category, [...(groups.get(definition.category) ?? []), definition])
     }
     return groups
-  }, [])
+  }, [character])
 
   const commit = (inventory: InventoryItem[]) => onChange({
     ...character,
@@ -48,14 +53,15 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
 
   const addCatalogItem = (event: FormEvent) => {
     event.preventDefault()
-    const definition = findEquipment(catalogItemId)
-    if (!definition || catalogWouldExceed) return
+    const definition = findCharacterEquipment(character, catalogItemId)
+    if (!definition || catalogWouldExceed || missingWeight) return
     const item: InventoryItem = {
       id: makeInventoryId(),
       catalogItemId: definition.id,
+      expansionId: EXPANSIONS.find((entry) => entry.equipment.some((item) => item.id === definition.id))?.id,
       name: definition.name,
       quantity: clamp(catalogQuantity || 1, 1, 999),
-      weight: definition.weight,
+      weight: selectedWeight,
       notes: '',
       category: definition.category,
       effect: definition.effect,
@@ -72,10 +78,11 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
         : undefined,
     }
     const inventory = definition.slot
-      ? character.inventory.map((current) => current.slot === definition.slot ? { ...current, active: false } : current)
+      ? character.inventory.map((current) => current.slot === definition.slot && availableInventory(character).some((item) => item.id === current.id) ? { ...current, active: false } : current)
       : character.inventory
     commit([...inventory, item])
     setCatalogItemId('')
+    setCatalogWeight('')
     setCatalogQuantity(1)
   }
 
@@ -111,7 +118,7 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
     const nextActive = !target.active
     commit(character.inventory.map((item) => {
       if (item.id === itemId) return { ...item, active: nextActive }
-      if (nextActive && target.slot && item.slot === target.slot) return { ...item, active: false }
+      if (nextActive && target.slot && item.slot === target.slot && availableInventory(character).some((entry) => entry.id === item.id)) return { ...item, active: false }
       return item
     }))
   }
@@ -147,7 +154,7 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
         <span className="point-counter">{inventoryWeight.toLocaleString('pt-BR')} KG</span>
       </div>
       <p className="panel-intro">
-        Escolha um item do arsenal para preencher peso, efeito, bônus e munição automaticamente. Itens ativos concedem seus bônus sem gastar pontos.
+        Escolha um item do arsenal para preencher peso, efeito, bônus e munição automaticamente. Itens ativos concedem seus bônus sem gastar pontos. Em cada teste, use o maior bônus direto de equipamento e aplique apenas os efeitos válidos para a situação.
       </p>
 
       <section className={`load-console load-console--${loadState.level}`} aria-label="Capacidade de carga do operador">
@@ -190,15 +197,16 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
         <small>Capacidade: 15 kg + 5 kg por ponto de Força total.</small>
       </section>
 
+      {hasAssassinsCreed(character) && <p className="panel-intro">Itens históricos filtrados pelo Pacote de Era selecionado em Operações da Irmandade. O arsenal base permanece consultável; disponibilidade depende do Mestre.</p>}
       <form className="catalog-form" onSubmit={addCatalogItem}>
         <label className="field catalog-picker">
           <span>Item do manual</span>
-          <select value={catalogItemId} required onChange={(event) => setCatalogItemId(event.currentTarget.value)}>
+          <select value={catalogItemId} required onChange={(event) => { setCatalogItemId(event.currentTarget.value); setCatalogWeight('') }}>
             <option value="">Selecione um equipamento</option>
             {[...groupedCatalog.entries()].map(([category, definitions]) => (
               <optgroup key={category} label={EQUIPMENT_CATEGORY_LABELS[category as keyof typeof EQUIPMENT_CATEGORY_LABELS]}>
                 {definitions.map((definition) => (
-                  <option key={definition.id} value={definition.id}>{definition.name} — {definition.weight.toLocaleString('pt-BR')} kg</option>
+                  <option key={definition.id} value={definition.id}>{definition.name} — {definition.weightUnspecified ? 'definir peso' : `${definition.weight.toLocaleString('pt-BR')} kg`}</option>
                 ))}
               </optgroup>
             ))}
@@ -208,7 +216,8 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
           <span>Quantidade</span>
           <input type="number" min={1} max={999} value={catalogQuantity} onChange={(event) => setCatalogQuantity(event.currentTarget.valueAsNumber)} />
         </label>
-        <button type="submit" className="primary-button" disabled={!catalogItemId || catalogWouldExceed}>Adicionar do arsenal</button>
+        {selectedCatalogItem?.weightUnspecified && <label className="field"><span>Peso unitário definido com o Mestre (kg)</span><input type="number" required min={weightRange[0]} max={weightRange[1]} step="0.01" value={catalogWeight} onChange={(event) => setCatalogWeight(event.currentTarget.value)} /><small>{selectedCatalogItem.weightRange ? `Faixa do livro: ${weightRange[0]}–${weightRange[1]} kg.` : 'O PDF não informa peso para este item.'}</small></label>}
+        <button type="submit" className="primary-button" disabled={!catalogItemId || catalogWouldExceed || missingWeight}>Adicionar do arsenal</button>
         <button type="button" className="secondary-button" onClick={() => setShowCustom((current) => !current)}>
           {showCustom ? 'Cancelar personalizado' : 'Item personalizado'}
         </button>
@@ -232,12 +241,12 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
         <p className="load-limit-warning" role="alert">Este item personalizado passaria do máximo absoluto de 200%.</p>
       )}
 
-      {character.inventory.length === 0 ? (
+      {availableInventory(character).length === 0 ? (
         <div className="empty-inline">Nenhum equipamento adicionado.</div>
       ) : (
         <div className="inventory-list inventory-list--detailed">
-          {character.inventory.map((item) => {
-            const definition = findEquipment(item.catalogItemId)
+          {availableInventory(character).map((item) => {
+            const definition = findCharacterEquipment(character, item.catalogItemId)
             const skillChoice = definition?.skillBonusChoice
             const grantsBonus = Boolean(
               definition?.defenseBonus ||
@@ -264,9 +273,9 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
 
                 {(item.effect || item.notes) && (
                   <div className="inventory-effect">
-                    {item.effect && <p>{item.effect}</p>}
+                    {(definition?.effect || item.effect) && <p>{definition?.effect ?? item.effect}</p>}
                     {item.notes && <p>{item.notes}</p>}
-                    {definition && <small>Manual // pág. {definition.sourcePage}</small>}
+                    {definition && <small>{EXPANSIONS.find((entry) => entry.id === equipmentExpansionId(item))?.name ?? 'Manual v1.4'} // pág. {definition.sourcePage}</small>}
                   </div>
                 )}
 
@@ -292,7 +301,7 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
                       <strong>{item.weapon.ammo}<small>/{item.weapon.magazineCapacity}</small></strong>
                     </div>
                     <div className="fire-controls" aria-label={`Disparos de ${item.name}`}>
-                      {item.weapon.allowedShots.map((shots) => (
+                      {(definition?.weapon?.allowedShots ?? item.weapon.allowedShots).map((shots) => (
                         <button type="button" key={shots} disabled={item.weapon!.ammo < shots} onClick={() => fireWeapon(item.id, shots)}>
                           Disparar {shots}
                         </button>

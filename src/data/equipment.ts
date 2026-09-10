@@ -21,10 +21,10 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'primaryWeapon',
     weight: 3.5,
     effect: '+1 em Combate a médias distâncias. Dano 1d10. Pente padrão de 20 munições.',
-    sourcePage: 25,
+    sourcePage: 29,
     slot: 'primary',
     skillBonuses: { combat: 1 },
-    weapon: { magazineCapacity: 20, allowedShots: [1, 3, 5, 10] },
+    weapon: { magazineCapacity: 20, allowedShots: [1, 3, 6] },
   },
   {
     id: 'cqb-smg',
@@ -32,10 +32,10 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'primaryWeapon',
     weight: 2.5,
     effect: '+2 em Combate em ambientes fechados; -1 contra alvos a longa distância. Dano 1d8. Pente de 25 munições.',
-    sourcePage: 25,
+    sourcePage: 29,
     slot: 'primary',
     skillBonuses: { combat: 2 },
-    weapon: { magazineCapacity: 25, allowedShots: [1, 3, 5, 10] },
+    weapon: { magazineCapacity: 25, allowedShots: [1, 3, 6] },
   },
   {
     id: 'light-machine-gun',
@@ -43,9 +43,9 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'primaryWeapon',
     weight: 10,
     effect: 'Gaste 3 Energia para Supressão. Requer Força 2; sem isso, -2 para atirar de pé. Dano 2d6. Caixa de 100 munições.',
-    sourcePage: 25,
+    sourcePage: 29,
     slot: 'primary',
-    weapon: { magazineCapacity: 100, allowedShots: [4, 5, 10] },
+    weapon: { magazineCapacity: 100, allowedShots: [6] },
   },
   {
     id: 'heavy-precision-rifle',
@@ -53,7 +53,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'primaryWeapon',
     weight: 7,
     effect: '+2 a longa distância se mirar na rodada anterior. Deve estar apoiado ou deitado. Dano 2d12. Pente de 10 munições.',
-    sourcePage: 25,
+    sourcePage: 29,
     slot: 'primary',
     subskillBonuses: { longRangeWeapons: 2 },
     weapon: { magazineCapacity: 10, allowedShots: [1] },
@@ -64,7 +64,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'secondaryWeapon',
     weight: 1,
     effect: 'Arma de backup; sacar da calça ou colete não custa ação. Dano 1d6. Pente de 10 munições.',
-    sourcePage: 25,
+    sourcePage: 29,
     slot: 'secondary',
     weapon: { magazineCapacity: 10, allowedShots: [1] },
   },
@@ -74,7 +74,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'secondaryWeapon',
     weight: 0.25,
     effect: 'Eliminações silenciosas contra inimigo desprevenido não quebram a Furtividade. Dano 1d4.',
-    sourcePage: 25,
+    sourcePage: 29,
     slot: 'secondary',
   },
   {
@@ -83,7 +83,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'recon',
     weight: 2,
     effect: '+2 Exploração para mapear terreno; teste de Tecnologia para evitar detecção por radar.',
-    sourcePage: 25,
+    sourcePage: 29,
     skillBonuses: { exploration: 2 },
   },
   {
@@ -92,7 +92,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'recon',
     weight: 1.5,
     effect: '+2 Tecnologia ou Exploração em dutos e frestas. Escolha a perícia beneficiada.',
-    sourcePage: 25,
+    sourcePage: 29,
     skillBonusChoice: { amount: 2, options: ['technology', 'exploration'] },
   },
   {
@@ -101,7 +101,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'recon',
     weight: 1,
     effect: 'Anula penalidades de escuridão total e concede +1 Exploração em operações noturnas.',
-    sourcePage: 25,
+    sourcePage: 29,
     skillBonuses: { exploration: 1 },
   },
   {
@@ -110,7 +110,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'recon',
     weight: 1,
     effect: 'Vê salas por baixo de portas; +2 Exploração sem revelar a equipe. Custa 1 Energia.',
-    sourcePage: 25,
+    sourcePage: 29,
     skillBonuses: { exploration: 2 },
   },
   {
@@ -119,7 +119,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'recon',
     weight: 4,
     effect: '+2 Tecnologia para portas eletrônicas, grades e alarmes físicos.',
-    sourcePage: 25,
+    sourcePage: 29,
     skillBonuses: { technology: 2 },
   },
   {
@@ -128,7 +128,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'recon',
     weight: 0.5,
     effect: '+2 Tecnologia para trancas, cadeados e cofres silenciosamente; não aumenta Alerta em sucesso.',
-    sourcePage: 25,
+    sourcePage: 29,
     skillBonuses: { technology: 2 },
   },
   {
@@ -137,7 +137,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'electronic',
     weight: 6,
     effect: 'Permite solicitar a extração da equipe.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'soflam',
@@ -145,7 +145,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'electronic',
     weight: 3,
     effect: 'Marca veículos e estruturas; aliados recebem +3 em Combate contra o alvo. Requer Exploração 2.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'rf-jammer',
@@ -153,7 +153,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'electronic',
     weight: 3.5,
     effect: 'Bolha de 50 m que bloqueia rádios inimigos e aliados.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'emp-disruptor',
@@ -161,7 +161,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'electronic',
     weight: 2,
     effect: 'Desativa câmeras, luzes e torres automatizadas por 3 rodadas; custa 2 Energia.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'air-micro-drone',
@@ -169,7 +169,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'electronic',
     weight: 0.5,
     effect: 'Opera por 5 turnos; possui câmera térmica e marcação. Ruído audível a 5 m; PV 1.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'tracked-cart',
@@ -177,7 +177,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'electronic',
     weight: 1.5,
     effect: 'Opera por 10 turnos; passa sob portas e dutos, desarma minas com Tecnologia. PV 5.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'hacking-kit',
@@ -185,7 +185,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'electronic',
     weight: 1,
     effect: 'Reutilizável; invade câmeras e fechaduras eletrônicas e extrai dados de servidores.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'frag-grenade',
@@ -193,7 +193,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'explosive',
     weight: 0.5,
     effect: 'Ação Padrão, alcance médio. Raio de 6 m; 4d6 de dano em seres na área.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'c4',
@@ -201,7 +201,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'explosive',
     weight: 1.5,
     effect: 'Dano massivo a estruturas e veículos; teste de Tecnologia para instalação segura.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'breaching-charge',
@@ -209,7 +209,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'explosive',
     weight: 1,
     effect: 'Destrói entrada e atordoa quem estiver dentro; inimigos perdem a primeira ação e sofrem -2 em Combate.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'flashbang',
@@ -217,7 +217,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'explosive',
     weight: 0.5,
     effect: 'Raio de 5 m; sem proteção ocular ou auricular, -3 em Combate na rodada seguinte.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'thermal-smoke',
@@ -225,7 +225,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'explosive',
     weight: 0.5,
     effect: 'Bloqueia visão normal e visores térmicos convencionais por 3 rodadas.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'claymore',
@@ -233,7 +233,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'explosive',
     weight: 1.5,
     effect: 'Detona ao captar movimento à frente; teste de Tecnologia para ocultação correta.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'ifak',
@@ -241,7 +241,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'medical',
     weight: 3,
     effect: '+2 Medicina; 4 usos por missão.',
-    sourcePage: 26,
+    sourcePage: 30,
     skillBonuses: { medicine: 2 },
   },
   {
@@ -249,8 +249,8 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     name: 'Injetor de Adrenalina Tática',
     category: 'medical',
     weight: 0.5,
-    effect: 'Remove penalidades por dano e fadiga e concede +2 Energia por 3 rodadas; depois causa -3 PV.',
-    sourcePage: 26,
+    effect: 'Remove penalidades por dano e fadiga e concede +2 Energia por 3 rodadas; depois gera Fadiga e -3 PV.',
+    sourcePage: 30,
   },
   {
     id: 'rappel-system',
@@ -258,7 +258,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'medical',
     weight: 2.5,
     effect: '+2 Exploração para infiltrações por telhados e desfiladeiros.',
-    sourcePage: 26,
+    sourcePage: 30,
     skillBonuses: { exploration: 2 },
   },
   {
@@ -267,7 +267,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'ammunition',
     weight: 2,
     effect: 'Bolsos de carregadores; referência: 3 pentes de fuzil ou 4 de submetralhadora.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'heavy-ammo-box',
@@ -275,7 +275,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'ammunition',
     weight: 5,
     effect: 'Fitas de munição para LMG; referência: 3 caixas ou fitas.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'precision-ammo',
@@ -283,7 +283,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'ammunition',
     weight: 1.5,
     effect: 'Quatro pentes com 10 munições.',
-    sourcePage: 26,
+    sourcePage: 30,
   },
   {
     id: 'ultralight-vest',
@@ -291,7 +291,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'protection',
     weight: 2,
     effect: '+2 Defesa; ocultável sob roupas; +1 Furtividade.',
-    sourcePage: 27,
+    sourcePage: 31,
     slot: 'armor',
     defenseBonus: 2,
     skillBonuses: { stealth: 1 },
@@ -301,30 +301,30 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     name: 'Colete Tático Leve',
     category: 'protection',
     weight: 4,
-    effect: '+5 Defesa; carregadores sem penalidade extra de organização.',
-    sourcePage: 27,
+    effect: '+4 Defesa.',
+    sourcePage: 31,
     slot: 'armor',
-    defenseBonus: 5,
+    defenseBonus: 4,
   },
   {
     id: 'medium-tactical-vest',
     name: 'Colete Tático Médio',
     category: 'protection',
     weight: 6,
-    effect: '+10 Defesa.',
-    sourcePage: 27,
+    effect: '+6 Defesa.',
+    sourcePage: 31,
     slot: 'armor',
-    defenseBonus: 10,
+    defenseBonus: 6,
   },
   {
     id: 'heavy-assault-armor',
     name: 'Armadura de Assalto Pesada',
     category: 'protection',
     weight: 12,
-    effect: '+15 Defesa; requer Força 2; -2 Furtividade e Pilotagem.',
-    sourcePage: 27,
+    effect: '+8 Defesa; requer Força 2; -2 Furtividade e Pilotagem.',
+    sourcePage: 31,
     slot: 'armor',
-    defenseBonus: 15,
+    defenseBonus: 8,
     skillBonuses: { stealth: -2, piloting: -2 },
   },
   {
@@ -333,7 +333,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'protection',
     weight: 1.5,
     effect: 'Não protege contra críticos; +1 Comunicação com equipe e QG.',
-    sourcePage: 27,
+    sourcePage: 31,
     skillBonuses: { communication: 1 },
   },
   {
@@ -341,10 +341,10 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     name: 'Escudo Balístico Tático',
     category: 'protection',
     weight: 6,
-    effect: '+5 Defesa temporária frontal; requer Força 2; exige pistola e causa -2 Furtividade.',
-    sourcePage: 27,
+    effect: '+4 Defesa frontal; requer Força 2; exige pistola e causa -2 Furtividade.',
+    sourcePage: 31,
     slot: 'shield',
-    defenseBonus: 5,
+    defenseBonus: 4,
     skillBonuses: { stealth: -2 },
   },
   {
@@ -353,7 +353,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 0.3,
     effect: 'Reutilizável. Necessário para Jogos e Socialização; reduz 1 Estresse de até 3 operadores.',
-    sourcePage: 27,
+    sourcePage: 31,
   },
   {
     id: 'hobby-item',
@@ -361,7 +361,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 0.5,
     effect: 'Reutilizável; necessário para Hobbies Manuais. A atividade reduz 2 Estresse e recupera 1 Compostura em ambiente calmo.',
-    sourcePage: 27,
+    sourcePage: 31,
   },
   {
     id: 'water-canteen',
@@ -369,7 +369,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 1.5,
     effect: 'Previne desidratação; peso cheio 1,5 kg e vazio 0,5 kg.',
-    sourcePage: 27,
+    sourcePage: 31,
   },
   {
     id: 'mre',
@@ -377,7 +377,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 0.5,
     effect: 'Previne Fome ou ajuda sua recuperação conforme o tempo sem alimentação.',
-    sourcePage: 27,
+    sourcePage: 31,
   },
   {
     id: 'field-cooking-kit',
@@ -385,7 +385,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 1.5,
     effect: 'Permite preparar Comida Típica e melhora o descanso.',
-    sourcePage: 27,
+    sourcePage: 31,
   },
   {
     id: 'tactical-tarp',
@@ -393,7 +393,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 1,
     effect: 'Abrigo para até 2; proteção ambiental e +1 Furtividade ao acampar.',
-    sourcePage: 27,
+    sourcePage: 31,
     skillBonuses: { stealth: 1 },
   },
   {
@@ -402,7 +402,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 0.1,
     effect: 'Reutilizável; permite acender fogo em condições úmidas e reduz fumaça visível.',
-    sourcePage: 27,
+    sourcePage: 31,
   },
   {
     id: 'compass-map',
@@ -410,7 +410,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 0.5,
     effect: '+2 em Planejamento de Rota durante o briefing.',
-    sourcePage: 27,
+    sourcePage: 31,
     skillBonuses: { exploration: 2 },
   },
   {
@@ -419,7 +419,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 0.5,
     effect: 'Iluminação de curto alcance compatível com NVG.',
-    sourcePage: 27,
+    sourcePage: 31,
   },
   {
     id: 'field-machete',
@@ -427,7 +427,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 1,
     effect: 'Abre caminho em vegetação; +25% velocidade de marcha. Dano 1d6 + Força.',
-    sourcePage: 27,
+    sourcePage: 31,
   },
   {
     id: 'paracord',
@@ -435,7 +435,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 0.5,
     effect: '+2 Sobrevivência em tarefas de amarração e construção de abrigo.',
-    sourcePage: 27,
+    sourcePage: 31,
     subskillBonuses: { survival: 2 },
   },
   {
@@ -444,7 +444,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'survival',
     weight: 0.2,
     effect: 'Dez usos; transforma água coletada em potável e previne infecções.',
-    sourcePage: 27,
+    sourcePage: 31,
   },
   {
     id: 'optic-red-dot',
@@ -452,7 +452,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'weaponModification',
     weight: 0.25,
     effect: '+1 em Curto e Médio Alcance. Ataques laterais contra o usuário recebem +1; um crítico Corpo a Corpo pode inutilizar a mira.',
-    sourcePage: 28,
+    sourcePage: 32,
     subskillBonuses: { shortRangeWeapons: 1, mediumRangeWeapons: 1 },
   },
   {
@@ -461,7 +461,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'weaponModification',
     weight: 0.3,
     effect: '+2 em Longo Alcance; -3 contra alvos a menos de 10 m. Ao focar, não percebe eventos fora da lente sem ação apropriada.',
-    sourcePage: 28,
+    sourcePage: 32,
     subskillBonuses: { longRangeWeapons: 2, shortRangeWeapons: -3 },
   },
   {
@@ -470,7 +470,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'weaponModification',
     weight: 0.5,
     effect: 'Alterna +1 em Longo ou Curto Alcance; -1 no primeiro ataque após sacar.',
-    sourcePage: 28,
+    sourcePage: 32,
     subskillBonuses: { longRangeWeapons: 1, shortRangeWeapons: 1 },
   },
   {
@@ -478,8 +478,8 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     name: 'Supressor',
     category: 'weaponModification',
     weight: 0.25,
-    effect: 'Reduz som e clarão; -3 dano e -1 em manobras de CQB muito apertado.',
-    sourcePage: 28,
+    effect: 'Reduz som e clarão; -2 dano (mínimo 1) e -1 em manobras de CQB muito apertado.',
+    sourcePage: 32,
   },
   {
     id: 'barrel-compensator',
@@ -487,7 +487,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'weaponModification',
     weight: 0.3,
     effect: 'Reduz em 1 uma penalidade de Automático. Quebra Furtividade ao disparar e concede +2 para localizar a origem.',
-    sourcePage: 28,
+    sourcePage: 32,
   },
   {
     id: 'barrel-extended',
@@ -495,7 +495,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'weaponModification',
     weight: 1,
     effect: '+1 dano a longa distância; -2 Combate a menos de 5 m e não pode ser ocultado sob roupa comum.',
-    sourcePage: 28,
+    sourcePage: 32,
     subskillBonuses: { shortRangeWeapons: -2 },
   },
   {
@@ -504,7 +504,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'weaponModification',
     weight: 0.3,
     effect: 'Ignora a penalidade de movimento em Semiautomático. Sacar ou guardar a configuração custa +1 m de movimento.',
-    sourcePage: 28,
+    sourcePage: 32,
   },
   {
     id: 'rail-bipod',
@@ -512,7 +512,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'weaponModification',
     weight: 0.5,
     effect: 'Apoiado ou deitado: +2 Combate e reduz recuo. Montar ou desmontar consome Movimento.',
-    sourcePage: 28,
+    sourcePage: 32,
     skillBonuses: { combat: 2 },
   },
   {
@@ -521,7 +521,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'weaponModification',
     weight: 0.25,
     effect: '+1 em tiro instintivo. No escuro ou fumaça, inimigos recebem +1 para acertar a origem do feixe.',
-    sourcePage: 29,
+    sourcePage: 33,
     subskillBonuses: { shortRangeWeapons: 1 },
   },
   {
@@ -530,7 +530,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'weaponModification',
     weight: 0.25,
     effect: 'Ilumina 20 m e pode aplicar -2 ao ataque de alvo próximo; revela a posição e remove o benefício de penumbra.',
-    sourcePage: 29,
+    sourcePage: 33,
   },
   {
     id: 'mag-pulls',
@@ -538,7 +538,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'weaponModification',
     weight: 0,
     effect: 'Recarga Tática passa de Ação Padrão para Ação Secundária; reduz em 1 a capacidade de carregadores da munição correspondente.',
-    sourcePage: 29,
+    sourcePage: 33,
   },
   {
     id: 'extended-rifle-magazines',
@@ -546,7 +546,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'ammunition',
     weight: 4,
     effect: 'Conjunto de carregadores estendidos: 30 munições cada. Recarga Tática custa Padrão + Secundária; Recarga Rápida custa Padrão.',
-    sourcePage: 29,
+    sourcePage: 33,
   },
   {
     id: 'extended-smg-magazines',
@@ -554,7 +554,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'ammunition',
     weight: 4,
     effect: 'Conjunto de carregadores estendidos: 50 munições cada. Recarga Tática custa Padrão + Secundária; Recarga Rápida custa Padrão.',
-    sourcePage: 29,
+    sourcePage: 33,
   },
   {
     id: 'extended-lmg-boxes',
@@ -562,7 +562,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'ammunition',
     weight: 10,
     effect: 'Conjunto de caixas estendidas: 200 munições cada. Recarga Tática custa Padrão + Secundária; Recarga Rápida custa Padrão.',
-    sourcePage: 29,
+    sourcePage: 33,
   },
   {
     id: 'extended-precision-magazines',
@@ -570,7 +570,7 @@ export const EQUIPMENT_CATALOG: EquipmentDefinition[] = [
     category: 'ammunition',
     weight: 2,
     effect: 'Conjunto de carregadores estendidos: 15 munições cada. Recarga Tática custa Padrão + Secundária; Recarga Rápida custa Padrão.',
-    sourcePage: 29,
+    sourcePage: 33,
   },
 ]
 

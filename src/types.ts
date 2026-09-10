@@ -15,6 +15,7 @@ export const SKILL_KEYS = [
   'medicine',
   'technology',
   'willpower',
+  'mobility',
 ] as const
 
 export const RESOURCE_KEYS = ['hp', 'energy', 'composure', 'stress'] as const
@@ -38,6 +39,7 @@ export const SUBSKILL_KEYS = [
   'mechanics',
   'electronics',
   'equipmentRepair',
+  'shortBlades', 'longBlades', 'heavyWeapons', 'rangedWeapons', 'disguise', 'engineering', 'mechanisms', 'crafts',
 ] as const
 
 export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number]
@@ -62,7 +64,7 @@ export type Skills = Record<SkillKey, number>
 export type Subskills = Record<SubskillKey, number>
 export type ResourceState = Record<ResourceKey, number>
 
-export type EquipmentSlot = 'primary' | 'secondary' | 'armor' | 'shield'
+export type EquipmentSlot = 'primary' | 'secondary' | 'armor' | 'shield' | 'head' | 'leftBlade' | 'rightBlade'
 export type EquipmentCategory =
   | 'primaryWeapon'
   | 'secondaryWeapon'
@@ -112,6 +114,8 @@ export interface ProgressionState {
 
 export interface Character {
   schemaVersion: 5
+  assassin: AssassinState
+  expansions: { enabledIds: string[]; attributeValues: Record<string, number> }
   level: number
   identity: Identity
   functionChoices: FunctionChoices
@@ -128,6 +132,7 @@ export interface Character {
 }
 
 export interface InventoryItem {
+  expansionId?: string
   id: string
   catalogItemId: string
   name: string
@@ -143,6 +148,12 @@ export interface InventoryItem {
 }
 
 export interface EquipmentDefinition {
+  weightUnspecified?: boolean
+  weightRange?: [number, number]
+  era?: number
+  armorResistance?: number
+  flowCap?: number
+  movementPenalty?: number
   id: string
   name: string
   category: EquipmentCategory
@@ -161,6 +172,25 @@ export interface EquipmentDefinition {
     magazineCapacity: number
     allowedShots: number[]
   }
+}
+
+export interface AssassinState {
+  functionId: string
+  specialization: string
+  era: number
+  modernTechnology: boolean
+  flow: number
+  suspicion: number
+  credibility: number
+  distance: number
+  stance: 'balanced' | 'offensive' | 'defensive'
+  primarySchool: string
+  guard: string
+  clues: { id: string; text: string; category: string; confirmed: boolean; scene: string }[]
+  target: string
+  layers: number
+  opportunities: string
+  bladeMods: { left: string[]; right: string[] }
 }
 
 export interface SubskillDefinition {

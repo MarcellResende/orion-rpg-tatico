@@ -1,0 +1,142 @@
+[
+  {
+    "id": "masyaf",
+    "name": "Tradição De Masyaf",
+    "sourcePage": 13,
+    "guard": "Assassino do Levante: +1 Defesa corpo a corpo enquanto houver pelo menos 2 inimigos hostis em alcance próximo.",
+    "fundamental": "Contra-Ataque: quando uma defesa corpo a corpo bem-sucedida contra um atacante em alcance superar o ataque por 5+, escolha mover 1,5 m sem provocar Reação dele OU fazê-lo perder a Reação até o início do próximo turno.",
+    "technique1": "Passo do Assassino: depois de acertar ataque, gaste Meia Ação para mover 1,5 m sem provocar Reação daquele alvo.",
+    "technique2": "Um Contra Muitos: 1/rodada, ignore o bônus de Superioridade Numérica do terceiro atacante contra você.",
+    "mastery": "Mestre Assassino: 1/combate, depois de defesa bem-sucedida, recupere sua Reação. A Reação recuperada só pode ser usada para Esquiva, Aparar ou Bloquear e respeita o limite universal."
+  },
+  {
+    "id": "liechtenauer",
+    "name": "Liechtenauer",
+    "sourcePage": 13,
+    "guard": "Ameaça Constante: +1 Ataque corpo a corpo; -1 Defesa contra ataques à distância enquanto ativa.",
+    "fundamental": "Vor: se agir antes do adversário na primeira rodada do duelo, +1 no primeiro ataque contra ele.",
+    "technique1": "Nach: depois de Aparar com sucesso, +2 no próximo ataque contra aquele inimigo até o fim do seu próximo turno.",
+    "technique2": "Indes: se o adversário mudar Postura ou Guarda em seu alcance, +1 Ataque e +1 Defesa contra ele até o fim do seu próximo turno.",
+    "mastery": "Pressão Ininterrupta: 1/combate, ao acertar por 5+, gaste Ação Secundária para fazer outro ataque contra o mesmo alvo com -3. Conta para o limite de ataque adicional."
+  },
+  {
+    "id": "fiore",
+    "name": "Armizare - Fiore Dei Liberi",
+    "sourcePage": 13,
+    "guard": "Porta de Ferro: +1 Defesa e +2 para resistir a efeitos que tentem deixá- lo Desequilibrado ou deslocá-lo.",
+    "fundamental": "Largo e Stretto: no início do turno escolha Largo (+1,5 m em um reposicionamento após atacar/defender) ou Stretto (+1 ao Aparar). Dura até o próximo turno.",
+    "technique1": "Cobertura: 1/rodada, se após Aparar um ataque ainda acertaria sua Defesa por apenas 1 ponto, trate-o como erro.",
+    "technique2": "Controle da Arma: quando alvo possuir Abertura, remova-a para fazê- lo perder a Reação até o início do próximo turno.",
+    "mastery": "Mestre de Armas: no início de cada combate escolha Ataque, Defesa ou Mobilidade. Receba +1 Ataque corpo a corpo, +1 Aparar ou +1,5 m em reposicionamentos após defesa até o fim da cena."
+  },
+  {
+    "id": "dardi",
+    "name": "Bolonhesa / Dardi",
+    "sourcePage": 14,
+    "guard": "Guarda Mutável: escolha Alta (+1 Ataque), Média (+1 Defesa na primeira troca da rodada) ou Baixa (+1 Defesa). Após atacar, pode mudar entre elas gratuitamente 1/rodada.",
+    "fundamental": "Assalto: na primeira rodada de combate corpo a corpo, +1,5 m de Movimento.",
+    "technique1": "Mutação: depois de mudar a variação da Guarda Mutável, o próximo ataque contra o mesmo adversário recebe +1.",
+    "technique2": "Sequência: ao acertar inimigo Desequilibrado, gaste Ação Secundária para segundo ataque com -3. Conta para o limite de ataque adicional.",
+    "mastery": "Assalto Perfeito: 1/combate, faça Movimento + Ataque + mudança de Guarda sem custo adicional. Se acertar, +2 Defesa até o início do próximo turno."
+  },
+  {
+    "id": "rapieira",
+    "name": "Rapieira Italiana",
+    "sourcePage": 14,
+    "guard": "Linha Estreita: +1 Aparar contra um único adversário em alcance. Com 2+ inimigos adjacentes, o bônus é perdido.",
+    "fundamental": "Medida: Ação Secundária, escolha um Duelista. Até atacar outro alvo, +1 Defesa contra esse oponente.",
+    "technique1": "Ponta Precisa: se ataque consumir Abertura e acertar, o alvo também fica Desequilibrado até o fim do próximo turno.",
+    "technique2": "Riposta: quando Aparar fizer o adversário errar por 5+, gaste a Ação Secundária do próximo turno para ataque com -2 antes de qualquer outra ação. Conta para o limite de ataque adicional.",
+    "mastery": "Mestre do Duelo: depois de duas rodadas consecutivas enfrentando o mesmo adversário, +1 Ataque contra ele. Some ao Teto normalmente; desaparece ao atacar outro alvo."
+  },
+  {
+    "id": "destreza",
+    "name": "La Verdadera Destreza",
+    "sourcePage": 14,
+    "guard": "Círculo: escolha 1 Adversário em alcance. +1 Defesa contra ele e nenhum bônus contra outros inimigos.",
+    "fundamental": "Geometria do Duelo: depois de completar uma rodada contra o mesmo Adversário, +1 no primeiro ataque contra ele em cada rodada.",
+    "technique1": "Medir o Adversário: Ação Secundária; Combate + Inteligência contra 10 + Exploração do alvo. Sucesso revela Defesa, Guarda/Postura, disponibilidade de Reação ou habilidade de combate relevante.",
+    "technique2": "Controle da Distância: depois de Aparar com sucesso, mova 1,5 m sem provocar Reação daquele Adversário.",
+    "mastery": "Mestre de Destreza: 1/combate, após defesa bem-sucedida contra o Adversário, faça-o perder a Reação e receber Abertura."
+  },
+  {
+    "id": "otomana",
+    "name": "Tradição Otomana",
+    "sourcePage": 15,
+    "guard": "Movimento Constante: enquanto possuir pelo menos 1 Fluxo, +1 Defesa corpo a corpo.",
+    "fundamental": "Combate Urbano: depois de Esquiva bem-sucedida, mova 1,5 m sem gastar Movimento.",
+    "technique1": "Fluxo de Combate: 1/rodada, acertar ataque corpo a corpo por 5+ concede +1 Fluxo, respeitando o limite de +1 Fluxo por ação.",
+    "technique2": "Assassino Urbano: gaste 1 Fluxo ao reposicionar-se para ignorar custo de obstáculo Simples ou terreno difícil.",
+    "mastery": "Mestre de Constantinopla: 1/combate, realize Parkour, ataque e continue o Parkour sem zerar Fluxo apenas por entrar em combate."
+  },
+  {
+    "id": "wushu",
+    "name": "Wushu / Jianfa",
+    "sourcePage": 15,
+    "guard": "Passo Fluido: se moveu pelo menos 1,5 m no turno, +1 Defesa corpo a corpo até o início do próximo turno.",
+    "fundamental": "Movimento Contínuo: depois de atacar, gaste Meia Ação para mover 1,5 m sem provocar Reação do alvo atacado.",
+    "technique1": "Ataque Fluido: se realizou Parkour no mesmo turno antes do ataque, +1 Ataque corpo a corpo.",
+    "technique2": "Redirecionamento: depois de Esquiva bem-sucedida, +1 no próximo ataque contra aquele adversário.",
+    "mastery": "Movimento Perfeito: 1/combate, Movimento -> Ataque -> Movimento; o segundo deslocamento pode ter até 3 m e não exige Meia Ação."
+  },
+  {
+    "id": "shinkage",
+    "name": "Shinkage-Ryū",
+    "sourcePage": 15,
+    "guard": "Sombra Nova: +1 Defesa corpo a corpo enquanto estiver enfrentando apenas 1 inimigo adjacente.",
+    "fundamental": "Resposta Serena: quando o primeiro ataque corpo a corpo de um adversário errar você na rodada, +1 Defesa contra o próximo ataque dele até o início do seu turno.",
+    "technique1": "Leitura do Ritmo: após o primeiro ataque de um adversário contra você na rodada, +1 Defesa contra ataques adicionais dele até o início do seu turno; não acumula com Resposta Serena, use o maior.",
+    "technique2": "Mudança de Ritmo: após Esquiva bem-sucedida, troque de Guarda ou volte a Postura genérica sem Meia Ação.",
+    "mastery": "Espadachim Shinkage: 1/combate, depois de defesa bem-sucedida, mova 1,5 m e receba +2 no próximo ataque contra aquele adversário."
+  },
+  {
+    "id": "iga",
+    "name": "Iga-Ryū",
+    "sourcePage": 16,
+    "guard": "Corpo Leve: usando Armadura Leve ou nenhuma, aumente em +1 o bônus de Defesa concedido por Esquiva.",
+    "fundamental": "Movimento de Combate: depois de acertar ataque corpo a corpo, gaste Meia Ação para mover 1,5 m sem provocar Reação do alvo.",
+    "technique1": "Mudança Vertical: depois de usar Parkour para reposicionar-se em combate, gaste 1 Fluxo para +1 Defesa até o próximo turno.",
+    "technique2": "Desaparecer: ao quebrar linha de visão depois de combate, +2 no primeiro teste de Furtividade para abandonar a cena.",
+    "mastery": "Shinobi: 1/combate, entrar em alcance corpo a corpo vindo de Rota de Parkour não zera Fluxo; o primeiro ataque desse turno recebe +1."
+  },
+  {
+    "id": "koga",
+    "name": "Kōga-Ryū",
+    "sourcePage": 16,
+    "guard": "Vigilante: +1 Defesa contra o primeiro ataque de inimigo que estava oculto, Mesclado ou fora da linha de visão no início da rodada.",
+    "fundamental": "Conheço Seus Truques: após uma Técnica de Escola ser usada contra você pela primeira vez na cena, +1 Defesa contra a próxima utilização da mesma Técnica.",
+    "technique1": "Perseguidor: +1 no primeiro teste de Perseguição iniciado contra alvo que você viu fugir.",
+    "technique2": "Olhar Treinado: quando inimigo tentar Ocultar-se durante Perseguição, +2 no teste de Procurar contra ele.",
+    "mastery": "Caçador de Sombras: 1/cena, quando inimigo em alcance visual tentar fugir ou se ocultar, gaste Reação para impor -2 ao teste dele."
+  },
+  {
+    "id": "francesa",
+    "name": "Esgrima Francesa",
+    "sourcePage": 16,
+    "guard": "En Garde: com arma de uma mão apropriada, +1 Aparar.",
+    "fundamental": "Riposta: quando Aparar fizer ataque errar por 5+, o adversário recebe Abertura.",
+    "technique1": "Passo de Esgrima: depois de defesa bem-sucedida, gaste Meia Ação para mover 1,5 m sem provocar Reação daquele atacante.",
+    "technique2": "Finta: 1/rodada, Ação Secundária e Combate + Inteligência contra Defesa do alvo; sucesso +1 no próximo ataque, falha por 5+ causa -1 Defesa até o próximo turno.",
+    "mastery": "Mestre da Sala: 1/combate, imediatamente após Aparar com sucesso, ataque aquele adversário com -2. Conta para o limite de ataque adicional."
+  },
+  {
+    "id": "silver",
+    "name": "Backsword / George Silver",
+    "sourcePage": 17,
+    "guard": "Guarda Firme: com espada de uma mão apropriada e sem escudo grande, +1 Defesa corpo a corpo.",
+    "fundamental": "Defesa Primeiro: quando Aparar por 5+, +1 Defesa contra o próximo ataque corpo a corpo sofrido na mesma rodada.",
+    "technique1": "Resposta Firme: se adversário errar você sem gastar sua Reação, +1 no próximo ataque contra ele.",
+    "technique2": "Contra Arma Pesada: +1 Defesa ao Aparar ataques de Armas Pesadas ou de Haste.",
+    "mastery": "Medida Segura: 1/combate, transforme em erro um ataque corpo a corpo que superou sua Defesa por apenas 1."
+  },
+  {
+    "id": "sabre",
+    "name": "Sabre Militar Europeu",
+    "sourcePage": 17,
+    "guard": "Guarda Móvel: +1 Iniciativa em cenas que começam diretamente em combate corpo a corpo.",
+    "fundamental": "Ataque de Passagem: se mover pelo menos 3 m antes de atacar, +1 Ataque naquele golpe.",
+    "technique1": "Passo de Sabre: depois de acertar, gaste Meia Ação para mover 1,5 m sem provocar Reação daquele alvo.",
+    "technique2": "Defesa em Movimento: depois de Aparar com sucesso, +1 Defesa contra o próximo atacante diferente na mesma rodada.",
+    "mastery": "Tempo de Sabre: 1/combate, mova até metade do Movimento, ataque e use o restante do Movimento sem provocar Reação do alvo atingido."
+  }
+]

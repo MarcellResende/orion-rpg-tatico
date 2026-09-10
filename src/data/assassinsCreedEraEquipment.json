@@ -1,0 +1,1491 @@
+[
+  {
+    "id": "assassins-creed:era-1-primaryWeapon-0",
+    "name": "Faca de Pedra · Pré-História",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Faca de Pedra 1d4",
+    "sourcePage": 21,
+    "era": 1,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-1-primaryWeapon-1",
+    "name": "Clava · Pré-História",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Clava 1d6 (Não Letal sem -2)",
+    "sourcePage": 21,
+    "era": 1,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-1-primaryWeapon-2",
+    "name": "Lança · Pré-História",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Lança 1d8",
+    "sourcePage": 21,
+    "era": 1,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-1-primaryWeapon-3",
+    "name": "Arco Simples · Pré-História",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Arco Simples 1d6 Silenciosa",
+    "sourcePage": 21,
+    "era": 1,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-1-survival-0",
+    "name": "Kit de Sobrevivência · Pré-História",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Sobrevivência +1",
+    "sourcePage": 21,
+    "era": 1
+  },
+  {
+    "id": "assassins-creed:era-1-survival-1",
+    "name": "Corda · Pré-História",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Corda +1 Mobilidade",
+    "sourcePage": 21,
+    "era": 1,
+    "skillBonuses": {
+      "mobility": 1
+    }
+  },
+  {
+    "id": "assassins-creed:era-1-survival-2",
+    "name": "Peles de Camuflagem · Pré-História",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Peles de Camuflagem +1 Furtividade em terreno adequado",
+    "sourcePage": 21,
+    "era": 1,
+    "skillBonuses": {
+      "stealth": 1
+    }
+  },
+  {
+    "id": "assassins-creed:era-1-survival-3",
+    "name": "Bolsa de Ervas · Pré-História",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Bolsa de Ervas +1 Primeiros Socorros",
+    "sourcePage": 21,
+    "era": 1,
+    "subskillBonuses": {
+      "firstAid": 1
+    }
+  },
+  {
+    "id": "assassins-creed:era-2-primaryWeapon-0",
+    "name": "Adaga de Bronze · Idade do Bronze",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Adaga de Bronze 1d6",
+    "sourcePage": 21,
+    "era": 2,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-2-primaryWeapon-1",
+    "name": "Espada Curta · Idade do Bronze",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Espada Curta 1d8",
+    "sourcePage": 21,
+    "era": 2,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-2-primaryWeapon-2",
+    "name": "Machado · Idade do Bronze",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Machado 1d8",
+    "sourcePage": 21,
+    "era": 2,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-2-primaryWeapon-3",
+    "name": "Lança · Idade do Bronze",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Lança 1d8",
+    "sourcePage": 21,
+    "era": 2,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-2-primaryWeapon-4",
+    "name": "Arco · Idade do Bronze",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Arco 1d8",
+    "sourcePage": 21,
+    "era": 2,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-2-survival-0",
+    "name": "Kit de Escriba · Idade do Bronze",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Escriba +1 com registros",
+    "sourcePage": 21,
+    "era": 2
+  },
+  {
+    "id": "assassins-creed:era-2-survival-1",
+    "name": "Selo/Insígnia · Idade do Bronze",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Selo/Insígnia +1 Credibilidade quando legítimo",
+    "sourcePage": 21,
+    "era": 2
+  },
+  {
+    "id": "assassins-creed:era-2-survival-2",
+    "name": "Corda de Escalada · Idade do Bronze",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Corda de Escalada",
+    "sourcePage": 21,
+    "era": 2
+  },
+  {
+    "id": "assassins-creed:era-2-survival-3",
+    "name": "Lanterna de óleo · Idade do Bronze",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Lanterna de óleo",
+    "sourcePage": 21,
+    "era": 2
+  },
+  {
+    "id": "assassins-creed:era-3-primaryWeapon-0",
+    "name": "Adaga · Idade do Ferro",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Adaga 1d6",
+    "sourcePage": 21,
+    "era": 3,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-3-primaryWeapon-1",
+    "name": "Espada · Idade do Ferro",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Espada 1d8",
+    "sourcePage": 21,
+    "era": 3,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-3-primaryWeapon-2",
+    "name": "Lança · Idade do Ferro",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Lança 1d10",
+    "sourcePage": 21,
+    "era": 3,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-3-primaryWeapon-3",
+    "name": "Javelina · Idade do Ferro",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Javelina 1d8",
+    "sourcePage": 21,
+    "era": 3,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-3-primaryWeapon-4",
+    "name": "Arco · Idade do Ferro",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Arco 1d8",
+    "sourcePage": 21,
+    "era": 3,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-3-survival-0",
+    "name": "Escudo Pequeno · Idade do Ferro",
+    "category": "protection",
+    "weight": 1.5,
+    "weightUnspecified": false,
+    "effect": "Broquel / Pequeno: +1 Defesa frontal; pode Aparar. Bloquear: Reação, +2 Defesa adicional (regra final, pág. 25).",
+    "sourcePage": 21,
+    "era": 3,
+    "slot": "shield",
+    "defenseBonus": 1
+  },
+  {
+    "id": "assassins-creed:era-3-survival-1",
+    "name": "Ferramentas Simples de Mecanismos · Idade do Ferro",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Ferramentas Simples de Mecanismos +1",
+    "sourcePage": 21,
+    "era": 3,
+    "subskillBonuses": {
+      "mechanisms": 1
+    }
+  },
+  {
+    "id": "assassins-creed:era-3-survival-2",
+    "name": "Kit Médico Histórico · Idade do Ferro",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit Médico Histórico +1 Primeiros Socorros",
+    "sourcePage": 21,
+    "era": 3,
+    "subskillBonuses": {
+      "firstAid": 1
+    }
+  },
+  {
+    "id": "assassins-creed:era-4-primaryWeapon-0",
+    "name": "Adaga · Antiguidade Clássica",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Adaga 1d6",
+    "sourcePage": 22,
+    "era": 4,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-4-primaryWeapon-1",
+    "name": "Espada Curta · Antiguidade Clássica",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Espada Curta 1d8",
+    "sourcePage": 22,
+    "era": 4,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-4-primaryWeapon-2",
+    "name": "Lança · Antiguidade Clássica",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Lança 1d10",
+    "sourcePage": 22,
+    "era": 4,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-4-primaryWeapon-3",
+    "name": "Arco · Antiguidade Clássica",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Arco 1d8",
+    "sourcePage": 22,
+    "era": 4,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-4-primaryWeapon-4",
+    "name": "Besta Regional · Antiguidade Clássica",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Besta Regional 1d10, Recarga Lenta, disponibilidade regional",
+    "sourcePage": 22,
+    "era": 4,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-4-survival-0",
+    "name": "Kit Cartográfico · Antiguidade Clássica",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit Cartográfico +1 rota",
+    "sourcePage": 22,
+    "era": 4
+  },
+  {
+    "id": "assassins-creed:era-4-survival-1",
+    "name": "Kit de Escrita · Antiguidade Clássica",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Escrita +1 documentos",
+    "sourcePage": 22,
+    "era": 4
+  },
+  {
+    "id": "assassins-creed:era-4-survival-2",
+    "name": "Manto Reversível · Antiguidade Clássica",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Manto Reversível pode ajudar a reduzir Suspeita após mudança de aparência 1/missão",
+    "sourcePage": 22,
+    "era": 4
+  },
+  {
+    "id": "assassins-creed:era-4-survival-3",
+    "name": "Bolsa de Moedas · Antiguidade Clássica",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Bolsa de Moedas +2 em 1 Negociação realmente resolvível com dinheiro",
+    "sourcePage": 22,
+    "era": 4
+  },
+  {
+    "id": "assassins-creed:era-5-primaryWeapon-0",
+    "name": "Espada Pesada · Antiguidade Tardia",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Espada Pesada 1d10",
+    "sourcePage": 22,
+    "era": 5,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-5-primaryWeapon-1",
+    "name": "Besta Pesada · Antiguidade Tardia",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Besta Pesada 2d6, Recarga Lenta, Rara",
+    "sourcePage": 22,
+    "era": 5,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-5-survival-0",
+    "name": "Cota de Malha · Antiguidade Tardia",
+    "category": "protection",
+    "weight": 7,
+    "weightUnspecified": false,
+    "effect": "Cota de Malha 7 kg, +2 Defesa, Fluxo máx.2",
+    "sourcePage": 22,
+    "era": 5,
+    "slot": "armor",
+    "defenseBonus": 2,
+    "armorResistance": 4,
+    "flowCap": 2
+  },
+  {
+    "id": "assassins-creed:era-5-survival-1",
+    "name": "Kit de Fortificação · Antiguidade Tardia",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Fortificação +1 Exploração para analisar posições defensivas",
+    "sourcePage": 22,
+    "era": 5,
+    "skillBonuses": {
+      "exploration": 1
+    }
+  },
+  {
+    "id": "assassins-creed:era-6-primaryWeapon-0",
+    "name": "Adaga Longa · Alta Idade Média",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Adaga Longa 1d6",
+    "sourcePage": 22,
+    "era": 6,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-6-primaryWeapon-1",
+    "name": "Espada · Alta Idade Média",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Espada 1d8",
+    "sourcePage": 22,
+    "era": 6,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-6-primaryWeapon-2",
+    "name": "Machado · Alta Idade Média",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Machado 1d10",
+    "sourcePage": 22,
+    "era": 6,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-6-primaryWeapon-3",
+    "name": "Lança · Alta Idade Média",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Lança 1d10",
+    "sourcePage": 22,
+    "era": 6,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-6-primaryWeapon-4",
+    "name": "Arco de Guerra · Alta Idade Média",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Arco de Guerra 1d10",
+    "sourcePage": 22,
+    "era": 6,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-6-survival-0",
+    "name": "Capa de Viagem · Alta Idade Média",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Capa de Viagem +1 Disfarce entre viajantes",
+    "sourcePage": 22,
+    "era": 6,
+    "subskillBonuses": {
+      "disguise": 1
+    }
+  },
+  {
+    "id": "assassins-creed:era-6-survival-1",
+    "name": "Kit de Navegação · Alta Idade Média",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Navegação +1 Exploração em viagens",
+    "sourcePage": 22,
+    "era": 6,
+    "skillBonuses": {
+      "exploration": 1
+    }
+  },
+  {
+    "id": "assassins-creed:era-6-survival-2",
+    "name": "Pequeno Espelho · Alta Idade Média",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Pequeno Espelho +1 observação indireta apropriada 1/cena",
+    "sourcePage": 22,
+    "era": 6
+  },
+  {
+    "id": "assassins-creed:era-7-primaryWeapon-0",
+    "name": "Adaga · Cruzadas / Idade Média Central",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Adaga 1d6",
+    "sourcePage": 22,
+    "era": 7,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-7-primaryWeapon-1",
+    "name": "Espada · Cruzadas / Idade Média Central",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Espada 1d8",
+    "sourcePage": 22,
+    "era": 7,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-7-primaryWeapon-2",
+    "name": "Maça · Cruzadas / Idade Média Central",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Maça 1d10 (+1 Ataque contra Armadura Pesada)",
+    "sourcePage": 22,
+    "era": 7,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-7-primaryWeapon-3",
+    "name": "Lança · Cruzadas / Idade Média Central",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Lança 1d10",
+    "sourcePage": 22,
+    "era": 7,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-7-primaryWeapon-4",
+    "name": "Besta · Cruzadas / Idade Média Central",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Besta 1d10 Recarga Lenta",
+    "sourcePage": 22,
+    "era": 7,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-7-primaryWeapon-5",
+    "name": "Faca de Arremesso · Cruzadas / Idade Média Central",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Faca de Arremesso 1d6 Curto e Ocultável",
+    "sourcePage": 22,
+    "era": 7,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-7-survival-0",
+    "name": "Traje de Peregrino · Cruzadas / Idade Média Central",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Traje de Peregrino +1 Disfarce contextual",
+    "sourcePage": 22,
+    "era": 7,
+    "subskillBonuses": {
+      "disguise": 1
+    }
+  },
+  {
+    "id": "assassins-creed:era-7-survival-1",
+    "name": "Kit de Escriba · Cruzadas / Idade Média Central",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Escriba +1 documentos",
+    "sourcePage": 22,
+    "era": 7
+  },
+  {
+    "id": "assassins-creed:era-7-survival-2",
+    "name": "Fumaça da Irmandade · Cruzadas / Idade Média Central",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Fumaça da Irmandade obscurece área 6 m por 2 rodadas, sem regras de fabricação",
+    "sourcePage": 22,
+    "era": 7
+  },
+  {
+    "id": "assassins-creed:era-8-primaryWeapon-0",
+    "name": "Arma Pesada · Baixa Idade Média",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Arma Pesada 2d6, Pesada/Quebrar Guarda",
+    "sourcePage": 22,
+    "era": 8,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-8-primaryWeapon-1",
+    "name": "Arma de Fogo Primitiva · Baixa Idade Média",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Arma de Fogo Primitiva 2d6, Ruidosa, Recarga Muito Lenta, Rara",
+    "sourcePage": 22,
+    "era": 8,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-8-survival-0",
+    "name": "Kit de Mecanismos Aprimorado · Baixa Idade Média",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Mecanismos Aprimorado +2",
+    "sourcePage": 22,
+    "era": 8,
+    "subskillBonuses": {
+      "mechanisms": 2
+    }
+  },
+  {
+    "id": "assassins-creed:era-8-survival-1",
+    "name": "Credencial de Mensageiro · Baixa Idade Média",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Credencial de Mensageiro +1 Credibilidade quando coerente",
+    "sourcePage": 22,
+    "era": 8
+  },
+  {
+    "id": "assassins-creed:era-9-primaryWeapon-0",
+    "name": "Rapieira · Renascimento",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Rapieira 1d8 (+1 Aparar)",
+    "sourcePage": 22,
+    "era": 9,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-9-primaryWeapon-1",
+    "name": "Adaga · Renascimento",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Adaga 1d6",
+    "sourcePage": 22,
+    "era": 9,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-9-primaryWeapon-2",
+    "name": "Arma Pesada · Renascimento",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Arma Pesada 2d6",
+    "sourcePage": 22,
+    "era": 9,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-9-primaryWeapon-3",
+    "name": "Pistola de Roda · Renascimento",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Pistola de Roda 1d12, Ruidosa, Recarga Muito Lenta, Rara",
+    "sourcePage": 22,
+    "era": 9,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-9-primaryWeapon-4",
+    "name": "Arcabuz · Renascimento",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Arcabuz 2d8, Longo, Ruidoso, Recarga Muito Lenta",
+    "sourcePage": 22,
+    "era": 9,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-9-survival-0",
+    "name": "Documentos Preparados · Renascimento",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Documentos Preparados +1 Credibilidade situacional",
+    "sourcePage": 22,
+    "era": 9
+  },
+  {
+    "id": "assassins-creed:era-9-survival-1",
+    "name": "Kit de Artífice · Renascimento",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Artífice +2 Tecnologia histórica",
+    "sourcePage": 22,
+    "era": 9,
+    "skillBonuses": {
+      "technology": 2
+    }
+  },
+  {
+    "id": "assassins-creed:era-9-survival-2",
+    "name": "Kit Cartográfico Urbano · Renascimento",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit Cartográfico Urbano +1 no primeiro teste de rota em cidade estudada",
+    "sourcePage": 22,
+    "era": 9
+  },
+  {
+    "id": "assassins-creed:era-10-primaryWeapon-0",
+    "name": "Sabre · Era das Navegações",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Sabre 1d8; após ataque bem-sucedido, +1 Esquiva até o próximo turno.",
+    "sourcePage": 22,
+    "era": 10,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-10-primaryWeapon-1",
+    "name": "Pistola de Pederneira · Era das Navegações",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Pistola de Pederneira 1d12 Ocultável/Ruidosa/Recarga Lenta",
+    "sourcePage": 22,
+    "era": 10,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-10-primaryWeapon-2",
+    "name": "Mosquete · Era das Navegações",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Mosquete 2d8 Longo/Ruidoso/Muito Lento",
+    "sourcePage": 22,
+    "era": 10,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-10-primaryWeapon-3",
+    "name": "Bacamarte · Era das Navegações",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Bacamarte 3d6/2d6/1d6 por faixa, Ruidoso/Muito Lento",
+    "sourcePage": 22,
+    "era": 10,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-10-survival-0",
+    "name": "Luneta · Era das Navegações",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Luneta +2 Exploração a distância",
+    "sourcePage": 22,
+    "era": 10,
+    "skillBonuses": {
+      "exploration": 2
+    }
+  },
+  {
+    "id": "assassins-creed:era-10-survival-1",
+    "name": "Bússola · Era das Navegações",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Bússola +1 navegação",
+    "sourcePage": 22,
+    "era": 10
+  },
+  {
+    "id": "assassins-creed:era-10-survival-2",
+    "name": "Kit Náutico · Era das Navegações",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit Náutico +2 em condução aquática 1/cena",
+    "sourcePage": 22,
+    "era": 10
+  },
+  {
+    "id": "assassins-creed:era-10-survival-3",
+    "name": "Casaco Reversível · Era das Navegações",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Casaco Reversível auxilia mudança de aparência",
+    "sourcePage": 22,
+    "era": 10
+  },
+  {
+    "id": "assassins-creed:era-11-primaryWeapon-0",
+    "name": "Sabre · Revoluções / Era Napoleônica",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Sabre 1d8; após ataque bem-sucedido, +1 Esquiva até o próximo turno.",
+    "sourcePage": 22,
+    "era": 11,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-11-primaryWeapon-1",
+    "name": "Pistola de Pederneira · Revoluções / Era Napoleônica",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Pistola de Pederneira 1d12",
+    "sourcePage": 22,
+    "era": 11,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-11-primaryWeapon-2",
+    "name": "Carabina · Revoluções / Era Napoleônica",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Carabina 2d6",
+    "sourcePage": 22,
+    "era": 11,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-11-primaryWeapon-3",
+    "name": "Mosquete · Revoluções / Era Napoleônica",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Mosquete 2d8",
+    "sourcePage": 22,
+    "era": 11,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-11-primaryWeapon-4",
+    "name": "Rifle · Revoluções / Era Napoleônica",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Rifle 2d8 Longo, +2 Ataque após Mirar sem se mover, Recarga Muito Lenta",
+    "sourcePage": 22,
+    "era": 11,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-11-survival-0",
+    "name": "Luneta · Revoluções / Era Napoleônica",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Luneta +2",
+    "sourcePage": 22,
+    "era": 11
+  },
+  {
+    "id": "assassins-creed:era-11-survival-1",
+    "name": "Uniforme/Traje Oficial · Revoluções / Era Napoleônica",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Uniforme/Traje Oficial Credibilidade 2-3",
+    "sourcePage": 22,
+    "era": 11
+  },
+  {
+    "id": "assassins-creed:era-11-survival-2",
+    "name": "Kit Cartográfico Militar · Revoluções / Era Napoleônica",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit Cartográfico Militar +2 primeiro teste de rota",
+    "sourcePage": 22,
+    "era": 11
+  },
+  {
+    "id": "assassins-creed:era-11-survival-3",
+    "name": "Kit de Mensageiro · Revoluções / Era Napoleônica",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Mensageiro +1 Disfarce contextual",
+    "sourcePage": 22,
+    "era": 11,
+    "subskillBonuses": {
+      "disguise": 1
+    }
+  },
+  {
+    "id": "assassins-creed:era-11-survival-4",
+    "name": "Bolsa Médica · Revoluções / Era Napoleônica",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Bolsa Médica +2 Primeiros Socorros",
+    "sourcePage": 22,
+    "era": 11,
+    "subskillBonuses": {
+      "firstAid": 2
+    }
+  },
+  {
+    "id": "assassins-creed:era-12-primaryWeapon-0",
+    "name": "Bengala · Era Industrial",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Bengala 1d6, Discreta, Não Letal sem -2",
+    "sourcePage": 23,
+    "era": 12,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-12-primaryWeapon-1",
+    "name": "Pistola de Percussão · Era Industrial",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Pistola de Percussão 1d12 Ruidosa/Recarga Lenta",
+    "sourcePage": 23,
+    "era": 12,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-12-primaryWeapon-2",
+    "name": "Rifle · Era Industrial",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Rifle 2d8 Longo",
+    "sourcePage": 23,
+    "era": 12,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-12-primaryWeapon-3",
+    "name": "Espingarda · Era Industrial",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Espingarda 2d6 Curto/Ruidosa",
+    "sourcePage": 23,
+    "era": 12,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-12-survival-0",
+    "name": "Relógio de Bolso · Era Industrial",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Relógio de Bolso +1 ação sincronizada",
+    "sourcePage": 23,
+    "era": 12
+  },
+  {
+    "id": "assassins-creed:era-12-survival-1",
+    "name": "Binóculo · Era Industrial",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Binóculo +2 Exploração distante",
+    "sourcePage": 23,
+    "era": 12,
+    "skillBonuses": {
+      "exploration": 2
+    }
+  },
+  {
+    "id": "assassins-creed:era-12-survival-2",
+    "name": "Kit Fotográfico · Era Industrial",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit Fotográfico registra evidências",
+    "sourcePage": 23,
+    "era": 12
+  },
+  {
+    "id": "assassins-creed:era-12-survival-3",
+    "name": "Kit de Mecanismos · Era Industrial",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Mecanismos +2",
+    "sourcePage": 23,
+    "era": 12,
+    "subskillBonuses": {
+      "mechanisms": 2
+    }
+  },
+  {
+    "id": "assassins-creed:era-13-primaryWeapon-0",
+    "name": "Bengala · Era Vitoriana / Belle Époque",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Bengala 1d6",
+    "sourcePage": 23,
+    "era": 13,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-13-primaryWeapon-1",
+    "name": "Revólver · Era Vitoriana / Belle Époque",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Revólver 1d10 Ruidoso",
+    "sourcePage": 23,
+    "era": 13,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-13-primaryWeapon-2",
+    "name": "Rifle · Era Vitoriana / Belle Époque",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Rifle 2d8 Longo",
+    "sourcePage": 23,
+    "era": 13,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-13-primaryWeapon-3",
+    "name": "Espingarda · Era Vitoriana / Belle Époque",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Espingarda 2d6 Curto/Ruidosa",
+    "sourcePage": 23,
+    "era": 13,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-13-survival-0",
+    "name": "Câmera Portátil · Era Vitoriana / Belle Époque",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Câmera Portátil",
+    "sourcePage": 23,
+    "era": 13
+  },
+  {
+    "id": "assassins-creed:era-13-survival-1",
+    "name": "Binóculo · Era Vitoriana / Belle Époque",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Binóculo +2 Exploração",
+    "sourcePage": 23,
+    "era": 13,
+    "skillBonuses": {
+      "exploration": 2
+    }
+  },
+  {
+    "id": "assassins-creed:era-13-survival-2",
+    "name": "Kit de Documentos · Era Vitoriana / Belle Époque",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Documentos +1 Credibilidade",
+    "sourcePage": 23,
+    "era": 13
+  },
+  {
+    "id": "assassins-creed:era-13-survival-3",
+    "name": "Kit Médico · Era Vitoriana / Belle Époque",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit Médico +2 Primeiros Socorros",
+    "sourcePage": 23,
+    "era": 13,
+    "subskillBonuses": {
+      "firstAid": 2
+    }
+  },
+  {
+    "id": "assassins-creed:era-14-primaryWeapon-0",
+    "name": "Pistola · Guerras Mundiais",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Pistola 1d10",
+    "sourcePage": 23,
+    "era": 14,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-14-primaryWeapon-1",
+    "name": "Submetralhadora · Guerras Mundiais",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Submetralhadora 1d8 e regras de fogo automático",
+    "sourcePage": 23,
+    "era": 14,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-14-primaryWeapon-2",
+    "name": "Rifle · Guerras Mundiais",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Rifle 2d8 Longo",
+    "sourcePage": 23,
+    "era": 14,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-14-primaryWeapon-3",
+    "name": "Espingarda · Guerras Mundiais",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Espingarda 2d6 Curto",
+    "sourcePage": 23,
+    "era": 14,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-14-primaryWeapon-4",
+    "name": "Rifle de Precisão · Guerras Mundiais",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Rifle de Precisão 2d12 Longo",
+    "sourcePage": 23,
+    "era": 14,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-14-survival-0",
+    "name": "Rádio Portátil · Guerras Mundiais",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Rádio Portátil",
+    "sourcePage": 23,
+    "era": 14
+  },
+  {
+    "id": "assassins-creed:era-14-survival-1",
+    "name": "Binóculo · Guerras Mundiais",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Binóculo +2 Exploração",
+    "sourcePage": 23,
+    "era": 14,
+    "skillBonuses": {
+      "exploration": 2
+    }
+  },
+  {
+    "id": "assassins-creed:era-14-survival-2",
+    "name": "Câmera Compacta · Guerras Mundiais",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Câmera Compacta",
+    "sourcePage": 23,
+    "era": 14
+  },
+  {
+    "id": "assassins-creed:era-14-survival-3",
+    "name": "Documentação Oficial · Guerras Mundiais",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Documentação Oficial",
+    "sourcePage": 23,
+    "era": 14
+  },
+  {
+    "id": "assassins-creed:era-14-survival-4",
+    "name": "Kit Médico · Guerras Mundiais",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit Médico +2",
+    "sourcePage": 23,
+    "era": 14
+  },
+  {
+    "id": "assassins-creed:era-15-survival-0",
+    "name": "Microcâmera · Guerra Fria",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Microcâmera +2 investigação visual",
+    "sourcePage": 23,
+    "era": 15
+  },
+  {
+    "id": "assassins-creed:era-15-survival-1",
+    "name": "Gravador · Guerra Fria",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Gravador preserva conversas",
+    "sourcePage": 23,
+    "era": 15
+  },
+  {
+    "id": "assassins-creed:era-15-survival-2",
+    "name": "Rádio Compacto · Guerra Fria",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Rádio Compacto",
+    "sourcePage": 23,
+    "era": 15
+  },
+  {
+    "id": "assassins-creed:era-15-survival-3",
+    "name": "Kit de Identidade · Guerra Fria",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Identidade +1 Credibilidade, versões avançadas +2 máx.3",
+    "sourcePage": 23,
+    "era": 15
+  },
+  {
+    "id": "assassins-creed:era-15-survival-4",
+    "name": "Vigilância · Guerra Fria",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Vigilância +1 observação",
+    "sourcePage": 23,
+    "era": 15
+  },
+  {
+    "id": "assassins-creed:era-16-primaryWeapon-0",
+    "name": "Pistola · Contemporâneo",
+    "category": "secondaryWeapon",
+    "weight": 1,
+    "weightUnspecified": false,
+    "effect": "Pistola 1d10",
+    "sourcePage": 23,
+    "era": 16,
+    "slot": "secondary",
+    "weapon": {
+      "magazineCapacity": 10,
+      "allowedShots": [
+        1
+      ]
+    }
+  },
+  {
+    "id": "assassins-creed:era-16-primaryWeapon-1",
+    "name": "SMG · Contemporâneo",
+    "category": "primaryWeapon",
+    "weight": 2.5,
+    "weightUnspecified": false,
+    "effect": "SMG 1d8",
+    "sourcePage": 23,
+    "era": 16,
+    "slot": "primary",
+    "weapon": {
+      "magazineCapacity": 25,
+      "allowedShots": [
+        1,
+        3,
+        6
+      ]
+    }
+  },
+  {
+    "id": "assassins-creed:era-16-primaryWeapon-2",
+    "name": "Fuzil de Assalto · Contemporâneo",
+    "category": "primaryWeapon",
+    "weight": 3.5,
+    "weightUnspecified": false,
+    "effect": "Fuzil de Assalto 2d6",
+    "sourcePage": 23,
+    "era": 16,
+    "slot": "primary",
+    "weapon": {
+      "magazineCapacity": 20,
+      "allowedShots": [
+        1,
+        3,
+        6
+      ]
+    }
+  },
+  {
+    "id": "assassins-creed:era-16-primaryWeapon-3",
+    "name": "Rifle de potência integral · Contemporâneo",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Rifle de potência integral 2d8 quando a campanha diferenciar essa categoria",
+    "sourcePage": 23,
+    "era": 16,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-16-primaryWeapon-4",
+    "name": "LMG · Contemporâneo",
+    "category": "primaryWeapon",
+    "weight": 10,
+    "weightUnspecified": false,
+    "effect": "LMG 2d6",
+    "sourcePage": 23,
+    "era": 16,
+    "slot": "primary",
+    "weapon": {
+      "magazineCapacity": 100,
+      "allowedShots": [
+        6
+      ]
+    }
+  },
+  {
+    "id": "assassins-creed:era-16-primaryWeapon-5",
+    "name": "Rifle de Precisão · Contemporâneo",
+    "category": "primaryWeapon",
+    "weight": 7,
+    "weightUnspecified": false,
+    "effect": "Rifle de Precisão 2d12. Use do RPG Tático v1.4 os modos de disparo, capacidade, recargas, acessórios, confiabilidade e demais regras modernas",
+    "sourcePage": 23,
+    "era": 16,
+    "slot": "primary",
+    "weapon": {
+      "magazineCapacity": 10,
+      "allowedShots": [
+        1
+      ]
+    }
+  },
+  {
+    "id": "assassins-creed:era-16-survival-0",
+    "name": "Kit de Identidade · Contemporâneo",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Kit de Identidade +1 Credibilidade",
+    "sourcePage": 23,
+    "era": 16
+  },
+  {
+    "id": "assassins-creed:era-16-survival-1",
+    "name": "Microcâmera · Contemporâneo",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Microcâmera +2 Investigação visual",
+    "sourcePage": 23,
+    "era": 16
+  },
+  {
+    "id": "assassins-creed:era-16-survival-2",
+    "name": "Vigilância · Contemporâneo",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Vigilância +1 observação",
+    "sourcePage": 23,
+    "era": 16
+  },
+  {
+    "id": "assassins-creed:era-16-survival-3",
+    "name": "Drone · Contemporâneo",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Drone conforme manual v1.4",
+    "sourcePage": 23,
+    "era": 16
+  },
+  {
+    "id": "assassins-creed:era-16-survival-4",
+    "name": "Comunicação Criptografada · Contemporâneo",
+    "category": "survival",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Comunicação Criptografada conforme manual",
+    "sourcePage": 23,
+    "era": 16
+  },
+  {
+    "id": "assassins-creed:era-15-primaryWeapon-0",
+    "name": "Pistola · Guerra Fria",
+    "category": "secondaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Pistola 1d10",
+    "sourcePage": 23,
+    "era": 15,
+    "slot": "secondary"
+  },
+  {
+    "id": "assassins-creed:era-15-primaryWeapon-1",
+    "name": "Submetralhadora · Guerra Fria",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Submetralhadora 1d8 e regras de fogo automático",
+    "sourcePage": 23,
+    "era": 15,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-15-primaryWeapon-2",
+    "name": "Rifle · Guerra Fria",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Rifle 2d8 Longo",
+    "sourcePage": 23,
+    "era": 15,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-15-primaryWeapon-3",
+    "name": "Espingarda · Guerra Fria",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Espingarda 2d6 Curto",
+    "sourcePage": 23,
+    "era": 15,
+    "slot": "primary"
+  },
+  {
+    "id": "assassins-creed:era-15-primaryWeapon-4",
+    "name": "Rifle de Precisão · Guerra Fria",
+    "category": "primaryWeapon",
+    "weight": 0,
+    "weightUnspecified": true,
+    "effect": "Rifle de Precisão 2d12 Longo",
+    "sourcePage": 23,
+    "era": 15,
+    "slot": "primary"
+  }
+]

@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { characterFunction, characterFunctionId, characterFunctions, characterSkillKeys, hasAssassinsCreed } from './data/characterOptions'
+import { AssassinsCreedPanel } from './components/AssassinsCreedPanel'
+import { lazy, Suspense, useState } from 'react'
+import { ExpansionsPanel } from './components/ExpansionsPanel'
+import { ExpansionAttributes } from './components/ExpansionAttributes'
 import { createEmptyCharacter } from './character'
 import { AbilitiesPanel } from './components/AbilitiesPanel'
 import { InventoryPanel } from './components/InventoryPanel'
-import { ManualReferencePanel } from './components/ManualReferencePanel'
 import { ProgressionPanel } from './components/ProgressionPanel'
 import { ResourceCard } from './components/ResourceCard'
 import { Stepper } from './components/Stepper'
@@ -12,7 +15,6 @@ import {
   ATTRIBUTE_LABELS,
   CONDITION_GROUP_LABELS,
   CONDITIONS,
-  FUNCTIONS,
   SKILL_LABELS,
   TRAITS,
 } from './data/manual'
@@ -37,7 +39,6 @@ import {
 import type { ActiveCondition } from './onlineTypes'
 import {
   ATTRIBUTE_KEYS,
-  SKILL_KEYS,
   type AttributeKey,
   type Character,
   type Identity,
@@ -45,6 +46,7 @@ import {
 } from './types'
 
 export type SaveState = 'saving' | 'saved' | 'error'
+const ManualReferencePanel = lazy(() => import('./components/ManualReferencePanel').then((module) => ({ default: module.ManualReferencePanel })))
 
 interface CharacterSheetProps {
   character: Character
@@ -75,7 +77,7 @@ const hpTone = (current: number, maximum: number) => {
   return 'green' as const
 }
 
-type SheetTab = 'sheet' | 'operations' | 'abilities' | 'progression' | 'reference' | 'notes'
+type SheetTab = 'sheet' | 'operations' | 'abilities' | 'progression' | 'reference' | 'notes' | 'expansions'
 
 export function CharacterSheet({
   character,
@@ -100,16 +102,16 @@ export function CharacterSheet({
   const effectiveSkills = calculateEffectiveSkills(character)
   const loadState = calculateLoadState(character)
   const attributePointsSpent = calculateAttributePointsSpent(character.attributes)
-  const skillPointsSpent = calculateSkillPointsSpent(character.skills)
+  const skillPointsSpent = calculateSkillPointsSpent(character.skills, character)
   const attributePointsRemaining = derived.maxAttributePoints - attributePointsSpent
   const skillPointsRemaining = derived.maxSkillPoints - skillPointsSpent
   const identityErrors = validateIdentity(character)
-  const selectedFunction = FUNCTIONS.find((item) => item.id === character.identity.functionId)
+  const selectedFunction = characterFunction(character)
   const selectedTrait = TRAITS.find((item) => item.id === character.identity.traitId)
   const operatorLevel = calculateLevelFromXp(character.progression.xp)
   const stressAtLimit = character.resources.stress >= derived.maxStress
   const stressSkillPenalty = character.resources.stress >= 5 ? -2 : character.resources.stress >= 3 ? -1 : 0
-  const abilityHpBonus = derived.maxHp - (20 + effectiveAttributes.constitution * 10)
+  const activeHpBonus = derived.maxHp - (20 + effectiveAttributes.constitution * 5)
   const availableConditions = CONDITIONS.filter(
     (definition) => !conditions.some((active) => active.conditionId === definition.id),
   )
@@ -122,6 +124,10 @@ export function CharacterSheet({
   }
 
   const updateIdentity = <Key extends keyof Identity,>(key: Key, value: Identity[Key]) => {
+    if (key === 'functionId' && hasAssassinsCreed(character)) {
+      commit((current) => applyCharacterLimits({ ...current, assassin: { ...current.assassin, functionId: String(value), specialization: '' } }))
+      return
+    }
     commit((current) => applyCharacterLimits({
       ...current,
       identity: { ...current.identity, [key]: value },
@@ -218,7 +224,8 @@ export function CharacterSheet({
           <button type="button" className={activeTab === 'operations' ? 'active' : ''} aria-pressed={activeTab === 'operations'} onClick={() => setActiveTab('operations')}>Condições e inventário</button>
           <button type="button" className={activeTab === 'abilities' ? 'active' : ''} aria-pressed={activeTab === 'abilities'} onClick={() => setActiveTab('abilities')}>Habilidades · {calculateActiveGeneralAbilities(character).length}</button>
           <button type="button" className={activeTab === 'progression' ? 'active' : ''} aria-pressed={activeTab === 'progression'} onClick={() => setActiveTab('progression')}>Progressão · Nível {operatorLevel}</button>
-          <button type="button" className={activeTab === 'reference' ? 'active' : ''} aria-pressed={activeTab === 'reference'} onClick={() => setActiveTab('reference')}>Manual v1.1</button>
+          <button type="button" className={activeTab === 'reference' ? 'active' : ''} aria-pressed={activeTab === 'reference'} onClick={() => setActiveTab('reference')}>Manual v1.4</button>
+          <button type="button" className={activeTab === 'expansions' ? 'active' : ''} aria-pressed={activeTab === 'expansions'} onClick={() => setActiveTab('expansions')}>Expansões</button>
           <button type="button" className={activeTab === 'notes' ? 'active' : ''} aria-pressed={activeTab === 'notes'} onClick={() => setActiveTab('notes')}>Anotações</button>
         </nav>
 
@@ -241,7 +248,7 @@ export function CharacterSheet({
             code="PV"
             current={character.resources.hp}
             maximum={derived.maxHp}
-            explanation={`20 base + ${effectiveAttributes.constitution} Constituição total × 10${abilityHpBonus > 0 ? ` + ${abilityHpBonus} de Habilidades` : ''}`}
+            explanation={`20 base + ${effectiveAttributes.constitution} Constituição total × 5${activeHpBonus !== 0 ? ` ${activeHpBonus > 0 ? '+' : '−'} ${Math.abs(activeHpBonus)} de bônus ativos` : ''}`}
             status={hpStatus(character.resources.hp, derived.maxHp)}
             tone={hpTone(character.resources.hp, derived.maxHp)}
             onDelta={(delta) => commit((current) => changeResource(current, 'hp', delta))}
@@ -252,7 +259,7 @@ export function CharacterSheet({
             code="EN"
             current={character.resources.energy}
             maximum={derived.maxEnergy}
-            explanation={`10 base + ${effectiveAttributes.dexterity} Destreza total × 5`}
+            explanation={`10 base + ${effectiveAttributes.dexterity} Destreza total × 3${derived.maxEnergy !== 10 + effectiveAttributes.dexterity * 3 ? `; ajuste de expansões: ${derived.maxEnergy - (10 + effectiveAttributes.dexterity * 3)}` : ''}`}
             status={character.resources.energy === 0 ? 'ESGOTADA' : 'OPERACIONAL'}
             tone="cyan"
             onDelta={(delta) => commit((current) => changeResource(current, 'energy', delta))}
@@ -390,7 +397,7 @@ export function CharacterSheet({
                   {attributePointsSpent} / {derived.maxAttributePoints}
                 </span>
               </div>
-              <p className="panel-intro">Distribua até {derived.maxAttributePoints} pontos. O limite aumenta nos níveis 3, 6 e 9; bônus da função não consomem pontos.</p>
+              <p className="panel-intro">Distribua até {derived.maxAttributePoints} pontos. O limite aumenta nos níveis 3, 6 e 9; bônus da função não consomem pontos. Máximo 3 por atributo na criação e 6 no total durante a campanha.</p>
               <div className="stepper-list">
                 {ATTRIBUTE_KEYS.map((key) => {
                   return (
@@ -398,18 +405,19 @@ export function CharacterSheet({
                       key={key}
                       label={ATTRIBUTE_LABELS[key]}
                       value={character.attributes[key]}
-                      bonus={bonuses.attributes[key]}
+                      bonus={effectiveAttributes[key] - character.attributes[key]}
                       hint={ATTRIBUTE_EFFECTS[key]}
                       disableDecrease={
                         character.attributes[key] === 0 ||
                         changeAttribute(character, key, -1) === character
                       }
-                      disableIncrease={attributePointsRemaining === 0}
+                      disableIncrease={changeAttribute(character, key, 1) === character}
                       onDecrease={() => commit((current) => changeAttribute(current, key, -1))}
                       onIncrease={() => commit((current) => changeAttribute(current, key, 1))}
                     />
                   )
                 })}
+                <ExpansionAttributes character={character} onChange={onChange} />
               </div>
             </section>
           </div>
@@ -427,11 +435,11 @@ export function CharacterSheet({
                 <label className="field field--wide">
                   <span>Função</span>
                   <select
-                    value={character.identity.functionId}
+                    value={characterFunctionId(character)}
                     onChange={(event) => updateIdentity('functionId', event.currentTarget.value)}
                   >
                     <option value="">Selecione uma função</option>
-                    {FUNCTIONS.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                    {characterFunctions(character).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
                   </select>
                 </label>
                 {selectedFunction && (
@@ -494,7 +502,7 @@ export function CharacterSheet({
                 {derived.maxSkillPoints} pontos distribuíveis (10 base + Inteligência total). Bônus de função, traço e equipamento aparecem no total e não gastam pontos.
               </p>
               <div className="stepper-list stepper-list--compact">
-                {SKILL_KEYS.map((key) => (
+                {characterSkillKeys(character).map((key) => (
                   <Stepper
                     key={key}
                     label={SKILL_LABELS[key]}
@@ -602,6 +610,7 @@ export function CharacterSheet({
           </section>
 
             <InventoryPanel character={character} onChange={onChange} />
+            {hasAssassinsCreed(character) && <AssassinsCreedPanel character={character} onChange={onChange} />}
           </div>
         </div>
 
@@ -614,7 +623,11 @@ export function CharacterSheet({
         </div>
 
         <div className="sheet-tab-panel" hidden={activeTab !== 'reference'}>
-          <ManualReferencePanel />
+          {activeTab === 'reference' && <Suspense fallback={<p role="status">Carregando manual…</p>}><ManualReferencePanel character={character} /></Suspense>}
+        </div>
+
+        <div className="sheet-tab-panel" hidden={activeTab !== 'expansions'}>
+          <ExpansionsPanel character={character} onChange={onChange} />
         </div>
 
         <div className="sheet-tab-panel" hidden={activeTab !== 'notes'}>
@@ -655,7 +668,7 @@ export function CharacterSheet({
 
       <footer>
         <span>ORION FIELD SYSTEM // ONLINE BUILD 1.2</span>
-        <span>FONTE: MANUAL DO OPERADOR V1.1</span>
+        <span>FONTE: MANUAL DO OPERADOR V1.4</span>
       </footer>
     </div>
   )

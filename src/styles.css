@@ -2322,3 +2322,16 @@ footer {
 .reference-row b:last-child { border-right: 0; }
 .reference-row span:first-child { color: var(--text); font-weight: 800; }
 .reference-row--head { position: sticky; top: 0; color: var(--green); background: #09171a; }
+.expansion-card { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem; margin: 1rem 0; border: 1px solid var(--border, #39443e); border-radius: 8px; }
+.expansion-card--active { border-color: #86ad6a; background: #86ad6a0d; }
+.expansion-card p { margin: .5rem 0; line-height: 1.6; }
+.expansion-card small { opacity: .75; }
+@media (max-width: 600px) { .expansion-card { flex-direction: column; align-items: flex-start; } }
+.ac-panel details { margin: 1rem; border: 1px solid var(--border, #39443e); padding: 1rem; border-radius: 8px; }
+.ac-panel summary { cursor: pointer; font-weight: 700; }
+.ac-panel .form-grid { padding: 1rem; }
+.ac-panel .secondary-button { margin: .5rem; }
+.ac-mod { display: flex; align-items: flex-start; gap: .75rem; padding: .8rem 0; border-bottom: 1px solid var(--border, #39443e); }
+.ac-mod input { flex: 0 0 auto; margin-top: .25rem; }
+.ac-mod small { display: block; line-height: 1.6; margin-top: .4rem; opacity: .8; }
+.ac-panel .reference-content { min-width: 0; overflow-wrap: anywhere; }

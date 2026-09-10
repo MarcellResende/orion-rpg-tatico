@@ -39,15 +39,17 @@ interface ConditionRow {
   created_at: string
 }
 
-const hydrateCampaignProgression = (value: unknown): CampaignProgressionState => {
+export const hydrateCampaignProgression = (value: unknown): CampaignProgressionState => {
   const source = typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
   const strings = (candidate: unknown, maximum: number) => Array.isArray(candidate)
     ? candidate.filter((item): item is string => typeof item === 'string').slice(0, maximum)
     : []
   const number = (candidate: unknown, minimum: number, maximum: number) =>
     Math.min(maximum, Math.max(minimum, typeof candidate === 'number' && Number.isFinite(candidate) ? Math.round(candidate) : minimum))
+  const brotherhood = source.brotherhood && typeof source.brotherhood === 'object' ? source.brotherhood as Record<string, unknown> : null
   const alert = source.alert === 'yellow' || source.alert === 'red' ? source.alert : 'green'
   return {
+    ...(brotherhood ? { brotherhood: { prestige: number(brotherhood.prestige, 0, 999), resources: number(brotherhood.resources, 0, 9999), notoriety: number(brotherhood.notoriety, 0, 5), fractures: number(brotherhood.fractures, 0, 3), doctrines: strings(brotherhood.doctrines, 3), elite: typeof brotherhood.elite === 'string' ? brotherhood.elite.slice(0, 80) : '', projects: strings(brotherhood.projects, 6), suspendedDoctrine: typeof brotherhood.suspendedDoctrine === 'string' ? brotherhood.suspendedDoctrine.slice(0, 80) : '' } } : {}),
     operationalPrestige: number(source.operationalPrestige, 0, 999),
     headquartersPoints: number(source.headquartersPoints, 0, 9999),
     squadDoctrines: strings(source.squadDoctrines, 3),

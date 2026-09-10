@@ -1,8 +1,9 @@
-import { findEquipment } from '../data/equipment'
-import { findGeneralAbility } from '../data/abilities'
-import { FUNCTIONS, TRAITS } from '../data/manual'
+import { assassinProtection, bladeWeightAdjustment } from './assassinsCreed'
+import { characterFunction, characterSkillKeys, characterSubskills, characterSubskillsFor, hasAssassinsCreed } from '../data/characterOptions'
+import { availableInventory, findCharacterEquipment, expansionModifiers } from '../data/expansions'
+import { findCharacterAbility, schoolSelectionAllowed } from '../data/characterAbilities'
+import { TRAITS } from '../data/manual'
 import { LEVEL_TABLE } from '../data/progression'
-import { SUBSKILLS } from '../data/subskills'
 import {
   ATTRIBUTE_KEYS,
   SKILL_KEYS,
@@ -48,7 +49,7 @@ export const calculateActiveGeneralAbilities = (character: Character) => {
   const slots = calculateProgressionRewards(calculateLevelFromXp(character.progression.xp)).generalAbilitySlots
   const selectedIds = [...new Set(character.progression.generalAbilities.slice(0, slots).filter(Boolean))]
   return selectedIds.flatMap((abilityId) => {
-    const ability = findGeneralAbility(abilityId)
+    const ability = schoolSelectionAllowed(selectedIds, abilityId) ? findCharacterAbility(character, abilityId) : undefined
     return ability ? [ability] : []
   })
 }
@@ -76,6 +77,7 @@ const emptySkills = (): Skills => ({
   medicine: 0,
   technology: 0,
   willpower: 0,
+  mobility: 0,
 })
 
 const emptySubskills = (): Subskills => Object.fromEntries(
@@ -87,9 +89,12 @@ const sumValues = <T extends string>(keys: readonly T[], values: Record<T, numbe
 
 export const calculateCharacterBonuses = (character: Character): CharacterBonuses => {
   const attributes = emptyAttributes()
+  const expansion = expansionModifiers(character)
+  for (const key of ATTRIBUTE_KEYS) attributes[key] += expansion.attributes[key] ?? 0
   const skills = emptySkills()
+  for (const key of SKILL_KEYS) skills[key] += expansion.skills[key] ?? 0
   const subskills = emptySubskills()
-  const selectedFunction = FUNCTIONS.find((item) => item.id === character.identity.functionId)
+  const selectedFunction = characterFunction(character)
   const selectedTrait = TRAITS.find((item) => item.id === character.identity.traitId)
 
   for (const key of ATTRIBUTE_KEYS) {
@@ -116,12 +121,16 @@ export const calculateCharacterBonuses = (character: Character): CharacterBonuse
     }
   }
 
-  for (const inventoryItem of character.inventory) {
+  const equipmentSkills = emptySkills()
+  const equipmentSubskills = emptySubskills()
+  for (const inventoryItem of availableInventory(character)) {
     if (!inventoryItem.active) continue
-    const definition = findEquipment(inventoryItem.catalogItemId)
+    const definition = findCharacterEquipment(character, inventoryItem.catalogItemId)
     if (!definition) continue
     for (const key of SKILL_KEYS) {
-      skills[key] += definition.skillBonuses?.[key] ?? 0
+      const amount = definition.skillBonuses?.[key] ?? 0
+      equipmentSkills[key] = Math.max(equipmentSkills[key], amount)
+      skills[key] += Math.min(0, amount)
     }
     const choice = definition.skillBonusChoice
     if (
@@ -129,20 +138,24 @@ export const calculateCharacterBonuses = (character: Character): CharacterBonuse
       inventoryItem.selectedSkillBonus &&
       choice.options.includes(inventoryItem.selectedSkillBonus)
     ) {
-      skills[inventoryItem.selectedSkillBonus] += choice.amount
+      equipmentSkills[inventoryItem.selectedSkillBonus] = Math.max(equipmentSkills[inventoryItem.selectedSkillBonus], choice.amount)
     }
     for (const key of SUBSKILL_KEYS) {
-      subskills[key] += definition.subskillBonuses?.[key] ?? 0
+      const amount = definition.subskillBonuses?.[key] ?? 0
+      equipmentSubskills[key] = Math.max(equipmentSubskills[key], amount)
+      subskills[key] += Math.min(0, amount)
     }
   }
 
+  for (const key of SKILL_KEYS) skills[key] += equipmentSkills[key]
+  for (const key of SUBSKILL_KEYS) subskills[key] += equipmentSubskills[key]
   return { attributes, skills, subskills }
 }
 
 export const calculateEffectiveAttributes = (character: Character): Attributes => {
   const bonuses = calculateCharacterBonuses(character).attributes
   return Object.fromEntries(
-    ATTRIBUTE_KEYS.map((key) => [key, Math.max(0, character.attributes[key] + bonuses[key])]),
+    ATTRIBUTE_KEYS.map((key) => [key, Math.min(6, Math.max(0, character.attributes[key] + bonuses[key]))]),
   ) as unknown as Attributes
 }
 
@@ -154,16 +167,16 @@ export const calculateUnencumberedEffectiveSkills = (character: Character): Skil
 }
 
 export const calculateInventoryWeight = (character: Character) =>
-  Math.round(character.inventory.reduce(
+  Math.round(availableInventory(character).reduce(
     (total, item) => total + item.weight * item.quantity,
     0,
-  ) * 100) / 100
+  ) * 100) / 100 + bladeWeightAdjustment(character)
 
 export const calculateBaseLoadLimit = (character: Character) => {
   const attributes = calculateEffectiveAttributes(character)
   const abilityBonus = calculateActiveGeneralAbilities(character)
     .reduce((total, ability) => total + (ability.loadLimitBonus ?? 0), 0)
-  return 15 + attributes.strength * 5 + abilityBonus
+  return Math.max(1, 15 + attributes.strength * 5 + abilityBonus + expansionModifiers(character).loadLimit)
 }
 
 export const calculateLoadState = (character: Character): LoadState => {
@@ -264,17 +277,17 @@ export const calculateEffectiveSubskills = (character: Character): Subskills => 
 }
 
 export const calculateMaxHp = (attributes: Attributes) =>
-  20 + attributes.constitution * 10
+  20 + attributes.constitution * 5
 
 export const calculateMaxEnergy = (attributes: Attributes) =>
-  10 + attributes.dexterity * 5
+  10 + attributes.dexterity * 3
 
 export const calculateEquipmentDefense = (character: Character) => {
   let armor = 0
   let shield = 0
-  for (const item of character.inventory) {
+  for (const item of availableInventory(character)) {
     if (!item.active) continue
-    const definition = findEquipment(item.catalogItemId)
+    const definition = findCharacterEquipment(character, item.catalogItemId)
     const bonus = definition?.defenseBonus ?? 0
     if (item.slot === 'armor') armor = Math.max(armor, bonus)
     if (item.slot === 'shield') shield = Math.max(shield, bonus)
@@ -283,7 +296,7 @@ export const calculateEquipmentDefense = (character: Character) => {
 }
 
 export const calculateDefense = (character: Character) =>
-  BASE_DEFENSE + calculateEquipmentDefense(character) + character.defenseModifiers.other
+  BASE_DEFENSE + calculateEquipmentDefense(character) + character.defenseModifiers.other + expansionModifiers(character).defense + assassinProtection(character).stanceDefense
 
 export const calculateMaxComposure = (attributes: Attributes, skills: Skills) =>
   5 + attributes.intelligence + skills.willpower
@@ -300,8 +313,8 @@ export const calculateMaxSkillPointsForCharacter = (character: Character) =>
 export const calculateAttributePointsSpent = (attributes: Attributes) =>
   sumValues(ATTRIBUTE_KEYS, attributes)
 
-export const calculateSkillPointsSpent = (skills: Skills) =>
-  sumValues(SKILL_KEYS, skills)
+export const calculateSkillPointsSpent = (skills: Skills, character?: Character) =>
+  sumValues(character ? characterSkillKeys(character) : SKILL_KEYS.filter((key) => key !== 'mobility'), skills)
 
 const specializationRatio = (skillKey: SkillKey) => skillKey === 'combat' ? 2 : 1
 
@@ -309,7 +322,7 @@ export const calculateSubskillPointsAvailable = (character: Character, skillKey:
   calculateUnencumberedEffectiveSkills(character)[skillKey] * specializationRatio(skillKey)
 
 export const calculateSubskillPointsSpent = (character: Character, skillKey: SkillKey) => {
-  const defined = SUBSKILLS
+  const defined = characterSubskills(character)
     .filter((definition) => definition.skillKey === skillKey)
     .reduce((total, definition) => total + character.subskills[definition.key], 0)
   const custom = character.specializations
@@ -322,7 +335,7 @@ export const calculateDerivedResources = (character: Character): DerivedResource
   const attributes = calculateEffectiveAttributes(character)
   const skills = calculateEffectiveSkills(character)
   const defenseEquipment = calculateEquipmentDefense(character)
-  const defenseOther = character.defenseModifiers.other
+  const defenseOther = character.defenseModifiers.other + expansionModifiers(character).defense + assassinProtection(character).stanceDefense
   const abilityMaxHpBonus = calculateActiveGeneralAbilities(character)
     .reduce((total, ability) => total + (ability.maxHpBonus ?? 0), 0)
   const level = calculateLevelFromXp(character.progression.xp)
@@ -330,8 +343,8 @@ export const calculateDerivedResources = (character: Character): DerivedResource
     .some((ability) => ability.id === 'tactical-runner')
   const loadMovementPenalty = calculateLoadState(character).movementPenalty
   return {
-    maxHp: calculateMaxHp(attributes) + abilityMaxHpBonus,
-    maxEnergy: calculateMaxEnergy(attributes),
+    maxHp: Math.max(1, calculateMaxHp(attributes) + abilityMaxHpBonus + expansionModifiers(character).maxHp),
+    maxEnergy: Math.max(0, calculateMaxEnergy(attributes) + expansionModifiers(character).maxEnergy),
     defense: BASE_DEFENSE + defenseEquipment + defenseOther,
     defenseBase: BASE_DEFENSE,
     defenseEquipment,
@@ -340,9 +353,9 @@ export const calculateDerivedResources = (character: Character): DerivedResource
     maxStress: calculateMaxStress(),
     maxSkillPoints: calculateMaxSkillPoints(attributes) + calculateProgressionRewards(level).bonusSkillPoints,
     maxAttributePoints: calculateAttributePointLimit(character),
-    socialDefense: 10 + skills.willpower,
+    socialDefense: 10 + skills.willpower + Number(hasAssassinsCreed(character) && character.assassin.functionId === 'assassins-creed:agente' && level >= 5 && character.assassin.specialization === 'Negociador'),
     bonusCap: 10 + level,
-    movement: Math.max(0, 9 + (runnerIgnoresLoadMovement ? 0 : loadMovementPenalty)),
+    movement: Math.max(0, 9 + (runnerIgnoresLoadMovement ? 0 : loadMovementPenalty) + assassinProtection(character).movementPenalty),
   }
 }
 
@@ -359,28 +372,28 @@ export const clampResources = (
   stress: clamp(resources.stress, 0, derived.maxStress),
 })
 
-const clampAllocatedSkills = (skills: Skills, maximum: number): Skills => {
+const clampAllocatedSkills = (skills: Skills, maximum: number, character: Character): Skills => {
   let remaining = maximum
-  const next = emptySkills()
-  for (const key of SKILL_KEYS) {
+  const next = { ...skills }
+  for (const key of characterSkillKeys(character)) {
     next[key] = clamp(skills[key], 0, remaining)
     remaining -= next[key]
   }
   return next
 }
 
-const clampAllocatedAttributes = (attributes: Attributes, maximum: number): Attributes => {
+const clampAllocatedAttributes = (attributes: Attributes, maximum: number, perAttribute: number): Attributes => {
   let remaining = maximum
   const next = emptyAttributes()
   for (const key of ATTRIBUTE_KEYS) {
-    next[key] = clamp(attributes[key], 0, remaining)
+    next[key] = clamp(attributes[key], 0, Math.min(remaining, perAttribute))
     remaining -= next[key]
   }
   return next
 }
 
 const clampSpecializations = (character: Character): Pick<Character, 'subskills' | 'specializations'> => {
-  const subskills = emptySubskills()
+  const subskills = { ...character.subskills }
   const specializations = character.specializations.map((specialization) => ({
     ...specialization,
     value: 0,
@@ -388,7 +401,7 @@ const clampSpecializations = (character: Character): Pick<Character, 'subskills'
 
   for (const skillKey of SKILL_KEYS) {
     let remaining = calculateSubskillPointsAvailable(character, skillKey)
-    for (const definition of SUBSKILLS.filter((item) => item.skillKey === skillKey)) {
+    for (const definition of characterSubskillsFor(character, skillKey)) {
       subskills[definition.key] = clamp(character.subskills[definition.key], 0, remaining)
       remaining -= subskills[definition.key]
     }
@@ -407,11 +420,13 @@ export const applyCharacterLimits = (character: Character): Character => {
   const attributes = clampAllocatedAttributes(
     character.attributes,
     calculateAttributePointLimitForLevel(level),
+    level === 1 ? 3 : 6,
   )
   const withAttributes = { ...character, level, attributes }
   const skills = clampAllocatedSkills(
     withAttributes.skills,
     calculateMaxSkillPointsForCharacter(withAttributes),
+    withAttributes,
   )
   const withSkills = { ...withAttributes, skills }
   const specializationValues = clampSpecializations(withSkills)
@@ -442,6 +457,7 @@ export const changeAttribute = (
   if (step > 0 && calculateAttributePointsSpent(character.attributes) >= calculateAttributePointLimit(character)) {
     return character
   }
+  if (step > 0 && (current >= (calculateLevelFromXp(character.progression.xp) === 1 ? 3 : 6) || calculateEffectiveAttributes(character)[key] >= 6)) return character
   if (step < 0 && current === 0) return character
 
   const candidate = {
@@ -450,7 +466,7 @@ export const changeAttribute = (
   }
   if (
     step < 0 &&
-    calculateSkillPointsSpent(character.skills) > calculateMaxSkillPointsForCharacter(candidate)
+    calculateSkillPointsSpent(character.skills, character) > calculateMaxSkillPointsForCharacter(candidate)
   ) {
     return character
   }
@@ -492,12 +508,12 @@ export const changeSkill = (
   delta: number,
 ): Character => {
   const step = Math.sign(delta)
-  if (step === 0) return character
+  if (step === 0 || !characterSkillKeys(character).includes(key)) return character
 
   const current = character.skills[key]
   if (
     step > 0 &&
-    calculateSkillPointsSpent(character.skills) >= calculateMaxSkillPointsForCharacter(character)
+    calculateSkillPointsSpent(character.skills, character) >= calculateMaxSkillPointsForCharacter(character)
   ) {
     return character
   }
@@ -519,7 +535,7 @@ export const changeSubskill = (
   key: SubskillKey,
   delta: number,
 ): Character => {
-  const definition = SUBSKILLS.find((item) => item.key === key)
+  const definition = characterSubskills(character).find((item) => item.key === key)
   const step = Math.sign(delta)
   if (!definition || step === 0) return character
   const current = character.subskills[key]

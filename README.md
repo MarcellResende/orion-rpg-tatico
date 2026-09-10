@@ -46,8 +46,8 @@ npm run build
 
 ## Regras automatizadas
 
-- PV máximo: `20 + Constituição × 10`.
-- Energia máxima: `10 + Destreza × 5`.
+- PV máximo: `20 + Constituição × 5`.
+- Energia máxima: `10 + Destreza × 3`.
 - Defesa: `10 + proteção equipada + outros modificadores`.
 - Compostura máxima: `5 + Vontade + Inteligência`.
 - Estresse máximo: `6`.
@@ -82,3 +82,20 @@ supabase/migrations/002_secure_conditions.sql
 
 Ela restringe a leitura das fichas, cria as condições protegidas e ativa sua atualização em tempo real.
 
+
+
+## Manual v1.4 e expansões
+
+O PDF base atual está em `public/Manual_Operador_v1.4.pdf`; a aba Manual oferece busca no texto completo. Fórmulas de PV/Energia, limites de atributos, proteção, disparos e bônus diretos de equipamento foram ajustados à v1.4. Regras situacionais continuam dependendo do contexto da mesa.
+
+A aba **Expansões** ativa módulos por operador. Atributos entram no bloco normal da ficha, regras na consulta e equipamentos no arsenal. Seleção e valores são salvos no JSON da ficha, sem migração de banco adicional. Desativar preserva os dados, suspende efeitos e peso; reativar respeita espaços de equipamento já ocupados.
+
+**Assassin’s Creed v1.5.1** está disponível, desativada por padrão. Ative-a em **Expansões** na ficha desejada. Ela acrescenta Mobilidade, seis funções históricas, subperícias, escolas de combate e equipamentos por era. Não acrescenta atributos nem um orçamento extra de pontos.
+
+Em **Condições e inventário**, o painel da expansão registra Fluxo, Suspeita, Credibilidade, perseguição, Dossiê, posturas, escolas e modificações das duas Lâminas Ocultas. Proteção usa RA, teto de Fluxo e penalidades de movimento conforme o PDF. As proteções do livro base ficam preservadas e suspensas durante a ativação. Pesos não especificados no PDF precisam ser informados com o Mestre ao adicionar o equipamento.
+
+O painel do Mestre oferece os registros coletivos da Irmandade quando há uma ficha com a expansão ativa. Regras situacionais, autorização de protótipos, recompensas e efeitos que dependem da cena continuam sob controle da mesa; os textos completos e as páginas do PDF estão na consulta do manual. Dados individuais e coletivos usam os campos JSON existentes do Supabase.
+
+Ao enviar um próximo PDF ao agente, escreva **“Este PDF é uma expansão: [nome]”**. O conteúdo será lido e integrado em `src/data/expansions.ts`, conforme `AGENTS.md`, e então aparecerá no seletor. O site não interpreta PDFs arbitrários automaticamente. Modificadores previstos pelo contrato são calculados; novas mecânicas exigem implementação específica. Atributos adicionais usam o orçamento próprio estabelecido pelo respectivo PDF.
+
+Validação: testes cobrem integração na ficha/arsenal/manual, várias expansões, limites, persistência, reativação e conflito de armadura. A verificação visual usa apenas dados de teste locais.
