@@ -14,6 +14,7 @@ import {
   addCharacterCondition,
   createCampaign,
   duplicateCampaign,
+  deleteCampaign,
   getOrCreateCharacter,
   joinCampaign,
   listCampaigns,
@@ -227,6 +228,21 @@ export function App() {
     }
   }
 
+  const handleDeleteCampaign = async (campaign: CampaignSummary) => {
+    if (campaign.role !== 'master' || actionLoading) return
+    setActionLoading(true)
+    setError('')
+    try {
+      await deleteCampaign(campaign)
+      await refreshCampaigns()
+    } catch (caught) {
+      setError(readableError(caught))
+      throw caught
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
   const scheduleSave = (nextCharacter: Character) => {
     if (!selectedCampaign || !activeCharacter) return
     const revision = saveRevision.current + 1
@@ -383,6 +399,7 @@ export function App() {
         error={error}
         onCreate={handleCreateCampaign}
         onDuplicate={handleDuplicateCampaign}
+        onDelete={handleDeleteCampaign}
         onJoin={handleJoinCampaign}
         onOpen={openCampaign}
         onSignOut={() => void signOut()}

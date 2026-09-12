@@ -3,6 +3,7 @@ import { AC_MODS, AC_SCHOOLS } from '../data/assassinsCreed'
 import { hasAssassinsCreed } from '../data/characterOptions'
 import { availableInventory, findCharacterEquipment } from '../data/expansions'
 import { LEVEL_TABLE } from '../data/progression'
+import { itemBladeMods, bladeModifiable } from '../data/itemModifications'
 
 export const assassinLevel = (character: Character) => LEVEL_TABLE.reduce((level, entry) => character.progression.xp >= entry.totalXp ? entry.level : level, 1)
 export const assassinSchoolChoices = (character: Character) => {
@@ -20,8 +21,7 @@ export const assassinSchoolChoices = (character: Character) => {
 
 export const equippedBladeMods = (character: Character) => {
   if (!hasAssassinsCreed(character)) return []
-  return (['left', 'right'] as const).flatMap((arm) => availableInventory(character).some((item) => item.active && item.slot === `${arm}Blade`)
-    ? AC_MODS.filter((mod) => character.assassin.bladeMods[arm].includes(mod.id)) : [])
+  return availableInventory(character).filter((item) => item.active && bladeModifiable(item)).flatMap((item) => itemBladeMods(character, item))
 }
 export function assassinProtection(character: Character, penetration = 0) {
   if (!hasAssassinsCreed(character)) return { ra: 0, effectiveRa: 0, flowMaximum: 0, flow: 0, parkourBonus: 0, movementPenalty: 0, stanceDefense: 0, stanceAttack: 0 }
@@ -47,9 +47,10 @@ export function assassinProtection(character: Character, penetration = 0) {
     stanceAttack: guardActive ? 0 : character.assassin.stance === 'offensive' ? 2 : character.assassin.stance === 'defensive' ? -2 : 0,
   }
 }
-export const bladeWeightAdjustment = (character: Character) => equippedBladeMods(character).reduce((sum, mod) => sum + mod.weight, 0)
+export const bladeWeightAdjustment = (character: Character) => hasAssassinsCreed(character) ? availableInventory(character).reduce((sum, item) => sum + itemBladeMods(character, item).reduce((weight, mod) => weight + mod.weight, 0) * item.quantity, 0) : 0
 export function bladeProfile(character: Character, arm: 'left' | 'right') {
-  const ids = character.assassin.bladeMods[arm]
+  const blade = availableInventory(character).find((item) => item.active && item.slot === `${arm}Blade` && bladeModifiable(item))
+  const ids = blade ? itemBladeMods(character, blade).map((mod) => mod.id) : character.assassin.bladeMods[arm]
   const noBlade = ids.includes('hook') || ids.includes('launcher')
   return {
     damage: noBlade ? 'Sem dano' : ids.includes('phantom') ? '1d8 à distância · 10 m' : ids.includes('combat') ? '1d8' : ids.includes('light') ? '1d4' : '1d6',

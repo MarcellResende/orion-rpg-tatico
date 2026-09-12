@@ -210,6 +210,14 @@ export async function duplicateCampaign(
   } satisfies CampaignSummary
 }
 
+export async function deleteCampaign(campaign: CampaignSummary) {
+  if (campaign.role !== 'master') throw new Error('Somente o mestre pode apagar esta campanha.')
+  // The campaigns_delete_master RLS policy verifies the authenticated user in the database.
+  const { data, error } = await requireSupabase().from('campaigns').delete().eq('id', campaign.id).select('id').single()
+  if (error) throw error
+  if (!data) throw new Error('A campanha não foi apagada. Verifique sua permissão de mestre.')
+}
+
 export async function joinCampaign(inviteCode: string) {
   const client = requireSupabase()
   const { data, error } = await client.rpc('join_campaign', {

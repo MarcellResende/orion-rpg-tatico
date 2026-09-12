@@ -1,4 +1,5 @@
 import { assassinProtection, bladeWeightAdjustment } from './assassinsCreed'
+import { firearmExtraWeight, inventoryWithModifications } from '../data/itemModifications'
 import { characterFunction, characterSkillKeys, characterSubskills, characterSubskillsFor, hasAssassinsCreed } from '../data/characterOptions'
 import { availableInventory, findCharacterEquipment, expansionModifiers } from '../data/expansions'
 import { findCharacterAbility, schoolSelectionAllowed } from '../data/characterAbilities'
@@ -123,7 +124,7 @@ export const calculateCharacterBonuses = (character: Character): CharacterBonuse
 
   const equipmentSkills = emptySkills()
   const equipmentSubskills = emptySubskills()
-  for (const inventoryItem of availableInventory(character)) {
+  for (const inventoryItem of inventoryWithModifications(availableInventory(character))) {
     if (!inventoryItem.active) continue
     const definition = findCharacterEquipment(character, inventoryItem.catalogItemId)
     if (!definition) continue
@@ -168,7 +169,7 @@ export const calculateUnencumberedEffectiveSkills = (character: Character): Skil
 
 export const calculateInventoryWeight = (character: Character) =>
   Math.round(availableInventory(character).reduce(
-    (total, item) => total + item.weight * item.quantity,
+    (total, item) => total + item.weight * item.quantity + firearmExtraWeight(item),
     0,
   ) * 100) / 100 + bladeWeightAdjustment(character)
 
@@ -285,7 +286,7 @@ export const calculateMaxEnergy = (attributes: Attributes) =>
 export const calculateEquipmentDefense = (character: Character) => {
   let armor = 0
   let shield = 0
-  for (const item of availableInventory(character)) {
+  for (const item of inventoryWithModifications(availableInventory(character))) {
     if (!item.active) continue
     const definition = findCharacterEquipment(character, item.catalogItemId)
     const bonus = definition?.defenseBonus ?? 0

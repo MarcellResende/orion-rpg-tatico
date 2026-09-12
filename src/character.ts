@@ -142,6 +142,8 @@ const hydrateInventory = (value: unknown): InventoryItem[] => {
       id: safeText(item.id, 100) || `legacy-${index}`,
       catalogItemId: safeText(item.catalogItemId, 100),
       expansionId: safeText(item.expansionId, 80) || undefined,
+      modifications: Array.isArray(item.modifications) ? [...new Set(item.modifications.filter((id): id is string => typeof id === 'string' && id.length <= 100))].slice(0, 30) : undefined,
+      bladeMods: Array.isArray(item.bladeMods) ? [...new Set(item.bladeMods.filter((id): id is string => typeof id === 'string' && id.length <= 100))].slice(0, 30) : undefined,
       name,
       quantity: clamp(safeNumber(item.quantity, 1), 1, 999),
       weight: safeDecimal(item.weight, 0, 9999),

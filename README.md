@@ -70,7 +70,11 @@ Uma campanha criada pelo mestre começa sem fichas. A ficha do mestre só é cri
 
 ## Como a hospedagem funciona
 
-O GitHub guarda o código-fonte. Cada atualização enviada para a branch `main` solicita uma nova publicação automática ao Netlify, que mantém o site acessível mesmo com o computador do mestre desligado. O Supabase é separado da hospedagem: ele guarda contas, campanhas, fichas e alterações em tempo real. Durante o RPG, o mestre cria a campanha, compartilha o código de convite e os jogadores entram pelo mesmo endereço do site.
+O GitHub guarda o código-fonte. A hospedagem atual é Cloudflare Workers, projeto `orion-rpg-tatico`, configurado em `wrangler.jsonc`. Atualizações da branch `main` disparam Workers Builds. A configuração Netlify permanece como alternativa histórica. O Supabase é separado da hospedagem: ele guarda contas, campanhas, fichas e alterações em tempo real. Durante o RPG, o mestre cria a campanha, compartilha o código de convite e os jogadores entram pelo mesmo endereço do site.
+
+O mestre pode apagar uma campanha na lista de campanhas, após confirmar seu nome. A política `campaigns_delete_master` do banco restringe a exclusão ao mestre; fichas, participantes e condições são removidos em cascata. Nenhuma nova migração é necessária para esse botão.
+
+Armas do livro base e Lâminas Ocultas oferecem **Modificações** abaixo do próprio item no inventário. Configurações ficam salvas por exemplar, com limites de espaços, peso e efeitos vinculados ao equipamento. Modificações antigas que estavam soltas permanecem guardadas; remova o item solto ao instalá-lo na arma para evitar contabilizá-lo duas vezes. A configuração antiga por braço da expansão é reconhecida na primeira lâmina daquele braço.
 
 ## Atualização obrigatória do Supabase
 

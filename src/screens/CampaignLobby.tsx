@@ -9,6 +9,7 @@ interface CampaignLobbyProps {
   error: string
   onCreate: (name: string, description: string) => Promise<void>
   onDuplicate: (campaign: CampaignSummary, name: string, description: string) => Promise<void>
+  onDelete: (campaign: CampaignSummary) => Promise<void>
   onJoin: (code: string) => Promise<void>
   onOpen: (campaign: CampaignSummary) => void
   onSignOut: () => void
@@ -22,6 +23,7 @@ export function CampaignLobby({
   error,
   onCreate,
   onDuplicate,
+  onDelete,
   onJoin,
   onOpen,
   onSignOut,
@@ -32,6 +34,8 @@ export function CampaignLobby({
   const [duplicateSource, setDuplicateSource] = useState<CampaignSummary | null>(null)
   const [duplicateName, setDuplicateName] = useState('')
   const [duplicateDescription, setDuplicateDescription] = useState('')
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [deleteName, setDeleteName] = useState('')
 
   const submitCreate = async (event: FormEvent) => {
     event.preventDefault()
@@ -108,6 +112,20 @@ export function CampaignLobby({
                         <button type="button" className="secondary-button" onClick={() => startDuplicate(campaign)}>Duplicar campanha</button>
                       )}
                     </div>
+                    {campaign.role === 'master' && <div>
+                      <button type="button" className="danger-text-button" disabled={actionLoading} onClick={() => { setDeleteId(campaign.id); setDeleteName('') }}>Apagar campanha</button>
+                      {deleteId === campaign.id && <form className="gateway-form campaign-duplicate-form" onSubmit={async (event) => {
+                        event.preventDefault()
+                        if (actionLoading || deleteName !== campaign.name) return
+                        try { await onDelete(campaign); setDeleteId(null); setDeleteName('') } catch { /* Keep confirmation open and show the application error. */ }
+                      }}>
+                        <strong>Apagar “{campaign.name}” definitivamente?</strong>
+                        <p>As fichas, condições, participantes e progresso desta campanha serão apagados para todos. Esta ação não pode ser desfeita.</p>
+                        <label><span>Digite o nome da campanha para confirmar</span><input value={deleteName} onChange={(event) => setDeleteName(event.currentTarget.value)} disabled={actionLoading} autoComplete="off" /></label>
+                        <button type="submit" className="danger-text-button" disabled={actionLoading || deleteName !== campaign.name}>{actionLoading ? 'Apagando...' : 'Confirmar exclusão definitiva'}</button>
+                        <button type="button" className="text-button" disabled={actionLoading} onClick={() => setDeleteId(null)}>Cancelar</button>
+                      </form>}
+                    </div>}
                     {duplicateSource?.id === campaign.id && (
                       <form className="gateway-form campaign-duplicate-form" onSubmit={submitDuplicate}>
                         <div className="campaign-duplicate-heading">

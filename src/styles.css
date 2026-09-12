@@ -2335,3 +2335,6 @@ footer {
 .ac-mod input { flex: 0 0 auto; margin-top: .25rem; }
 .ac-mod small { display: block; line-height: 1.6; margin-top: .4rem; opacity: .8; }
 .ac-panel .reference-content { min-width: 0; overflow-wrap: anywhere; }
+/* Each equipment instance owns its configuration below its inventory controls. */
+.item-modifications { width: 100%; margin-top: 1rem; border-top: 1px solid var(--border, #29413d); padding-top: .75rem; }
+.item-modifications summary { cursor: pointer; font-weight: 700; padding: .5rem 0; }

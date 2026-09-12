@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import type { AssassinState, Character } from '../types'
-import { AC_ERAS, AC_MODS, AC_SPECIALIZATIONS } from '../data/assassinsCreed'
+import { AC_ERAS, AC_SPECIALIZATIONS } from '../data/assassinsCreed'
 import { characterFunction, hasAssassinsCreed } from '../data/characterOptions'
-import { availableInventory } from '../data/expansions'
-import { assassinLevel, assassinProtection, assassinSchoolChoices, bladeProfile, dossierState, graveWoundThreshold } from '../rules/assassinsCreed'
+import { assassinLevel, assassinProtection, assassinSchoolChoices, dossierState, graveWoundThreshold } from '../rules/assassinsCreed'
 import { calculateDerivedResources } from '../rules/calculations'
 import { Stepper } from './Stepper'
 
@@ -61,24 +60,7 @@ export function AssassinsCreedPanel({ character, onChange }: { character: Charac
       <label className="field"><span>Guarda ativa</span><select value={activeGuard?.id ?? ''} onChange={(event) => commit({ guard: event.currentTarget.value, stance: 'balanced' })}><option value="">Postura genérica</option>{schools.map((school) => <option key={school.id} value={school.id}>{school.name}</option>)}</select></label>
       {schools.map((school) => <article className="expansion-card" key={school.id}><div><strong>{school.name}</strong><p>Guarda: {school.guard}</p><p>Fundamental: {school.fundamental}</p>{school.technique1Known && <p>Técnica I: {school.technique1}</p>}{school.technique2Known && <p>Técnica II: {school.technique2}</p>}{school.mastered && <p><b>Maestria desbloqueada:</b> {school.mastery}</p>}</div></article>)}
     </div></details>
-    <details><summary>Lâminas Ocultas · customização por braço</summary><div className="reference-content">
-      <p>Instale somente exemplares adquiridos pela Célula, entre missões, em Oficina ou com Artífice/ferramentas. Custos abaixo são por aquisição, não por troca. Cada braço precisa da sua Lâmina equipada no inventário. Não há compra ou desconto automático de RI.</p>
-      {(['left', 'right'] as const).map((arm) => {
-        const selected = AC_MODS.filter((mod) => state.bladeMods[arm].includes(mod.id))
-        const spaces = selected.reduce((sum, mod) => sum + mod.slots, 0)
-        const equipped = availableInventory(character).some((item) => item.active && item.slot === `${arm}Blade`)
-        const profile = bladeProfile(character, arm)
-        return <section key={arm}><h3>Braço {arm === 'left' ? 'esquerdo' : 'direito'} · {spaces}/2 espaços · {equipped ? 'equipada' : 'guardada/ausente'}</h3>
-          <p><b>{profile.damage}</b> · {profile.weight.toLocaleString('pt-BR')} kg · {profile.assassination ? 'Permite Assassinato quando os critérios forem cumpridos' : 'Sem Assassinato'} · {profile.parry ? 'Pode Aparar, respeitando o estado da Lâmina' : 'Não pode Aparar'}. O peso das modificações equipadas já entra na carga.</p>
-          {AC_MODS.map((mod) => {
-            const checked = state.bladeMods[arm].includes(mod.id)
-            const incompatible = (mod.id === 'light' && selected.some((entry) => ['counterweight', 'silent'].includes(entry.id))) || (['counterweight', 'silent'].includes(mod.id) && selected.some((entry) => entry.id === 'light'))
-            return <label className="ac-mod" key={mod.id}><input type="checkbox" checked={checked} disabled={!checked && (spaces + mod.slots > 2 || incompatible || state.era < mod.era)} onChange={() => commit({ bladeMods: { ...state.bladeMods, [arm]: checked ? state.bladeMods[arm].filter((id) => id !== mod.id) : [...state.bladeMods[arm], mod.id] } })} /><span><b>{mod.name}</b> · {mod.slots} espaço(s) · {mod.cost} RI · {AC_ERAS[mod.era - 1]}<small>{mod.effect}</small></span></label>
-          })}
-        </section>
-      })}
-      <p>Protótipos antecipados exigem autorização narrativa e +3 RI; consulte o Mestre. A seleção normal respeita a era mínima. Penalidades em revista física: máximo -3 Disfarce.</p>
-    </div></details>
+    <p className="panel-intro">Personalize cada Lâmina Oculta na aba Modificações do próprio item no inventário.</p>
     <details><summary>Alvo, Dossiê e oportunidades</summary><div className="reference-content">
       <label className="field"><span>Alvo do Dossiê</span><input maxLength={200} value={state.target} onChange={(event) => commit({ target: event.currentTarget.value })} /></label>
       <p><b>{dossier.label}</b> · {dossier.points} PD · {dossier.categories} categorias. Profundo exige 4 PD/2 categorias; Completo, 6 PD/3 categorias. Máximo 2 PD por cena.</p>

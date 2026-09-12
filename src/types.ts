@@ -132,6 +132,8 @@ export interface Character {
 }
 
 export interface InventoryItem {
+  modifications?: string[]
+  bladeMods?: string[]
   expansionId?: string
   id: string
   catalogItemId: string

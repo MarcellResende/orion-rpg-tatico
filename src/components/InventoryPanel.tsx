@@ -1,4 +1,6 @@
 import { hasAssassinsCreed } from '../data/characterOptions'
+import { ItemModifications } from './ItemModifications'
+import { bladeModifiable } from '../data/itemModifications'
 import { useMemo, useState, type FormEvent } from 'react'
 import {
   EQUIPMENT_CATALOG,
@@ -39,7 +41,7 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
 
   const groupedCatalog = useMemo(() => {
     const groups = new Map<string, typeof EQUIPMENT_CATALOG>()
-    for (const definition of availableEquipment(character).filter((item) => !item.era || !hasAssassinsCreed(character) || item.era === character.assassin.era)) {
+    for (const definition of availableEquipment(character).filter((item) => item.category !== 'weaponModification' && (!item.era || !hasAssassinsCreed(character) || item.era === character.assassin.era))) {
       groups.set(definition.category, [...(groups.get(definition.category) ?? []), definition])
     }
     return groups
@@ -66,6 +68,8 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
       category: definition.category,
       effect: definition.effect,
       active: true,
+      modifications: [],
+      bladeMods: [],
       slot: definition.slot,
       selectedSkillBonus: definition.skillBonusChoice?.options[0],
       weapon: definition.weapon
@@ -318,7 +322,14 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
                   </div>
                 )}
 
-                <button type="button" className="danger-text-button inventory-remove" onClick={() => commit(character.inventory.filter((current) => current.id !== item.id))}>Remover item</button>
+                <ItemModifications character={character} item={item} onChange={onChange} />
+                <button type="button" className="danger-text-button inventory-remove" onClick={() => {
+                  // Clear the legacy arm configuration when its original blade is removed.
+                  if (bladeModifiable(item)) {
+                    const arm = item.slot === 'leftBlade' ? 'left' : 'right'
+                    onChange({ ...character, inventory: character.inventory.filter((current) => current.id !== item.id), assassin: { ...character.assassin, bladeMods: { ...character.assassin.bladeMods, [arm]: [] } } })
+                  } else commit(character.inventory.filter((current) => current.id !== item.id))
+                }}>Remover item</button>
               </article>
             )
           })}
