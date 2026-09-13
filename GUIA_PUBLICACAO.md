@@ -1,6 +1,8 @@
 # Guia simples: colocar o ORION online
 
-Este guia foi escrito para quem nunca programou. Você fará a configuração uma única vez. Depois disso, para jogar, basta abrir o endereço da Netlify.
+O site existente usa **Cloudflare Workers**, projeto `orion-rpg-tatico`. Enviar alterações para `main` no GitHub inicia a publicação no mesmo projeto. As instruções Netlify abaixo são históricas e servem apenas para instalações alternativas.
+
+Para ativar a nova central de sessões no banco existente, abra o SQL Editor do Supabase e execute `supabase/migrations/005_session_platform.sql`, após as migrações 001–004. Não crie outro projeto. A publicação no Cloudflare e essa atualização do banco são etapas separadas.
 
 ## Antes de começar
 

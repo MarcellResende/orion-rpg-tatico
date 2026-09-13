@@ -1,5 +1,6 @@
 import { characterFunction, characterFunctionId, characterFunctions, characterSkillKeys, hasAssassinsCreed } from './data/characterOptions'
 import { AssassinsCreedPanel } from './components/AssassinsCreedPanel'
+import { CharacterExtras } from './components/CharacterExtras'
 import { lazy, Suspense, useState } from 'react'
 import { ExpansionsPanel } from './components/ExpansionsPanel'
 import { ExpansionAttributes } from './components/ExpansionAttributes'
@@ -49,6 +50,8 @@ export type SaveState = 'saving' | 'saved' | 'error'
 const ManualReferencePanel = lazy(() => import('./components/ManualReferencePanel').then((module) => ({ default: module.ManualReferencePanel })))
 
 interface CharacterSheetProps {
+  campaignId?: string
+  onShowSession?: () => void
   character: Character
   campaignName: string
   isOwnCharacter: boolean
@@ -81,6 +84,8 @@ type SheetTab = 'sheet' | 'operations' | 'abilities' | 'progression' | 'referenc
 
 export function CharacterSheet({
   character,
+  campaignId,
+  onShowSession,
   campaignName,
   isOwnCharacter,
   isMaster,
@@ -167,6 +172,7 @@ export function CharacterSheet({
           </div>
         </div>
         <div className="topbar-actions">
+          {onShowSession&&<button type="button" className="secondary-button" onClick={onShowSession}>Sessão e dados</button>}
           <span className={`save-state save-state--${saveState}`} role="status">
             <span aria-hidden="true" />
             {saveState === 'saving' && 'Salvando'}
@@ -664,6 +670,7 @@ export function CharacterSheet({
             <p>A ficha, o inventário e as condições são salvos no Supabase. O mestre acompanha o esquadrão em tempo real.</p>
           </div>
         </aside>
+        {activeTab==='notes'&&<CharacterExtras character={character} campaignId={campaignId} onChange={onChange}/>}
       </main>
 
       <footer>

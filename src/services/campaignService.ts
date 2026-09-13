@@ -32,6 +32,8 @@ interface CharacterRow {
 }
 
 interface ConditionRow {
+  expires_round?: number | null
+  duration_note?: string
   id: string
   character_id: string
   condition_id: string
@@ -49,6 +51,7 @@ export const hydrateCampaignProgression = (value: unknown): CampaignProgressionS
   const brotherhood = source.brotherhood && typeof source.brotherhood === 'object' ? source.brotherhood as Record<string, unknown> : null
   const alert = source.alert === 'yellow' || source.alert === 'red' ? source.alert : 'green'
   return {
+    ...(source.metadata && typeof source.metadata === 'object' ? { metadata: { era: String((source.metadata as Record<string, unknown>).era ?? '').slice(0,100), image: String((source.metadata as Record<string, unknown>).image ?? '').slice(0,2000), rules: String((source.metadata as Record<string, unknown>).rules ?? '').slice(0,100), archived: (source.metadata as Record<string, unknown>).archived === true } } : {}),
     ...(brotherhood ? { brotherhood: { prestige: number(brotherhood.prestige, 0, 999), resources: number(brotherhood.resources, 0, 9999), notoriety: number(brotherhood.notoriety, 0, 5), fractures: number(brotherhood.fractures, 0, 3), doctrines: strings(brotherhood.doctrines, 3), elite: typeof brotherhood.elite === 'string' ? brotherhood.elite.slice(0, 80) : '', projects: strings(brotherhood.projects, 6), suspendedDoctrine: typeof brotherhood.suspendedDoctrine === 'string' ? brotherhood.suspendedDoctrine.slice(0, 80) : '' } } : {}),
     operationalPrestige: number(source.operationalPrestige, 0, 999),
     headquartersPoints: number(source.headquartersPoints, 0, 9999),
@@ -81,6 +84,8 @@ export const deduplicateCampaigns = (campaigns: CampaignSummary[]) => {
 }
 
 const mapCondition = (row: ConditionRow): ActiveCondition => ({
+  expiresRound: row.expires_round,
+  durationNote: row.duration_note,
   id: row.id,
   characterId: row.character_id,
   conditionId: row.condition_id,
@@ -106,7 +111,7 @@ const listConditionsForCharacters = async (characterIds: string[]) => {
 
   const { data, error } = await requireSupabase()
     .from('character_conditions')
-    .select('id,character_id,condition_id,added_by,created_at')
+    .select('*')
     .in('character_id', characterIds)
     .order('created_at', { ascending: true })
 
@@ -333,7 +338,7 @@ export async function addCharacterCondition(characterId: string, conditionId: st
   if (error) throw error
   const { data, error: readError } = await client
     .from('character_conditions')
-    .select('id,character_id,condition_id,added_by,created_at')
+    .select('*')
     .eq('character_id', characterId)
     .eq('condition_id', conditionId)
     .single()

@@ -51,5 +51,9 @@ export const AC_EQUIPMENT: EquipmentDefinition[] = [
 export const ASSASSINS_CREED: ExpansionDefinition = {
   id: AC_ID, name: "Assassin’s Creed", version: '1.5.1', source: 'Expansão fan-made · compatível com RPG Tático v1.4',
   description: 'Infiltração histórica, Mobilidade, funções da Irmandade, escolas de combate, Dossiê, Fluxo e Lâminas Ocultas.',
-  attributePoints: 0, attributes: [], rules: pages, equipment: [...AC_EQUIPMENT, ...eraEquipment as EquipmentDefinition[]],
+  attributePoints: 0, attributes: [], rules: pages, equipment: [...AC_EQUIPMENT.map((entry) => {
+    const weights: Record<string, number> = { clothes: 1.5, 'light-armor': 3, 'medium-armor': 6.5, 'heavy-armor': 11, 'exceptional-armor': 12 }
+    const weight = weights[entry.id.replace(`${AC_ID}:`, '')]
+    return weight === undefined ? entry : { ...entry, weight, weightUnspecified: false, weightRange: undefined, weightSourcePage: 49 }
+  }), ...eraEquipment.map((entry) => entry.id === 'assassins-creed:era-12-survival-3' ? { ...entry, weight: 1, weightUnspecified: false } : entry.id === 'assassins-creed:era-16-survival-3' ? { ...entry, weight: 2, weightUnspecified: false } : entry) as EquipmentDefinition[]],
 }

@@ -344,9 +344,9 @@ export const calculateDerivedResources = (character: Character): DerivedResource
     .some((ability) => ability.id === 'tactical-runner')
   const loadMovementPenalty = calculateLoadState(character).movementPenalty
   return {
-    maxHp: Math.max(1, calculateMaxHp(attributes) + abilityMaxHpBonus + expansionModifiers(character).maxHp),
-    maxEnergy: Math.max(0, calculateMaxEnergy(attributes) + expansionModifiers(character).maxEnergy),
-    defense: BASE_DEFENSE + defenseEquipment + defenseOther,
+    maxHp: Math.max(1, calculateMaxHp(attributes) + abilityMaxHpBonus + expansionModifiers(character).maxHp + (character.masterAdjustments?.hp??0)),
+    maxEnergy: Math.max(0, calculateMaxEnergy(attributes) + expansionModifiers(character).maxEnergy + (character.masterAdjustments?.energy??0)),
+    defense: BASE_DEFENSE + defenseEquipment + defenseOther + (character.masterAdjustments?.defense??0),
     defenseBase: BASE_DEFENSE,
     defenseEquipment,
     defenseOther,

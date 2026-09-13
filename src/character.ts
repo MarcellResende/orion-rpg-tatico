@@ -24,7 +24,7 @@ import {
   clamp,
 } from './rules/calculations'
 import { findGeneralAbility, findGeneralAbilityByName } from './data/abilities'
-import { hydrateExpansions } from './data/expansions'
+import { hydrateExpansions, EXPANSIONS } from './data/expansions'
 
 const EMPTY_ATTRIBUTES: Attributes = {
   strength: 0,
@@ -141,6 +141,7 @@ const hydrateInventory = (value: unknown): InventoryItem[] => {
     return [{
       id: safeText(item.id, 100) || `legacy-${index}`,
       catalogItemId: safeText(item.catalogItemId, 100),
+      inventoryGroup: ['weapons','protection','tools','consumables','documents','narrative'].includes(String(item.inventoryGroup)) ? item.inventoryGroup as InventoryItem['inventoryGroup'] : undefined,
       expansionId: safeText(item.expansionId, 80) || undefined,
       modifications: Array.isArray(item.modifications) ? [...new Set(item.modifications.filter((id): id is string => typeof id === 'string' && id.length <= 100))].slice(0, 30) : undefined,
       bladeMods: Array.isArray(item.bladeMods) ? [...new Set(item.bladeMods.filter((id): id is string => typeof id === 'string' && id.length <= 100))].slice(0, 30) : undefined,
@@ -214,6 +215,8 @@ export const hydrateCharacter = (value: unknown): Character => {
   const level = calculateLevelFromXp(xp)
 
   const identity: Identity = {
+    portrait: /^https:\/\//.test(safeText(identitySource.portrait, 2000)) ? safeText(identitySource.portrait, 2000) : '',
+    biography: safeText(identitySource.biography, 4000),
     name: safeText(identitySource.name),
     codename: safeText(identitySource.codename),
     age:
@@ -278,6 +281,7 @@ export const hydrateCharacter = (value: unknown): Character => {
       other: clamp(safeNumber(defenseSource.other), -20, 20),
     },
     inventory: hydrateInventory(root.inventory),
+    masterAdjustments: root.masterAdjustments ? { hp:clamp(safeNumber(safeObject(root.masterAdjustments).hp),-999,999),energy:clamp(safeNumber(safeObject(root.masterAdjustments).energy),-999,999),defense:clamp(safeNumber(safeObject(root.masterAdjustments).defense),-999,999),reason:safeText(safeObject(root.masterAdjustments).reason,1000) } : undefined,
     notes: safeText(root.notes, 20000),
     updatedAt: safeText(root.updatedAt) || new Date().toISOString(),
   }
@@ -285,6 +289,10 @@ export const hydrateCharacter = (value: unknown): Character => {
   for (const key of SKILL_KEYS) {
     character.skills[key] = clamp(safeNumber(skillsSource[key]), 0, 999)
   }
+  character.inventory = character.inventory.map(item => {
+    const definition=EXPANSIONS.flatMap(e=>e.equipment).find(e=>e.id===item.catalogItemId)
+    return definition && !definition.weightUnspecified ? {...item,weight:definition.weight} : item
+  })
 
   for (const key of SUBSKILL_KEYS) {
     character.subskills[key] = clamp(safeNumber(subskillsSource[key]), 0, 99)

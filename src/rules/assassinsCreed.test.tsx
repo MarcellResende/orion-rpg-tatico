@@ -102,7 +102,7 @@ describe('Assassin’s Creed v1.5.1', () => {
     character.assassin.stance = 'defensive'
     expect(assassinProtection(character).flowMaximum).toBe(1)
     expect(calculateDerivedResources(character)).toMatchObject({ defense: 17, movement: 7.5 })
-    expect(calculateInventoryWeight(character)).toBe(13)
+    expect(calculateInventoryWeight(character)).toBe(14.5)
     expect(bladeProfile(character, 'left').weight).toBe(1)
   })
   it('preserva as restrições de duas escolas, escolhas e Maestria no nível 9', () => {

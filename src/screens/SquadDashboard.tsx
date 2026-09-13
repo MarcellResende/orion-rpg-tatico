@@ -1,4 +1,6 @@
 import { BrotherhoodPanel } from '../components/BrotherhoodPanel'
+import { SquadOperatorTools } from '../components/SquadOperatorTools'
+import { CampaignSessionSummary } from '../components/CampaignSessionSummary'
 import { hasAssassinsCreed } from '../data/characterOptions'
 import { useEffect, useState } from 'react'
 import { CampaignProgressionPanel } from '../components/CampaignProgressionPanel'
@@ -8,6 +10,9 @@ import { calculateDerivedResources, calculateLevelFromXp } from '../rules/calcul
 import type { CampaignProgressionState, CampaignSummary, OnlineCharacter, ResourceQuickAction } from '../onlineTypes'
 
 interface SquadDashboardProps {
+  error?: string
+  onShowSession?: () => void
+  onRefresh?: () => void
   campaign: CampaignSummary
   characters: OnlineCharacter[]
   currentUserId: string
@@ -48,6 +53,9 @@ export function SquadDashboard({
   onCampaignProgressionChange,
   onShowCampaigns,
   onSignOut,
+  onShowSession,
+  onRefresh,
+  error,
 }: SquadDashboardProps) {
   const [copied, setCopied] = useState(false)
   const [xpCriteria, setXpCriteria] = useState<Record<string, boolean>>({})
@@ -94,6 +102,7 @@ export function SquadDashboard({
       <header className="lobby-header">
         <div className="brand-lockup"><span className="brand-mark" aria-hidden="true">O</span><div><span className="eyebrow">ORION // ESCUDO DO MESTRE</span><h1>{campaign.name}</h1></div></div>
         <div className="topbar-actions">
+          {onShowSession&&<button className="primary-button" onClick={onShowSession}>Sessão, combate e backups</button>}
           <span className={`save-state ${realtimeConnected ? 'save-state--saved' : 'save-state--saving'}`}><span aria-hidden="true" />{realtimeConnected ? 'Tempo real ativo' : 'Conectando'}</span>
           <button type="button" className="secondary-button" onClick={onOpenOwnCharacter}>{masterHasCharacter ? 'Minha ficha' : 'Criar minha ficha'}</button>
           <button type="button" className="secondary-button" onClick={onShowCampaigns}>Campanhas</button>
@@ -102,15 +111,18 @@ export function SquadDashboard({
       </header>
 
       <main className="squad-main">
+        {error&&<p role="alert" className="form-message form-message--error">{error}</p>}
         <section className="squad-command-bar">
           <div><span className="eyebrow">CÓDIGO DE CONVOCAÇÃO</span><strong>{campaign.inviteCode}</strong></div>
           <button type="button" className="secondary-button" onClick={copyInvite}>{copied ? 'Código copiado' : 'Copiar código'}</button>
+          <button type="button" className="secondary-button" onClick={()=>{const link=`${window.location.origin}/?invite=${campaign.inviteCode}`;void navigator.clipboard.writeText(link).then(()=>setCopied(true)).catch(()=>window.prompt('Copie o link:',link))}}>Copiar link de convite</button>
           <div><span className="eyebrow">OPERADORES</span><strong>{characters.length}</strong></div>
         </section>
 
         <div className="squad-heading"><div><span className="section-index">01</span><div><span className="eyebrow">SITUAÇÃO DA EQUIPE</span><h2>Ficha de Esquadrão</h2></div></div><p>Use os controles rápidos durante a sessão ou abra a ficha completa de qualquer operador.</p></div>
 
         <CampaignProgressionPanel progression={campaign.progression} onChange={onCampaignProgressionChange} />
+        <CampaignSessionSummary campaign={campaign} characters={characters} userId={currentUserId}/>
         {characters.some((entry) => hasAssassinsCreed(entry.sheet)) && <BrotherhoodPanel progression={campaign.progression} onChange={onCampaignProgressionChange} />}
 
         {characters.length > 0 && (
@@ -189,6 +201,7 @@ export function SquadDashboard({
                   </div>
 
                   <button type="button" className="operator-open-button" onClick={() => onOpenCharacter(character)}>Abrir ficha completa</button>
+                  <SquadOperatorTools character={character} onChanged={()=>onRefresh?.()}/>
                 </article>
               )
             })}

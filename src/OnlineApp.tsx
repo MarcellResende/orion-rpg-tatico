@@ -10,12 +10,15 @@ import { CampaignLobby } from './screens/CampaignLobby'
 import { ResetPasswordScreen } from './screens/ResetPasswordScreen'
 import { SetupRequired } from './screens/SetupRequired'
 import { SquadDashboard } from './screens/SquadDashboard'
+import { SessionPanel } from './components/SessionPanel'
+import { CampaignSessionSummary } from './components/CampaignSessionSummary'
 import {
   addCharacterCondition,
   createCampaign,
   duplicateCampaign,
   deleteCampaign,
   getOrCreateCharacter,
+  getCharacter,
   joinCampaign,
   listCampaigns,
   listSquadCharacters,
@@ -27,7 +30,7 @@ import {
 } from './services/campaignService'
 import type { Character } from './types'
 
-type AppView = 'lobby' | 'sheet' | 'squad'
+type AppView = 'lobby' | 'sheet' | 'squad' | 'session'
 
 interface PendingCharacterSave {
   campaignId: string
@@ -63,6 +66,8 @@ export function App() {
   const saveRevision = useRef(0)
   const pendingSave = useRef<PendingCharacterSave | null>(null)
   const saveInFlight = useRef(false)
+  const failedSave = useRef(false)
+  const quickActionLocks = useRef(new Set<string>())
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -96,7 +101,9 @@ export function App() {
     setLoading(true)
     setError('')
     try {
-      setCampaigns(await listCampaigns())
+      const next = await listCampaigns()
+      setCampaigns(next)
+      setSelectedCampaign(current => current ? next.find(c => c.id === current.id) ?? current : current)
     } catch (caught) {
       setError(readableError(caught))
     } finally {
@@ -135,6 +142,29 @@ export function App() {
     }
   }, [refreshSquad, selectedCampaign, view])
 
+  useEffect(() => {
+    if (!selectedCampaign || view !== 'sheet' || !activeCharacter) return
+    const campaignId = selectedCampaign.id, ownerId = activeCharacter.ownerId
+    const refresh = async () => {
+      if (pendingSave.current || saveInFlight.current) return
+      try {
+        const updated = await getCharacter(campaignId, ownerId)
+        if (updated && !pendingSave.current && !saveInFlight.current) setActiveCharacter(updated)
+      } catch (caught) { setError(readableError(caught)) }
+    }
+    const channel = subscribeToSquad(campaignId, () => void refresh(), setRealtimeConnected)
+    const timer = window.setInterval(() => void refresh(), 8000)
+    return () => { clearInterval(timer); void removeSubscription(channel) }
+  }, [selectedCampaign?.id, activeCharacter?.ownerId, view])
+
+  useEffect(() => {
+    const warn = (event: BeforeUnloadEvent) => {
+      if (pendingSave.current || saveInFlight.current) { event.preventDefault(); event.returnValue = '' }
+    }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [])
+
   useEffect(() => () => {
     if (saveTimer.current !== null) window.clearTimeout(saveTimer.current)
   }, [])
@@ -145,17 +175,20 @@ export function App() {
     if (!pending) return
     pendingSave.current = null
     saveInFlight.current = true
+    failedSave.current = false
     try {
       await saveCharacter(pending.campaignId, pending.ownerId, pending.character)
       if (saveRevision.current === pending.revision && pendingSave.current === null) {
         setSaveState('saved')
       }
     } catch (caught) {
+      if (!pendingSave.current) pendingSave.current = pending
+      failedSave.current = true
       setSaveState('error')
       setError(readableError(caught))
     } finally {
       saveInFlight.current = false
-      if (pendingSave.current && saveTimer.current === null) void flushPendingSave()
+      if (pendingSave.current && saveTimer.current === null && !failedSave.current) void flushPendingSave()
     }
   }
 
@@ -263,6 +296,8 @@ export function App() {
   }
 
   const handleQuickAction = async ({ character, resource, delta }: ResourceQuickAction) => {
+    if (quickActionLocks.current.has(character.id)) return
+    quickActionLocks.current.add(character.id)
     const nextSheet = changeResource(character.sheet, resource, delta)
     setSquad((current) => current.map((item) => item.id === character.id ? { ...item, sheet: nextSheet } : item))
     try {
@@ -270,6 +305,8 @@ export function App() {
     } catch (caught) {
       setError(readableError(caught))
       await refreshSquad()
+    } finally {
+      quickActionLocks.current.delete(character.id)
     }
   }
 
@@ -400,6 +437,11 @@ export function App() {
         onCreate={handleCreateCampaign}
         onDuplicate={handleDuplicateCampaign}
         onDelete={handleDeleteCampaign}
+        onEdit={async campaign=>{
+          if(campaign.role!=='master')return
+          setActionLoading(true)
+          try {const {error}=await requireSupabase().from('campaigns').update({name:campaign.name.trim(),description:campaign.description.trim(),progression_state:campaign.progression}).eq('id',campaign.id).select('id').single();if(error)throw error;await refreshCampaigns()}finally{setActionLoading(false)}
+        }}
         onJoin={handleJoinCampaign}
         onOpen={openCampaign}
         onSignOut={() => void signOut()}
@@ -407,10 +449,15 @@ export function App() {
     )
   }
 
+  if(view==='session')return <SessionPanel campaign={selectedCampaign} characters={squad} userId={session.user.id} onBack={()=>setView(selectedCampaign.role==='master'?'squad':'sheet')} onRestored={()=>{void refreshCampaigns();void refreshSquad()}}/>
+
   if (view === 'squad' && selectedCampaign.role === 'master') {
     return (
       <SquadDashboard
+        error={error}
         campaign={selectedCampaign}
+        onShowSession={()=>setView('session')}
+        onRefresh={()=>void refreshSquad()}
         characters={squad}
         currentUserId={session.user.id}
         loading={loading}
@@ -432,8 +479,12 @@ export function App() {
   }
 
   return (
+    <>
+    {error&&<div role="alert" className="form-message form-message--error">{error}{saveState==='error'&&<button className="secondary-button" onClick={()=>{setSaveState('saving');void flushPendingSave()}}>Tentar salvar novamente</button>}</div>}
     <CharacterSheet
       character={activeCharacter.sheet}
+      campaignId={selectedCampaign.id}
+      onShowSession={()=>setView('session')}
       campaignName={selectedCampaign.name}
       isOwnCharacter={activeCharacter.ownerId === session.user.id}
       isMaster={selectedCampaign.role === 'master'}
@@ -447,5 +498,7 @@ export function App() {
       onShowSquad={() => setView('squad')}
       onSignOut={() => void signOut()}
     />
+    <CampaignSessionSummary campaign={selectedCampaign} characters={[activeCharacter]} userId={session.user.id}/>
+    </>
   )
 }

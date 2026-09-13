@@ -103,3 +103,23 @@ O painel do Mestre oferece os registros coletivos da Irmandade quando há uma fi
 Ao enviar um próximo PDF ao agente, escreva **“Este PDF é uma expansão: [nome]”**. O conteúdo será lido e integrado em `src/data/expansions.ts`, conforme `AGENTS.md`, e então aparecerá no seletor. O site não interpreta PDFs arbitrários automaticamente. Modificadores previstos pelo contrato são calculados; novas mecânicas exigem implementação específica. Atributos adicionais usam o orçamento próprio estabelecido pelo respectivo PDF.
 
 Validação: testes cobrem integração na ficha/arsenal/manual, várias expansões, limites, persistência, reativação e conflito de armadura. A verificação visual usa apenas dados de teste locais.
+
+## Central de sessão e PDF com tabelas de peso
+
+A atualização usa o PDF `RPG_Tatico_Assassins_Creed_Expansao_v1.5.1_pesos_tabelas.pdf`, incluindo as tabelas finais das páginas 40–49. Pesos oficiais atualizam equipamentos existentes ao carregar a ficha. A expansão continua opcional; desativá-la preserva conteúdo sem conceder efeitos ou peso.
+
+Já existiam: contas, campanhas e convites por código, permissões de Mestre/Jogador, exclusão de campanha pelo Mestre, ficha reativa, arsenal e customizações por exemplar, Dossiê, Suspeita, Fluxo, proteção, progressão e recursos da Irmandade.
+
+Foram acrescentados: edição e arquivamento de campanhas com metadados, imagem opcional e convite por link; retrato e biografia; organização do inventário em seis grupos; lista de participantes; resumo do combate e avisos; condições com duração; ajustes justificados do Mestre; exclusão de personagens; central com iniciativa, ações, rodadas, dados, missões, sincronização regional, notas públicas/privadas, documentos, histórico protegido e exportação/restauração de JSON.
+
+### Ativação do banco
+
+Execute `supabase/migrations/005_session_platform.sql` no SQL Editor do projeto existente, após as migrações 001–004. Publicar o site no Cloudflare não executa SQL no Supabase. Sem essa migração, fichas, pesos, organização do inventário e edição de campanha funcionam; a central e os novos registros protegidos não ficam disponíveis. Não considerar a ativação concluída apenas porque a compilação do Cloudflare passou.
+
+As rolagens são geradas no servidor. O histórico não aceita edição ou exclusão pelo cliente; eventos de ficha são visíveis apenas ao dono e ao Mestre, enquanto eventos públicos de sessão são visíveis aos membros. Notas privadas têm uma tabela com acesso exclusivo do Mestre. As sessões usam revisão para rejeitar sobrescritas de uma segunda tela. Condições expiradas são removidas no início da rodada registrada; ao entrar no turno, Sangrando desconta 4 PV, Atordoado remove a ação padrão uma vez, Colapso impede reação e Imobilizado zera o movimento. A passagem aguarda salvar antes de permitir o próximo turno.
+
+Backups são versionados, validados e limitados a 15 MB na importação. A restauração é atômica, exige Mestre, mesma campanha e participantes existentes, preservando o histórico anterior. Importar uma ficha individual não substitui condições protegidas nem permite ao jogador alterar ajustes do Mestre. Avisos direcionados são destaques para o destinatário, não mensagens privadas. Arquivar organiza a lista; não bloqueia acesso à campanha.
+
+Decisões da mesa: iniciativa e modificadores situacionais, movimento especial, efeitos de doenças e ferimentos dependentes da cena, recompensas, protótipos e aprovação de Assassinato Garantido. Sincronização segue pontos de observação regionais; não foi inventada uma moeda gastável. Concluir missão não concede XP ou recursos em duplicidade: o Mestre confirma as recompensas no painel existente.
+
+Validação desta atualização: 77 testes, incluindo PostgreSQL local com as cinco migrações, isolamento de permissões, revisão concorrente, condições de turno e restauração com rollback; compilação de produção; conferência da central no navegador com dados locais e largura de celular. A migração ainda precisa ser aplicada no projeto de produção por uma sessão administrativa autenticada.

@@ -50,6 +50,8 @@ export type SubskillKey = (typeof SUBSKILL_KEYS)[number]
 export type FunctionChoices = Record<string, AttributeKey | ''>
 
 export interface Identity {
+  portrait?: string
+  biography?: string
   name: string
   codename: string
   age: number | null
@@ -113,6 +115,7 @@ export interface ProgressionState {
 }
 
 export interface Character {
+  masterAdjustments?: { hp:number; energy:number; defense:number; reason:string }
   schemaVersion: 5
   assassin: AssassinState
   expansions: { enabledIds: string[]; attributeValues: Record<string, number> }
@@ -132,6 +135,7 @@ export interface Character {
 }
 
 export interface InventoryItem {
+  inventoryGroup?: 'weapons' | 'protection' | 'tools' | 'consumables' | 'documents' | 'narrative'
   modifications?: string[]
   bladeMods?: string[]
   expansionId?: string
@@ -150,6 +154,7 @@ export interface InventoryItem {
 }
 
 export interface EquipmentDefinition {
+  weightSourcePage?: number
   weightUnspecified?: boolean
   weightRange?: [number, number]
   era?: number

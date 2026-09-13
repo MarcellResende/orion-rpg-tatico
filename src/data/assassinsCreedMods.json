@@ -5,9 +5,10 @@
     "slots": 1,
     "cost": 4,
     "era": 8,
-    "weight": 0,
+    "weight": 0.25,
     "effect": "Vantagem: se o combate começar sem a Lâmina revelada, +2 Iniciativa. Se a Iniciativa já foi determinada por outro motivo, +1 no primeiro ataque com ela; os dois bônus não acumulam. Desvantagem: em 1 natural num teste diretamente com a Lâmina, fica Desalinhada; -2 nos testes com ela até gastar Ação Padrão ajustando.",
-    "sourcePage": 20
+    "sourcePage": 20,
+    "weightSourcePage": 40
   },
   {
     "id": "defensive",
@@ -17,7 +18,8 @@
     "era": 3,
     "weight": 0.5,
     "effect": "Peso +0,5 kg. Vantagem: ao Aparar com aquela Lâmina, +2 Defesa. Desvantagem: Fluxo máximo -1, mínimo 1.",
-    "sourcePage": 20
+    "sourcePage": 20,
+    "weightSourcePage": 40
   },
   {
     "id": "duel",
@@ -25,9 +27,10 @@
     "slots": 1,
     "cost": 7,
     "era": 9,
-    "weight": 0,
+    "weight": 0.25,
     "effect": "Estado Oculto funciona normalmente. Mudar para Estado de Duelo custa Meia Ação. Nesse estado, a Lâmina conta como arma compatível com Técnicas de Escola apropriadas a arma curta de uma mão; 1/rodada, a primeira Técnica usada através dela recebe +1 no teste relacionado. Desvantagem: enquanto em Duelo não permite Assassinato e deixa de ser visualmente Ocultável.",
-    "sourcePage": 20
+    "sourcePage": 20,
+    "weightSourcePage": 40
   },
   {
     "id": "hook",
@@ -37,7 +40,8 @@
     "era": 9,
     "weight": 0.5,
     "effect": "Conversão, peso +0,5 kg. Durante Parkour, +1,5 m de Deslocamento. Gancho de Segurança: 1/cena, ao falhar Rota Técnica ou Arriscada por 1-2, gaste 1 Fluxo para transformar em sucesso simples. Pressão Enganchada: 1/rodada, faça Pressionar sem a penalidade -2; a manobra causa 0 dano e existe apenas para controle. Desvantagem: aquele braço perde Dano e Assassinato.",
-    "sourcePage": 20
+    "sourcePage": 20,
+    "weightSourcePage": 40
   },
   {
     "id": "light",
@@ -47,7 +51,8 @@
     "era": 9,
     "weight": -0.25,
     "effect": "Peso da Lâmina passa a 0,25 kg. Ao terminar Parkour e entrar imediatamente em combate usando aquela Lâmina, a transição por si só não zera Fluxo. Dano convencional 1d4; Assassinato permanece normal.",
-    "sourcePage": 20
+    "sourcePage": 20,
+    "weightSourcePage": 40
   },
   {
     "id": "combat",
@@ -57,7 +62,8 @@
     "era": 8,
     "weight": 0.5,
     "effect": "Peso +0,5 kg; dano convencional 1d8. 1/rodada, ao acertar por 5+, gaste Ação Secundária para conceder Abertura. Desvantagem: -2 Disfarce em revista física e não recebe benefícios que exijam Lâmina Leve ou especialmente discreta.",
-    "sourcePage": 20
+    "sourcePage": 20,
+    "weightSourcePage": 40
   },
   {
     "id": "counterweight",
@@ -67,7 +73,8 @@
     "era": 9,
     "weight": 0.25,
     "effect": "Peso +0,25 kg. Depois de Aparar com sucesso, 1/rodada troque entre Guarda/Postura sem pagar a Meia Ação. Incompatível com Lâmina Leve.",
-    "sourcePage": 20
+    "sourcePage": 20,
+    "weightSourcePage": 40
   },
   {
     "id": "silent",
@@ -75,9 +82,10 @@
     "slots": 1,
     "cost": 7,
     "era": 9,
-    "weight": 0,
+    "weight": 0.25,
     "effect": "1/cena, se uma ação discreta feita diretamente com a Lâmina falhar sem testemunha direta, a falha não aumenta Suspeita automaticamente; o Mestre aplica outra consequência. Dano permanece 1d6. Desvantagem: aquela Lâmina não pode Aparar.",
-    "sourcePage": 20
+    "sourcePage": 20,
+    "weightSourcePage": 40
   },
   {
     "id": "tools",
@@ -85,9 +93,10 @@
     "slots": 1,
     "cost": 4,
     "era": 4,
-    "weight": 0,
+    "weight": 0.25,
     "effect": "O bracelete conta como ferramenta adequada para tarefas simples/médias de Mecanismos e concede +1 Mecanismos. Com Kit de Mecanismos adequado, 1/cena uma falha por exatamente 1 ponto pode ser rerrolada; aceite o segundo resultado. Em um 1 natural num teste de combate realizado usando aquele braço, o módulo fica Comprometido até manutenção; a Lâmina continua funcionando.",
-    "sourcePage": 20
+    "sourcePage": 20,
+    "weightSourcePage": 40
   },
   {
     "id": "secret",
@@ -97,7 +106,8 @@
     "era": 1,
     "weight": 0.25,
     "effect": "Peso +0,25 kg. Guarda 1 objeto pequeno compatível ou 2 minúsculos. Inspeção superficial não revela o conteúdo; revista dedicada precisa identificar o compartimento. 1/missão, se houve preparação no briefing, revele que um objeto plausível previamente disponível foi guardado ali. Se descoberto, +1 Suspeita ou consequência equivalente.",
-    "sourcePage": 21
+    "sourcePage": 21,
+    "weightSourcePage": 40
   },
   {
     "id": "phantom",
@@ -105,9 +115,10 @@
     "slots": 2,
     "cost": 10,
     "era": 11,
-    "weight": 0,
+    "weight": 0.75,
     "effect": "Conversão. Ataque discreto à distância: 1d8, alcance 10 m, Armas à Distância + Destreza. Pode permitir Assassinato contra Comum desprevenido quando todas as condições forem cumpridas. 1 disparo preparado; depois fica Desarmada. Preparar novamente custa Ação Padrão. Enquanto Desarmada não pode disparar nem realizar Assassinato com aquele braço. Não pode Aparar.",
-    "sourcePage": 21
+    "sourcePage": 21,
+    "weightSourcePage": 40
   },
   {
     "id": "gun",
@@ -115,9 +126,10 @@
     "slots": 2,
     "cost": 10,
     "era": 9,
-    "weight": 0,
+    "weight": 0.75,
     "effect": "Conversão. A função normal da Lâmina permanece 1d6, Ocultável e capaz de Assassinato. O módulo de disparo causa 1d10 em alcance Curto e é Ruidoso. Disparo de Emergência: 1/combate, após uma Esquiva bem-sucedida ou quando um inimigo terminar seu movimento em alcance corpo a corpo, abra uma Janela de Disparo até o fim do seu próximo turno. Durante essa janela, em seu próprio turno, pode disparar com Ação Secundária. Esse disparo conta para o limite universal de 1 ataque adicional por rodada. Depois, Recarga Muito Lenta afeta apenas o módulo de disparo; a Lâmina segue funcionando. Até o módulo estar preparado novamente, aquele braço não pode Aparar.",
-    "sourcePage": 21
+    "sourcePage": 21,
+    "weightSourcePage": 40
   },
   {
     "id": "launcher",
@@ -125,9 +137,10 @@
     "slots": 2,
     "cost": 10,
     "era": 12,
-    "weight": 1,
+    "weight": 1.0,
     "effect": "Conversão, peso +1 kg. Em ambiente apropriado, uma Rota Vertical válida pode ser substituída por Ação Padrão para alcançar diretamente um ponto elevado próximo definido pelo Mestre. Não gera Fluxo; se já possuir Fluxo, -1 após o uso. Desvantagem: aquele braço perde Dano e Assassinato.",
-    "sourcePage": 21
+    "sourcePage": 21,
+    "weightSourcePage": 40
   },
   {
     "id": "debilitating",
@@ -135,8 +148,9 @@
     "slots": 1,
     "cost": 7,
     "era": 4,
-    "weight": 0,
+    "weight": 0.25,
     "effect": "1 carga preparada e tratada de forma abstrata. Após ataque bem-sucedido, o alvo sofre -1 no próximo teste e faz Fortitude contra DT = 12 + metade do Nível do usuário, arredondado para baixo, máximo 17; a DT permanece escondida do alvo. Sucesso: apenas -1. Falha: além do -1, recebe uma Condição debilitante Leve apropriada até o fim do próximo turno. A carga é consumida em qualquer resultado e só é reabastecida pela logística da Irmandade. Não aumenta dano.",
-    "sourcePage": 21
+    "sourcePage": 21,
+    "weightSourcePage": 40
   }
 ]

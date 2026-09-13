@@ -1,7 +1,10 @@
 import { useState, type FormEvent } from 'react'
+import { CampaignEditor } from '../components/CampaignEditor'
+import { safeImage } from '../session'
 import type { CampaignSummary } from '../onlineTypes'
 
 interface CampaignLobbyProps {
+  onEdit?: (campaign: CampaignSummary) => Promise<void>
   campaigns: CampaignSummary[]
   email: string
   loading: boolean
@@ -24,13 +27,15 @@ export function CampaignLobby({
   onCreate,
   onDuplicate,
   onDelete,
+  onEdit,
   onJoin,
   onOpen,
   onSignOut,
 }: CampaignLobbyProps) {
   const [campaignName, setCampaignName] = useState('')
   const [description, setDescription] = useState('')
-  const [inviteCode, setInviteCode] = useState('')
+  const [inviteCode, setInviteCode] = useState(() => typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('invite')?.slice(0,8).toUpperCase()??'' : '')
+  const [filter,setFilter]=useState('active')
   const [duplicateSource, setDuplicateSource] = useState<CampaignSummary | null>(null)
   const [duplicateName, setDuplicateName] = useState('')
   const [duplicateDescription, setDuplicateDescription] = useState('')
@@ -95,16 +100,19 @@ export function CampaignLobby({
         <div className="lobby-grid">
           <section className="lobby-section campaign-list-section" aria-labelledby="campaign-list-heading">
             <div className="lobby-section-heading"><div><span className="section-index">01</span><h2 id="campaign-list-heading">Campanhas disponíveis</h2></div><span>{campaigns.length}</span></div>
+            <label className="field"><span>Mostrar campanhas</span><select value={filter} onChange={e=>setFilter(e.target.value)}><option value="active">Ativas / recentes</option><option value="archived">Arquivadas</option><option value="all">Todas</option></select></label>
             {loading ? (
               <div className="loading-state">Carregando operações...</div>
             ) : campaigns.length === 0 ? (
               <div className="empty-state"><strong>Nenhuma campanha ainda</strong><p>Crie a primeira campanha como mestre ou use o código enviado por outro mestre.</p></div>
             ) : (
               <div className="campaign-list">
-                {campaigns.map((campaign) => (
+                {campaigns.filter(c=>filter==='all'||Boolean(c.progression.metadata?.archived)===(filter==='archived')).map((campaign) => (
                   <article key={campaign.id} className="campaign-card">
                     <div className="campaign-card__meta"><span>{campaign.role === 'master' ? 'MESTRE' : 'JOGADOR'}</span><code>{campaign.inviteCode}</code></div>
                     <h3>{campaign.name}</h3>
+                    {safeImage(campaign.progression.metadata?.image)&&<img className="campaign-cover" src={campaign.progression.metadata?.image} alt="Imagem da campanha" referrerPolicy="no-referrer"/>}
+                    <p>{campaign.progression.metadata?.era} · {campaign.progression.metadata?.rules}{campaign.progression.metadata?.archived?' · Arquivada':''}</p>
                     <p>{campaign.description || 'Operação sem descrição.'}</p>
                     <div className="campaign-card__actions">
                       <button type="button" className="primary-button" onClick={() => onOpen(campaign)}>Abrir campanha</button>
@@ -113,6 +121,7 @@ export function CampaignLobby({
                       )}
                     </div>
                     {campaign.role === 'master' && <div>
+                      {onEdit&&<CampaignEditor campaign={campaign} onSave={onEdit} busy={actionLoading}/>}
                       <button type="button" className="danger-text-button" disabled={actionLoading} onClick={() => { setDeleteId(campaign.id); setDeleteName('') }}>Apagar campanha</button>
                       {deleteId === campaign.id && <form className="gateway-form campaign-duplicate-form" onSubmit={async (event) => {
                         event.preventDefault()

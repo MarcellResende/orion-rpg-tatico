@@ -2338,3 +2338,23 @@ footer {
 /* Each equipment instance owns its configuration below its inventory controls. */
 .item-modifications { width: 100%; margin-top: 1rem; border-top: 1px solid var(--border, #29413d); padding-top: .75rem; }
 .item-modifications summary { cursor: pointer; font-weight: 700; padding: .5rem 0; }
+.session-layout { display:grid; gap:1rem; }
+.session-section { padding:1.25rem; min-width:0; }
+.session-section h2 { margin-bottom:1rem; }
+.session-toolbar { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; position:sticky; top:0; z-index:5; background:#0c191b; padding:.8rem; border:1px solid #29413d; }
+.session-record { padding:1rem 0; border-bottom:1px solid #29413d; }
+.session-section details summary,.session-record summary { cursor:pointer; padding:.8rem 0; }
+.session-section p,.session-record p { margin:.6rem 0; line-height:1.6; }
+.session-section input,.session-section textarea,.session-section select { max-width:100%; }
+.combat-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem; }
+.combat-card { padding:1rem; border:1px solid #29413d; border-radius:6px; min-width:0; }
+.combat-card--current { border:2px solid #72dbae; background:#142c29; }
+.combat-actions { display:flex; flex-wrap:wrap; gap:.5rem; margin:.75rem 0; }
+.combat-actions button { padding:.65rem; background:#183632; border:1px solid #42726a; border-radius:4px; color:#d9ebe7; }
+.combat-actions input { width:5rem; margin-left:.5rem; }
+.history-json { white-space:pre-wrap; overflow-wrap:anywhere; max-height:30rem; overflow:auto; font-size:.8rem; }
+.operator-portrait { width:80px; height:80px; border-radius:8px; object-fit:cover; }
+.campaign-cover { width:100%; max-height:180px; object-fit:cover; border-radius:6px; }
+.preserve-lines { white-space:pre-line; }
+@media(max-width:600px) { .session-section { padding:.85rem; } .session-toolbar { position:static; } .combat-list { grid-template-columns:1fr; } .session-section button { min-height:44px; } }
+.session-content { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 18px; }

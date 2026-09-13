@@ -4,6 +4,7 @@ export type CampaignRole = 'master' | 'player'
 export type AlertLevel = 'green' | 'yellow' | 'red'
 
 export interface CampaignProgressionState {
+  metadata?: { era: string; image: string; rules: string; archived: boolean }
   brotherhood?: { prestige: number; resources: number; notoriety: number; fractures: number; doctrines: string[]; elite: string; projects: string[]; suspendedDoctrine: string }
   operationalPrestige: number
   headquartersPoints: number
@@ -46,6 +47,8 @@ export interface OnlineCharacter {
 }
 
 export interface ActiveCondition {
+  expiresRound?: number | null
+  durationNote?: string
   id: string
   characterId: string
   conditionId: string

@@ -19,7 +19,11 @@ interface InventoryPanelProps {
 const makeInventoryId = () =>
   globalThis.crypto?.randomUUID?.() ?? `item-${Date.now()}-${Math.random().toString(36).slice(2)}`
 
+const INVENTORY_GROUPS = {weapons:'Armas',protection:'Armaduras e proteções',tools:'Ferramentas',consumables:'Consumíveis',documents:'Documentos',narrative:'Itens narrativos'}
+const inventoryGroup = (item: InventoryItem): keyof typeof INVENTORY_GROUPS => item.inventoryGroup ?? (['primaryWeapon','secondaryWeapon'].includes(item.category)?'weapons':item.category==='protection'?'protection':['ammunition','explosive','medical'].includes(item.category)?'consumables':item.category==='custom'?'narrative':'tools')
+
 export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
+  const [group,setGroup] = useState('all')
   const [catalogItemId, setCatalogItemId] = useState('')
   const [catalogQuantity, setCatalogQuantity] = useState(1)
   const [catalogWeight, setCatalogWeight] = useState('')
@@ -245,11 +249,12 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
         <p className="load-limit-warning" role="alert">Este item personalizado passaria do máximo absoluto de 200%.</p>
       )}
 
-      {availableInventory(character).length === 0 ? (
+      <label className="field"><span>Organizar inventário</span><select value={group} onChange={e=>setGroup(e.target.value)}><option value="all">Todos os itens</option>{Object.entries(INVENTORY_GROUPS).map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label>
+      {availableInventory(character).filter(item=>group==='all'||inventoryGroup(item)===group).length === 0 ? (
         <div className="empty-inline">Nenhum equipamento adicionado.</div>
       ) : (
         <div className="inventory-list inventory-list--detailed">
-          {availableInventory(character).map((item) => {
+          {availableInventory(character).filter(item=>group==='all'||inventoryGroup(item)===group).map((item) => {
             const definition = findCharacterEquipment(character, item.catalogItemId)
             const skillChoice = definition?.skillBonusChoice
             const grantsBonus = Boolean(
@@ -265,6 +270,7 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
                   <div>
                     <span className="inventory-category">{EQUIPMENT_CATEGORY_LABELS[item.category]}</span>
                     <strong>{item.name}</strong>
+                    <label className="field"><span>Grupo do item</span><select value={inventoryGroup(item)} onChange={e=>updateItem(item.id,current=>({...current,inventoryGroup:e.target.value as InventoryItem['inventoryGroup']}))}>{Object.entries(INVENTORY_GROUPS).map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label>
                     <span>{item.quantity} × {item.weight.toLocaleString('pt-BR')} kg = {(item.quantity * item.weight).toLocaleString('pt-BR')} kg</span>
                   </div>
                   {grantsBonus && (
@@ -324,6 +330,7 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
 
                 <ItemModifications character={character} item={item} onChange={onChange} />
                 <button type="button" className="danger-text-button inventory-remove" onClick={() => {
+                  if (!window.confirm(`Remover ${item.name} do inventário? As modificações deste exemplar também serão removidas.`)) return
                   // Clear the legacy arm configuration when its original blade is removed.
                   if (bladeModifiable(item)) {
                     const arm = item.slot === 'leftBlade' ? 'left' : 'right'
