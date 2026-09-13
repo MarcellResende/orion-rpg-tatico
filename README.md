@@ -70,6 +70,10 @@ Uma campanha criada pelo mestre começa sem fichas. A ficha do mestre só é cri
 
 ## Como a hospedagem funciona
 
+Endereço público confirmado: https://orion-rpg-tatico.marcellalvesresende10.workers.dev/
+
+O site publicado usa o Supabase `sxztwtcmuhwdfoeqhiva` (confirmado na configuração pública da aplicação). Aplicar migrações apenas nesse projeto. Os projetos `yuzajkgvpjtinwxyfdru` e `mvlidoniieconmbbuqeb` vistos na conta MarcellResende não são o banco vinculado ao ORION; não os retomar nem alterar para esta tarefa.
+
 O GitHub guarda o código-fonte. A hospedagem atual é Cloudflare Workers, projeto `orion-rpg-tatico`, configurado em `wrangler.jsonc`. Atualizações da branch `main` disparam Workers Builds. A configuração Netlify permanece como alternativa histórica. O Supabase é separado da hospedagem: ele guarda contas, campanhas, fichas e alterações em tempo real. Durante o RPG, o mestre cria a campanha, compartilha o código de convite e os jogadores entram pelo mesmo endereço do site.
 
 O mestre pode apagar uma campanha na lista de campanhas, após confirmar seu nome. A política `campaigns_delete_master` do banco restringe a exclusão ao mestre; fichas, participantes e condições são removidos em cascata. Nenhuma nova migração é necessária para esse botão.
