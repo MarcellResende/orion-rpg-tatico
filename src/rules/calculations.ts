@@ -1,4 +1,5 @@
 import { assassinProtection, bladeWeightAdjustment } from './assassinsCreed'
+import { carriedItemWeight } from './ammunition'
 import { firearmExtraWeight, inventoryWithModifications } from '../data/itemModifications'
 import { characterFunction, characterSkillKeys, characterSubskills, characterSubskillsFor, hasAssassinsCreed } from '../data/characterOptions'
 import { availableInventory, findCharacterEquipment, expansionModifiers } from '../data/expansions'
@@ -169,7 +170,7 @@ export const calculateUnencumberedEffectiveSkills = (character: Character): Skil
 
 export const calculateInventoryWeight = (character: Character) =>
   Math.round(availableInventory(character).reduce(
-    (total, item) => total + item.weight * item.quantity + firearmExtraWeight(item),
+    (total, item) => total + carriedItemWeight(item) * item.quantity + firearmExtraWeight(item),
     0,
   ) * 100) / 100 + bladeWeightAdjustment(character)
 

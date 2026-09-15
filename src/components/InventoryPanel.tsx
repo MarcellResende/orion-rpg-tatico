@@ -1,4 +1,5 @@
 import { hasAssassinsCreed } from '../data/characterOptions'
+import { AMMO_FAMILIES, carriedItemWeight, compatibleBags, reloadFromBag } from '../rules/ammunition'
 import { ItemModifications } from './ItemModifications'
 import { bladeModifiable } from '../data/itemModifications'
 import { useMemo, useState, type FormEvent } from 'react'
@@ -67,6 +68,7 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
       expansionId: EXPANSIONS.find((entry) => entry.equipment.some((item) => item.id === definition.id))?.id,
       name: definition.name,
       quantity: clamp(catalogQuantity || 1, 1, 999),
+      ammoBag: definition.ammoBagFamily ? {family:definition.ammoBagFamily,reloads:6} : undefined,
       weight: selectedWeight,
       notes: '',
       category: definition.category,
@@ -88,7 +90,7 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
     const inventory = definition.slot
       ? character.inventory.map((current) => current.slot === definition.slot && availableInventory(character).some((item) => item.id === current.id) ? { ...current, active: false } : current)
       : character.inventory
-    commit([...inventory, item])
+    commit([...inventory, ...(definition.ammoBagFamily || definition.ammunitionFamily ? Array.from({length:item.quantity},(_,index)=>({...item,id:makeInventoryId(),quantity:1,active:!item.slot||index===0})) : [item])])
     setCatalogItemId('')
     setCatalogWeight('')
     setCatalogQuantity(1)
@@ -271,7 +273,7 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
                     <span className="inventory-category">{EQUIPMENT_CATEGORY_LABELS[item.category]}</span>
                     <strong>{item.name}</strong>
                     <label className="field"><span>Grupo do item</span><select value={inventoryGroup(item)} onChange={e=>updateItem(item.id,current=>({...current,inventoryGroup:e.target.value as InventoryItem['inventoryGroup']}))}>{Object.entries(INVENTORY_GROUPS).map(([id,name])=><option key={id} value={id}>{name}</option>)}</select></label>
-                    <span>{item.quantity} × {item.weight.toLocaleString('pt-BR')} kg = {(item.quantity * item.weight).toLocaleString('pt-BR')} kg</span>
+                    <span>{item.quantity} × {carriedItemWeight(item).toLocaleString('pt-BR')} kg = {(item.quantity * carriedItemWeight(item)).toLocaleString('pt-BR')} kg</span>
                   </div>
                   {grantsBonus && (
                     <label className="equipment-toggle">
@@ -304,6 +306,7 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
                   </label>
                 )}
 
+                {item.ammoBag && <div className="weapon-console"><strong>{AMMO_FAMILIES[item.ammoBag.family]} · {item.ammoBag.reloads}/6 recargas</strong><label className="field"><span>Recargas restantes (ajuste do briefing)</span><input type="number" min={0} max={6} value={item.ammoBag.reloads} onChange={e=>updateItem(item.id,current=>({...current,ammoBag:{...current.ammoBag!,reloads:clamp(Number(e.target.value),0,6)}}))}/></label><p>{item.ammoBag.reloads===0?'Saco vazio: 0,25 kg.':'Saco com munição: 1 kg.'} Cada saco conserva sua própria reserva.</p></div>}
                 {item.weapon && (
                   <div className="weapon-console">
                     <div className="ammo-readout">
@@ -318,13 +321,13 @@ export function InventoryPanel({ character, onChange }: InventoryPanelProps) {
                       ))}
                       <button type="button" disabled={item.weapon.ammo >= item.weapon.magazineCapacity} onClick={() => fireWeapon(item.id, -1)}>Corrigir +1</button>
                     </div>
-                    <div className="magazine-controls">
+                    {definition?.ammunitionFamily ? <div className="magazine-controls"><span>Saco compatível · {AMMO_FAMILIES[definition.ammunitionFamily]}</span>{compatibleBags(character,item).map((bag,index)=><button type="button" key={bag.id} disabled={item.weapon!.ammo>=item.weapon!.magazineCapacity} onClick={()=>onChange(reloadFromBag(character,item.id,bag.id))}>Recarregar · saco {index+1} ({bag.ammoBag!.reloads}/6)</button>)}{!compatibleBags(character,item).length&&<p>Adicione um Saco de Munição compatível com recargas disponíveis.</p>}<p>A recarga mantém o custo de ação da arma; registre a ação no combate.</p></div> : <div className="magazine-controls">
                       <span>Pentes reserva</span>
                       <button type="button" disabled={item.weapon.spareMagazines === 0} onClick={() => updateItem(item.id, (current) => current.weapon ? { ...current, weapon: { ...current.weapon, spareMagazines: current.weapon.spareMagazines - 1 } } : current)}>−</button>
                       <output>{item.weapon.spareMagazines}</output>
                       <button type="button" onClick={() => updateItem(item.id, (current) => current.weapon ? { ...current, weapon: { ...current.weapon, spareMagazines: clamp(current.weapon.spareMagazines + 1, 0, 99) } } : current)}>+</button>
                       <button type="button" className="reload-button" disabled={item.weapon.spareMagazines === 0 || item.weapon.ammo === item.weapon.magazineCapacity} onClick={() => reloadWeapon(item.id)}>Recarregar</button>
-                    </div>
+                    </div>}
                   </div>
                 )}
 

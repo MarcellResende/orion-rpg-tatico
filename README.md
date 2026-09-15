@@ -110,6 +110,8 @@ Validação: testes cobrem integração na ficha/arsenal/manual, várias expans�
 
 ## Central de sessão e PDF com tabelas de peso
 
+Atualização de 14/09/2026: o PDF disponível no site passou a ser `RPG_Tatico_Assassins_Creed_Expansao_v1.5.1_armas_tabelas_compactado.pdf` (58 páginas). As tabelas por era das páginas 21–28 e as capacidades das páginas 56–57 estão integradas aos equipamentos, mantendo os IDs das fichas existentes. O Saco de Munição (p. 58) possui seis recargas individuais por exemplar e família compatível, pesa 1 kg com reserva e 0,25 kg vazio. Armas e sacos adicionados em quantidade ficam separados por exemplar. Valores permanecem no JSON existente; esta atualização não exige migração de banco. Custos de ações de recarga continuam conforme a regra da arma e são registrados pelo jogador no combate.
+
 A atualização usa o PDF `RPG_Tatico_Assassins_Creed_Expansao_v1.5.1_pesos_tabelas.pdf`, incluindo as tabelas finais das páginas 40–49. Pesos oficiais atualizam equipamentos existentes ao carregar a ficha. A expansão continua opcional; desativá-la preserva conteúdo sem conceder efeitos ou peso.
 
 Já existiam: contas, campanhas e convites por código, permissões de Mestre/Jogador, exclusão de campanha pelo Mestre, ficha reativa, arsenal e customizações por exemplar, Dossiê, Suspeita, Fluxo, proteção, progressão e recursos da Irmandade.

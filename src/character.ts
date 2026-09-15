@@ -141,6 +141,7 @@ const hydrateInventory = (value: unknown): InventoryItem[] => {
     return [{
       id: safeText(item.id, 100) || `legacy-${index}`,
       catalogItemId: safeText(item.catalogItemId, 100),
+      ammoBag: ['historical','world-wars','contemporary'].includes(String(safeObject(item.ammoBag).family)) ? {family:safeObject(item.ammoBag).family as NonNullable<InventoryItem['ammoBag']>['family'],reloads:clamp(safeNumber(safeObject(item.ammoBag).reloads),0,6)} : undefined,
       inventoryGroup: ['weapons','protection','tools','consumables','documents','narrative'].includes(String(item.inventoryGroup)) ? item.inventoryGroup as InventoryItem['inventoryGroup'] : undefined,
       expansionId: safeText(item.expansionId, 80) || undefined,
       modifications: Array.isArray(item.modifications) ? [...new Set(item.modifications.filter((id): id is string => typeof id === 'string' && id.length <= 100))].slice(0, 30) : undefined,
@@ -291,7 +292,8 @@ export const hydrateCharacter = (value: unknown): Character => {
   }
   character.inventory = character.inventory.map(item => {
     const definition=EXPANSIONS.flatMap(e=>e.equipment).find(e=>e.id===item.catalogItemId)
-    return definition && !definition.weightUnspecified ? {...item,weight:definition.weight} : item
+    if (!definition) return item
+    return {...item,effect:definition.effect,...(!definition.weightUnspecified?{weight:definition.weight}:{}),...(definition.ammunitionFamily && definition.weapon ? {weapon:{...definition.weapon,ammo:item.weapon?Math.min(item.weapon.ammo,definition.weapon.magazineCapacity):definition.weapon.magazineCapacity,spareMagazines:item.weapon?.spareMagazines??0}}:{}),...(definition.ammoBagFamily?{ammoBag:{family:definition.ammoBagFamily,reloads:item.ammoBag?.reloads??6}}:{})}
   })
 
   for (const key of SUBSKILL_KEYS) {

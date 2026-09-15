@@ -26,6 +26,7 @@ export const AC_SPECIALIZATIONS: Record<string, string[]> = {
 
 const item = (id: string, name: string, weight: number, effect: string, extra: Partial<EquipmentDefinition> = {}): EquipmentDefinition => ({ id: `${AC_ID}:${id}`, name, weight, effect, sourcePage: 19, category: 'survival', ...extra })
 export const AC_EQUIPMENT: EquipmentDefinition[] = [
+  ...(['historical','world-wars','contemporary'] as const).map((family,index)=>item(`ammo-bag-${family}`,`Saco de Munição · ${['Histórica','Guerras Mundiais / Guerra Fria','Contemporânea'][index]}`,1,'6 recargas completas para armas da mesma família. Cada saco tem sua própria reserva; vazio pesa 0,25 kg. A recarga exige a ação indicada pela arma.',{category:'ammunition',sourcePage:58,ammoBagFamily:family})),
   item('hidden-blade-left', 'Lâmina Oculta · braço esquerdo', .5, '1d6; Ocultável; permite Assassinato. 2 espaços de modificação.', { category: 'secondaryWeapon', slot: 'leftBlade' }),
   item('hidden-blade-right', 'Lâmina Oculta · braço direito', .5, '1d6; Ocultável; permite Assassinato. 2 espaços de modificação.', { category: 'secondaryWeapon', slot: 'rightBlade' }),
   item('hidden-pouch', 'Bolsa Oculta', .25, 'Esconde 1 objeto pequeno; revista direta ainda pode encontrá-lo.'),
@@ -54,6 +55,7 @@ export const ASSASSINS_CREED: ExpansionDefinition = {
   attributePoints: 0, attributes: [], rules: pages, equipment: [...AC_EQUIPMENT.map((entry) => {
     const weights: Record<string, number> = { clothes: 1.5, 'light-armor': 3, 'medium-armor': 6.5, 'heavy-armor': 11, 'exceptional-armor': 12 }
     const weight = weights[entry.id.replace(`${AC_ID}:`, '')]
-    return weight === undefined ? entry : { ...entry, weight, weightUnspecified: false, weightRange: undefined, weightSourcePage: 49 }
+    const updated = {...entry,sourcePage:entry.sourcePage>=24 && entry.sourcePage<58 && !entry.ammunitionFamily?entry.sourcePage+6:entry.sourcePage}
+    return weight === undefined ? updated : { ...updated, weight, weightUnspecified: false, weightRange: undefined, weightSourcePage: 55 }
   }), ...eraEquipment.map((entry) => entry.id === 'assassins-creed:era-12-survival-3' ? { ...entry, weight: 1, weightUnspecified: false } : entry.id === 'assassins-creed:era-16-survival-3' ? { ...entry, weight: 2, weightUnspecified: false } : entry) as EquipmentDefinition[]],
 }

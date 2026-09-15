@@ -135,6 +135,7 @@ export interface Character {
 }
 
 export interface InventoryItem {
+  ammoBag?: { family: 'historical' | 'world-wars' | 'contemporary'; reloads: number }
   inventoryGroup?: 'weapons' | 'protection' | 'tools' | 'consumables' | 'documents' | 'narrative'
   modifications?: string[]
   bladeMods?: string[]
@@ -154,6 +155,8 @@ export interface InventoryItem {
 }
 
 export interface EquipmentDefinition {
+  ammunitionFamily?: 'historical' | 'world-wars' | 'contemporary'
+  ammoBagFamily?: 'historical' | 'world-wars' | 'contemporary'
   weightSourcePage?: number
   weightUnspecified?: boolean
   weightRange?: [number, number]
